@@ -27,7 +27,7 @@ export function UserNav() {
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-3 cursor-pointer">
                 <div className="relative">
-                  <Avatar className="size-9 shrink-0">
+                  <Avatar className="size-8 md:size-9 shrink-0">
                     <AvatarImage src="/avtar/av1.png" alt="avtar" />
                     <AvatarFallback className="bg-transparent">
                       JD
@@ -36,12 +36,12 @@ export function UserNav() {
                   <span className="size-4 shrink-0 absolute flex items-center text-white justify-center bottom-0 -right-1 rounded-full bg-[#22CAAD] text-[12px] font-medium border-white border-[2px]" />
                 </div>
                 <div className="flex flex-col gap-[2px] items-start">
-                  <p className="text-sm font-medium leading-none">
+                  <p className="text-[14px] md:text-sm font-medium leading-none">
                     Jay Hargudson
                   </p>
-                  <p className="text-[14px]">Manager</p>
+                  <p className="text-[10px] md:text-[14px]">Manager</p>
                 </div>
-                <BsFillCaretDownFill className="size-4 text-gray" />
+                <BsFillCaretDownFill className="size-3 md:size-4 text-gray" />
               </div>
             </DropdownMenuTrigger>
           </TooltipTrigger>

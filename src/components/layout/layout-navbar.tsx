@@ -7,15 +7,15 @@ import { Separator } from "../ui/separator";
 export function Navbar() {
   return (
     <header className="h-14 md:h-20 flex items-center justify-between md:justify-end sticky top-0 z-10 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:shadow-secondary">
-      <div className="mx-4 sm:mx-8 flex h-14 items-center">
+      <div className="mx-4 sm:mx-8 flex h-14 items-center w-full">
         <div className="flex items-center space-x-4 lg:space-x-0">
           <SheetMenu />
         </div>
-        <div className="flex flex-1 items-center justify-end gap-5">
-          <div className="relative">
+        <div className="flex flex-1 items-center justify-end gap-3 md:gap-5">
+          <div className="relative hidden md:block">
             <Input
               placeholder="Search product..."
-              className="w-[210px] rounded-xl hidden md:block h-10 pl-9"
+              className="w-[210px] rounded-xl h-10 pl-9"
             />
             <Search className="size-5 shrink-0 text-gray absolute top-2.5 left-2" />
           </div>
@@ -29,7 +29,7 @@ export function Navbar() {
               2
             </span>
           </div>
-          <div className="size-8 rounded-full flex items-center justify-center object-contain cursor-pointer">
+          <div className="size-7 md:gap-8 rounded-full flex items-center justify-center object-contain cursor-pointer">
             <img
               src="/language/english.png"
               alt="region"
