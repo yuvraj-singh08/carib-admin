@@ -1,12 +1,16 @@
 import {
-  Tag,
-  Users,
   Settings,
-  Bookmark,
-  SquarePen,
-  LayoutGrid,
   LucideIcon,
+  ShoppingCart,
+  UserRound,
+  Package,
+  CircleGauge,
+  Clipboard,
+  MessageSquare,
+  LifeBuoy,
+  ChartColumn,
 } from "lucide-react";
+
 
 type Submenu = {
   href: string;
@@ -36,7 +40,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/",
           label: "Dashboard",
           active: pathname === "/",
-          icon: LayoutGrid,
+          icon: CircleGauge,
           submenus: [],
         },
       ],
@@ -48,7 +52,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "",
           label: "Flights",
           active: pathname.includes("/flights"),
-          icon: SquarePen,
+          icon: ShoppingCart,
           submenus: [
             {
               href: "/menu1",
@@ -61,7 +65,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/bookings",
           label: "Bookings",
           active: pathname.includes("/bookings"),
-          icon: Bookmark,
+          icon: UserRound,
           submenus: [
             {
               href: "/menu1",
@@ -74,7 +78,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/payment",
           label: "Payment",
           active: pathname.includes("/payment"),
-          icon: Tag,
+          icon: Package,
           submenus: [
             {
               href: "/menu1",
@@ -87,7 +91,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/reports",
           label: "Reports & Analytics",
           active: pathname.includes("/reports"),
-          icon: Users,
+          icon: ChartColumn,
           submenus: [
             {
               href: "/menu1",
@@ -105,7 +109,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/user-management",
           label: "User Management",
           active: pathname.includes("/user-management"),
-          icon: Settings,
+          icon: Clipboard,
           submenus: [],
         },
       ],
@@ -117,7 +121,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/Ticket",
           label: "Ticket",
           active: pathname.includes("/Ticket"),
-          icon: Users,
+          icon: MessageSquare,
           submenus: [],
         },
       ],
@@ -129,7 +133,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/support",
           label: "Support",
           active: pathname.includes("/support"),
-          icon: Users,
+          icon: LifeBuoy,
           submenus: [],
         },
       ],
@@ -141,7 +145,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/settings",
           label: "Settings",
           active: pathname.includes("/settings"),
-          icon: Users,
+          icon: Settings,
           submenus: [],
         },
       ],
