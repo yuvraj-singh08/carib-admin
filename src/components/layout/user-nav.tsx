@@ -1,13 +1,11 @@
-
 import { LayoutGrid, LogOut, User } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { BsFillCaretDownFill } from "react-icons/bs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  TooltipProvider
+  TooltipProvider,
 } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
@@ -16,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 
@@ -27,15 +25,24 @@ export function UserNav() {
         <Tooltip delayDuration={100}>
           <TooltipTrigger asChild>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="relative h-8 w-8 rounded-full"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="#" alt="Avatar" />
-                  <AvatarFallback className="bg-transparent">JD</AvatarFallback>
-                </Avatar>
-              </Button>
+              <div className="flex items-center gap-3 cursor-pointer">
+                <div className="relative">
+                  <Avatar className="size-9 shrink-0">
+                    <AvatarImage src="/avtar/av1.png" alt="avtar" />
+                    <AvatarFallback className="bg-transparent">
+                      JD
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="size-4 shrink-0 absolute flex items-center text-white justify-center bottom-0 -right-1 rounded-full bg-[#22CAAD] text-[12px] font-medium border-white border-[2px]" />
+                </div>
+                <div className="flex flex-col gap-[2px] items-start">
+                  <p className="text-sm font-medium leading-none">
+                    Jay Hargudson
+                  </p>
+                  <p className="text-[14px]">Manager</p>
+                </div>
+                <BsFillCaretDownFill className="size-4 text-gray" />
+              </div>
             </DropdownMenuTrigger>
           </TooltipTrigger>
           <TooltipContent side="bottom">Profile</TooltipContent>

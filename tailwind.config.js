@@ -29,6 +29,7 @@ module.exports = {
         orange:'#FD7E14',
         violet:'#482A89',
         customBlue:'#0561fc',
+        lightGray:'##C9CFD2',
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
