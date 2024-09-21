@@ -152,9 +152,9 @@ const columns: ColumnDef<Booking>[] = [
     header: "Booking Status",
     cell: ({ row }) => (
       <div
-        className={`capitalize ${getStatusColor(
+        className={`capitalize bg-lightGray/30 p-0.5 px-2 rounded-lg ${getStatusColor(
           row.getValue("bookingStatus")
-        )}`}
+        )} `}
       >
         {row.getValue("bookingStatus")}
       </div>
