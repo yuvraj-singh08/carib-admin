@@ -60,6 +60,8 @@ type FlightRule = {
   lastUpdate: string;
 };
 
+
+
 const columns: ColumnDef<FlightRule>[] = [
   {
     id: "select",
@@ -117,6 +119,7 @@ const columns: ColumnDef<FlightRule>[] = [
   },
   
 ];
+
 
 export default function FlightRulesManager() {
   const [flightRules, setFlightRules] = useState<FlightRule[]>([]);
