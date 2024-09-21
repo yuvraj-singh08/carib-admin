@@ -25,7 +25,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { format } from "date-fns";
-import { useEffect } from "react";
 
 export const FlightSearchSection = () => {
   const form = useForm<z.infer<typeof AdminFlightSearchSchema>>({
