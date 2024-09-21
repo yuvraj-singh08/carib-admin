@@ -1,10 +1,12 @@
+import { FlightSearchSection } from "@/components/dashboard/flight-search-form";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { TicketStatusCountsOptions } from "@/constants/dashboard";
 
 const DashboardPage = () => {
   return (
     <ContentLayout>
-      <main className="w-full min-h-screen bg-lightGray flex flex-col gap-4 py-5">
+      <main className="w-full min-h-screen bg-lightGray flex flex-col gap-4">
+        <FlightSearchSection />
         <div className="w-full h-full grid grid-cols-8 gap-2 md:gap-4">
           {TicketStatusCountsOptions.map((option, index) => (
             <div
