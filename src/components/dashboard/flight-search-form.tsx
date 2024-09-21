@@ -139,14 +139,14 @@ export const FlightSearchSection = () => {
     <div className="w-full bg-white border rounded-xl mt-3 py-5 pl-3">
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="flex gap-2 items-center">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-2 items-start md:items-center">
             <div className="flex items-center">
               <FormField
                 control={control}
                 name="from"
                 render={({ field }) => (
                   <FormItem className="w-[130px]">
-                      <FormLabel>From</FormLabel>
+                    <FormLabel>From</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -171,7 +171,7 @@ export const FlightSearchSection = () => {
                 name="to"
                 render={({ field }) => (
                   <FormItem className="w-[130px]">
-                      <FormLabel>To</FormLabel>
+                    <FormLabel>To</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
