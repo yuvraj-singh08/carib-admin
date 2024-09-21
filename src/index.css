@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -60,14 +58,12 @@
   }
 }
 
-
 .inter {
   font-family: "Inter", system-ui;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
 }
-
 
 @layer base {
   * {
@@ -76,10 +72,20 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: #a2a2a2;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #e8e9ea;
+    border-radius: 9999px;
+  }
   
-  /* ::-webkit-scrollbar{
-    display: none;
-  } */
 }
-
-

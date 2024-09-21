@@ -7,7 +7,7 @@ import { TicketStatusCountsOptions } from "@/constants/dashboard";
 const DashboardPage = () => {
   return (
     <ContentLayout>
-      <main className="w-full min-h-screen flex flex-col gap-4">
+      <main className="w-full min-h-screen flex flex-col gap-4 ">
         <FlightSearchSection />
         <div className="w-full h-full grid grid-cols-8 gap-2 md:gap-4">
           {TicketStatusCountsOptions.map((option, index) => (

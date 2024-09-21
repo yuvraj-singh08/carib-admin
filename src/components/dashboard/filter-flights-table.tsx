@@ -314,7 +314,7 @@ export default function FlightBookingsTable() {
               ?.value as string) || ""
           }
         >
-          <SelectTrigger className="w-[120px] rounded-xl">
+          <SelectTrigger className="w-[110px] rounded-xl">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -335,7 +335,7 @@ export default function FlightBookingsTable() {
             ""
           }
         >
-          <SelectTrigger className="w-[130px] rounded-xl">
+          <SelectTrigger className="w-[110px] rounded-xl">
             <SelectValue placeholder="Supplier" />
           </SelectTrigger>
           <SelectContent>
@@ -348,7 +348,7 @@ export default function FlightBookingsTable() {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-[100px] rounded-xl justify-start text-left font-normal"
+              className="w-[110px] rounded-xl justify-start text-left font-normal"
             >
               {!date && <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />}
               {date ? format(date, "dd/MM/yyyy") : <span>Month</span>}
@@ -386,9 +386,9 @@ export default function FlightBookingsTable() {
           className="max-w-sm ml-auto rounded-xl"
         />
       </div>
-      <div className="rounded-md border overflow-x-auto">
-        <Table className="min-w-max">
-          <ScrollArea className="max-w-full overflow-x-auto">
+      <div className="rounded-md border overflow-x-auto ">
+        <Table className="min-w-max scroll-visible">
+          <ScrollArea className="max-w-full overflow-x-auto ">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -470,6 +470,7 @@ export default function FlightBookingsTable() {
                 variant={page === pageIndex + 1 ? "default" : "outline"}
                 size="sm"
                 onClick={() => table.setPageIndex(page - 1)}
+                className="px-3"
               >
                 {page}
               </Button>
