@@ -38,7 +38,7 @@ export const FlightSearchSection = () => {
       type: "oneway",
       from: "",
       to: "",
-      airline: "Amadeus",
+      airline: "amadeus",
       departureDate: new Date(),
       flightClass: "first",
       passengers: {
