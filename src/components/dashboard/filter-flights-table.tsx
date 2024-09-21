@@ -88,6 +88,7 @@ const columns: ColumnDef<Booking>[] = [
     id: "select",
     header: ({ table }) => (
       <input
+      className="cursor-pointer"
         type="checkbox"
         checked={table.getIsAllPageRowsSelected()}
         onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
@@ -96,6 +97,7 @@ const columns: ColumnDef<Booking>[] = [
     ),
     cell: ({ row }) => (
       <input
+       className="cursor-pointer"
         type="checkbox"
         checked={row.getIsSelected()}
         onChange={(e) => row.toggleSelected(!!e.target.checked)}
@@ -413,7 +415,7 @@ export default function FlightBookingsTable() {
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-3 text-[#777980]">
+                      <TableCell key={cell.id} className="px-3 text-[#777980] py-3">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
