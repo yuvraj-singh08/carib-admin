@@ -58,7 +58,7 @@ export const FlightSearchSection = () => {
   }
 
   return (
-    <div className="w-full flex items-center gap-4 bg-white border rounded-xl my-6 py-5 px-5">
+    <div className="w-full flex items-center gap-4 bg-white border rounded-xl mt-3 py-5 px-5">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

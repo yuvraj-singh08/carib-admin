@@ -1,3 +1,5 @@
+
+import FilterFlighTable from "@/components/dashboard/filter-flights-table";
 import { FlightSearchSection } from "@/components/dashboard/flight-search-form";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { TicketStatusCountsOptions } from "@/constants/dashboard";
@@ -5,7 +7,7 @@ import { TicketStatusCountsOptions } from "@/constants/dashboard";
 const DashboardPage = () => {
   return (
     <ContentLayout>
-      <main className="w-full min-h-screen bg-lightGray flex flex-col gap-4">
+      <main className="w-full min-h-screen flex flex-col gap-4">
         <FlightSearchSection />
         <div className="w-full h-full grid grid-cols-8 gap-2 md:gap-4">
           {TicketStatusCountsOptions.map((option, index) => (
@@ -27,6 +29,7 @@ const DashboardPage = () => {
             </div>
           ))}
         </div>
+        <FilterFlighTable />
       </main>
     </ContentLayout>
   );

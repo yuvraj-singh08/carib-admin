@@ -8,7 +8,7 @@ export function ContentLayout({ children }: ContentLayoutProps) {
   return (
     <div >
       {/* <Navbar /> */}
-      <div className="container pt-8 pb-8 px-4 md:px-5">{children}</div>
+      <div className="container pt-8 pb-8 px-4 md:px-5 bg-lightGray/40">{children}</div>
     </div>
   );
 }
