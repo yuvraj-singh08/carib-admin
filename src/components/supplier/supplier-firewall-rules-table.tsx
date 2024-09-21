@@ -203,8 +203,8 @@ export default function FlightRulesManager() {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="amadeus">Amadeus</SelectItem>
-                      <SelectItem value="sabre">Sabre</SelectItem>
-                      <SelectItem value="travelport">Travelport</SelectItem>
+                      <SelectItem value="kiusys">Kiusys</SelectItem>
+                      <SelectItem value="duffel">Duffel</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

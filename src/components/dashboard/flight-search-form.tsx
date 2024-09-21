@@ -225,9 +225,9 @@ export const FlightSearchSection = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Amadeus">Amadeus</SelectItem>
-                      <SelectItem value="KIUSYS">KIUSYS</SelectItem>
-                      <SelectItem value="Duffel">Duffel</SelectItem>
+                      <SelectItem value="amadeus">Amadeus</SelectItem>
+                      <SelectItem value="kiusys">Kiusys</SelectItem>
+                      <SelectItem value="duffel">Duffel</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

@@ -341,8 +341,8 @@ export default function FlightBookingsTable() {
             <SelectValue placeholder="Supplier" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Amadeus">Amadeus</SelectItem>
-            <SelectItem value="KIUSYS">KIUSYS</SelectItem>
+            <SelectItem value="amadeus">Amadeus</SelectItem>
+            <SelectItem value="kiusys">Kiusys</SelectItem>
             <SelectItem value="Duffel">Duffel</SelectItem>
           </SelectContent>
         </Select>
