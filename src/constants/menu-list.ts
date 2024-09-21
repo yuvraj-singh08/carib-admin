@@ -106,9 +106,9 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/user-management",
+          href: "/manage-user",
           label: "User Management",
-          active: pathname.includes("/user-management"),
+          active: pathname.includes("/manage-user"),
           icon: Clipboard,
           submenus: [],
         },
