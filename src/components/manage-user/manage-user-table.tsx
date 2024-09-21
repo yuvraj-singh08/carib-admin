@@ -81,6 +81,7 @@ export default function UserManagementPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
+  const [checkedRows, setCheckedRows] = useState<boolean[]>(Array(defaultUsers.length).fill(false));
 
   const form = useForm({
     resolver: zodResolver(userFormSchema),
@@ -120,6 +121,7 @@ export default function UserManagementPage() {
 
   const handleDelete = (id: number) => {
     setUsers(users.filter((user) => user.id !== id));
+    setCheckedRows(checkedRows.filter((_, index) => users[index].id !== id)); // Update checked rows on delete
   };
 
   const totalPages = Math.ceil(users.length / pageSize);
@@ -127,6 +129,18 @@ export default function UserManagementPage() {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  const handleHeaderCheckboxChange = (checked: boolean) => {
+    setCheckedRows(checkedRows.map(() => checked));
+  };
+
+  const handleRowCheckboxChange = (index: number) => {
+    const newCheckedRows = [...checkedRows];
+    newCheckedRows[index] = !newCheckedRows[index];
+    setCheckedRows(newCheckedRows);
+  };
+
+  const isAllChecked = checkedRows.every((checked) => checked);
 
   return (
     <div className="w-full bg-white px-3 rounded-lg space-y-6 py-5">
@@ -330,7 +344,11 @@ export default function UserManagementPage() {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[50px]">
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={isAllChecked}
+                onChange={(e) => handleHeaderCheckboxChange(e.target.checked)}
+              />
             </TableHead>
             <TableHead>User ID</TableHead>
             <TableHead>Name</TableHead>
@@ -342,10 +360,14 @@ export default function UserManagementPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paginatedUsers.map((user) => (
+          {paginatedUsers.map((user, index) => (
             <TableRow key={user.id}>
               <TableCell>
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={checkedRows[(currentPage - 1) * pageSize + index] || false}
+                  onChange={() => handleRowCheckboxChange((currentPage - 1) * pageSize + index)}
+                />
               </TableCell>
               <TableCell>{user.uniqueId}</TableCell>
               <TableCell>{user.name}</TableCell>

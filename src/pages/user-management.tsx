@@ -1,3 +1,5 @@
+
+import ManageRolesTable from "@/components/manage-user/manage-roles-table";
 import ManageUserTable from "@/components/manage-user/manage-user-table";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
@@ -34,7 +36,7 @@ export const UserManagementPage = () => {
               <ManageUserTable/>
             </TabsContent>
             <TabsContent value="rolePermission">
-              Role & Permission Content
+              <ManageRolesTable/>
             </TabsContent>
           </Tabs>
         </div>
@@ -42,3 +44,4 @@ export const UserManagementPage = () => {
     </ContentLayout>
   );
 };
+
