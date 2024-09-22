@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Separator } from "../ui/separator";
+import { CoupnViewDialog } from "./coupon-view-dialog";
 
 // Define the schema for the coupon form
 const couponFormSchema = z.object({
@@ -57,14 +58,21 @@ const couponFormSchema = z.object({
   airlineCode: z.string().optional(),
   flightCode: z.string().optional(),
   expiryDate: z.date(),
-  status: z.enum(["active", "inactive"]).default("active"), // Added status field
 });
+
+type CouponUsage = {
+  userId: number;
+  usedCount: number;
+  usedDate: Date;
+};
 
 type Coupon = z.infer<typeof couponFormSchema> & {
   id: number;
   userLimit: number;
   used: number;
+  usageDetails: CouponUsage[]; // Add this field for user usage details
 };
+
 const initialCoupons: Coupon[] = [
   {
     id: 1,
@@ -74,12 +82,34 @@ const initialCoupons: Coupon[] = [
     discountType: "percentage",
     discount: "20",
     limit: "10",
-    used: 50,
+    used: 5,
     expiryDate: new Date("2024-09-30"),
-    status: "active",
     userLimit: 100,
     image: "https://via.placeholder.com/150",
     way: "One way",
+    usageDetails: [
+      { userId: 101, usedCount: 1, usedDate: new Date("2024-03-15") },
+      { userId: 102, usedCount: 2, usedDate: new Date("2024-04-01") },
+      { userId: 103, usedCount: 1, usedDate: new Date("2024-05-20") },
+    ],
+  },
+  {
+    id: 2,
+    title: "Summer Clearance",
+    description: "Get $10 off on orders over $50",
+    code: "SUMMER10",
+    discountType: "fixed",
+    discount: "10",
+    limit: "20",
+    used: 12,
+    expiryDate: new Date("2024-08-15"),
+    userLimit: 50,
+    image: "https://via.placeholder.com/150",
+    way: "Two way",
+    usageDetails: [
+      { userId: 201, usedCount: 1, usedDate: new Date("2024-06-10") },
+      { userId: 202, usedCount: 1, usedDate: new Date("2024-07-05") },
+    ],
   },
 ];
 
@@ -109,7 +139,6 @@ const CouponManagementSystemTable = () => {
       airlineCode: "",
       flightCode: "",
       expiryDate: new Date(),
-      status: "active",
     },
   });
 
@@ -131,7 +160,13 @@ const CouponManagementSystemTable = () => {
     } else {
       setCoupons([
         ...coupons,
-        { id: Date.now(), ...values, used: 0, userLimit: Number(values.limit) },
+        {
+          id: Date.now(),
+          ...values,
+          used: 0,
+          userLimit: Number(values.limit),
+          usageDetails: [],
+        },
       ]);
     }
     setIsDialogOpen(false);
@@ -189,7 +224,6 @@ const CouponManagementSystemTable = () => {
                 airlineCode: "",
                 flightCode: "",
                 expiryDate: new Date(),
-                status: "active",
               });
               setIsDialogOpen(true);
             }}
@@ -222,7 +256,6 @@ const CouponManagementSystemTable = () => {
             <TableHead>User Limit</TableHead>
             <TableHead>Used</TableHead>
             <TableHead>Expiry Date</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead className="flex items-center justify-center">
               Action
             </TableHead>
@@ -243,14 +276,6 @@ const CouponManagementSystemTable = () => {
               <TableCell>{coupon.userLimit}</TableCell>
               <TableCell>{coupon.used}</TableCell>
               <TableCell>{format(coupon.expiryDate, "dd-MM-yyyy")}</TableCell>
-              <TableCell>
-                <span
-                  className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                    coupon.status === "active" ? "bg-green-500" : "bg-red-500"
-                  }`}
-                ></span>
-                {coupon.status}
-              </TableCell>
               <TableCell className="flex items-center justify-center">
                 <div className="flex items-center space-x-2">
                   <Button
@@ -470,27 +495,14 @@ const CouponManagementSystemTable = () => {
                       </FormItem>
                     )}
                   />
-
-                  {/* Status Field */}
                   <FormField
                     control={form.control}
-                    name="status"
+                    name="destination"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Status</FormLabel>
+                        <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="active">Active</SelectItem>
-                              <SelectItem value="inactive">Inactive</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <Input {...field} placeholder="Coupon Description" />
                         </FormControl>
                       </FormItem>
                     )}
@@ -599,105 +611,11 @@ const CouponManagementSystemTable = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Coupon View Dialog */}
       {selectedCoupon && (
-        <Dialog
-          open={Boolean(selectedCoupon)}
-          onOpenChange={() => setSelectedCoupon(null)}
-        >
-          <DialogContent className="max-w-5xl">
-            <DialogHeader>
-              <DialogTitle className="text-blue">Coupon Details</DialogTitle>
-            </DialogHeader>
-            <div className="w-full flex items-start gap-4 mt-3">
-              <div className="w-1/2 flex flex-col gap-4">
-                <div className="w-full grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-3 ">
-                    <h1 className="text-[15px] font-medium text-blue">Title</h1>
-                    <h1 className="text-[15px] font-medium text-blue">
-                      Discount
-                    </h1>
-                    <h1 className="text-[15px] font-medium text-blue">
-                      Coupon Code
-                    </h1>
-                    <h1 className="text-[15px] font-medium text-blue">
-                      Origin
-                    </h1>
-                    <h1 className="text-[15px] font-medium text-blue">
-                      Airline code
-                    </h1>
-                    <h1 className="text-[15px] font-medium text-blue">
-                      Expiry Date
-                    </h1>
-                  </div>
-                  <div className="flex flex-col gap-[13px]">
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.title}
-                    </h1>
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.discount}
-                    </h1>
-                    <h1 className="text-[14px] text-customBlue">
-                      {selectedCoupon.code}
-                    </h1>
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.origin}
-                    </h1>
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.airlineCode}
-                    </h1>
-                    <h1 className="text-[14px] text-[#777980]">
-                      {format(selectedCoupon.expiryDate, "dd-MM-yyyy")}
-                    </h1>
-                  </div>
-                </div>
-              </div>
-              <Separator orientation="vertical" className="h-[220px] -mt-3" />
-              <div className="w-1/2 flex flex-col gap-4">
-                <div className="w-full grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-3 ">
-                    <h1 className="text-[15px] font-medium text-blue">
-                      Description
-                    </h1>
-                    <h1 className="text-[15px] font-medium text-blue">Limit</h1>
-                    <h1 className="text-[15px] font-medium text-blue">Way</h1>
-                    <h1 className="text-[15px] font-medium text-blue">
-                      Destination
-                    </h1>
-                    <h1 className="text-[15px] font-medium text-blue">
-                      Flight code
-                    </h1>
-                    <h1 className="text-[15px] font-medium text-blue">Image</h1>
-                  </div>
-                  <div className="flex flex-col gap-[13px]">
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.description}
-                    </h1>
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.limit}
-                    </h1>
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.way}
-                    </h1>
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.destination}
-                    </h1>
-                    <h1 className="text-[14px] text-[#777980]">
-                      {selectedCoupon.flightCode}
-                    </h1>
-                    <div className="w-16 h-auto object-contain rounded-md">
-                      <img
-                        src="icons/coupn.png"
-                        alt="coupon"
-                        className="w-24 h-auto"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <CoupnViewDialog
+          selectedCoupon={selectedCoupon}
+          setSelectedCoupon={setSelectedCoupon}
+        />
       )}
     </div>
   );
