@@ -32,7 +32,7 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CirclePlus, Eye, Pencil, Trash2 } from "lucide-react";
+import { CirclePlus, Eye, Pencil, Search, Trash2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -171,32 +171,40 @@ const CouponManagementSystemTable = () => {
   return (
     <div className="p-4 bg-white rounded-xl">
       <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-bold">Special Deals</h1>
-        <Button
-          onClick={() => {
-            setEditingCoupon(null);
-            form.reset({
-              title: "",
-              description: "",
-              discount: "",
-              discountType: "percentage",
-              limit: "",
-              code: "",
-              way: "One way",
-              origin: "",
-              destination: "",
-              airlineCode: "",
-              flightCode: "",
-              expiryDate: new Date(),
-              status: "active",
-            });
-            setIsDialogOpen(true);
-          }}
-        >
-          {" "}
-          <CirclePlus size={16} className="mr-2 fill-white text-blue" />
-          Add Special Deal
-        </Button>
+        <h1 className="text-2xl font-bold text-blue">Special Deals</h1>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => {
+              setEditingCoupon(null);
+              form.reset({
+                title: "",
+                description: "",
+                discount: "",
+                discountType: "percentage",
+                limit: "",
+                code: "",
+                way: "One way",
+                origin: "",
+                destination: "",
+                airlineCode: "",
+                flightCode: "",
+                expiryDate: new Date(),
+                status: "active",
+              });
+              setIsDialogOpen(true);
+            }}
+          >
+            <CirclePlus size={16} className="mr-2 fill-white text-blue" />
+            Add Special Deal
+          </Button>
+          <div className="relative hidden md:block">
+            <Input
+              placeholder="Search..."
+              className="w-[180px] rounded-xl h-10 pl-9"
+            />
+            <Search className="size-5 shrink-0 text-gray absolute top-2.5 left-2" />
+          </div>
+        </div>
       </div>
 
       <Table>
@@ -215,7 +223,7 @@ const CouponManagementSystemTable = () => {
             <TableHead>Used</TableHead>
             <TableHead>Expiry Date</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead className="flex items-center justify-center">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -241,17 +249,18 @@ const CouponManagementSystemTable = () => {
                 ></span>
                 {coupon.status}
               </TableCell>
-              <TableCell>
+              <TableCell className="flex items-center justify-center">
                 <div className="flex items-center space-x-2">
-                  <Button variant="ghost" onClick={() => handleView(coupon)}>
-                    <Eye size={16} className="text-blue-500" />
+                  <Button variant="ghost" className="bg-orange-400/20" onClick={() => handleView(coupon)}>
+                    <Eye size={16} className="text-orange-500" />
                   </Button>
-                  <Button variant="ghost" onClick={() => handleEdit(coupon)}>
+                  <Button variant="ghost" className="bg-green-400/20" onClick={() => handleEdit(coupon)}>
                     <Pencil size={16} className="text-green-500" />
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleDelete(coupon.id)}
+                    className="bg-red-400/20"
                   >
                     <Trash2 size={16} className="text-red-500" />
                   </Button>
