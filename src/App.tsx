@@ -7,6 +7,7 @@ import SettingsPage from "./pages/settings";
 import LandingPageSettings from "./pages/landing-page-settings";
 import ProfilePage from "./pages/profile";
 import CustomerDetailsPage from "./pages/customers-details";
+import TicketsPage from "./pages/tickets";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/landing-settings" element={<LandingPageSettings />} />
         <Route path="/customer-details" element={<CustomerDetailsPage />} />
+        <Route path="/tickets" element={<TicketsPage />} />
       </Routes>
     </>
   );
