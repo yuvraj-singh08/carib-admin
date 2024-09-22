@@ -4,6 +4,7 @@ import SupplierFirewallPage from "./pages/supplier-firewall";
 import ManageAirlinesPage from "./pages/manage-airlines";
 import { UserManagementPage } from "./pages/user-management";
 import SettingsPage from "./pages/settings";
+import LandingPageSettings from "./pages/landing-page-settings";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/manage-airlines" element={<ManageAirlinesPage />} />
         <Route path="/manage-user" element={<UserManagementPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/landing-settings" element={<LandingPageSettings />} />
       </Routes>
     </>
   );
