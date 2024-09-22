@@ -1,4 +1,5 @@
-import CookieSettingsForm from "@/components/landing-settings/cookie-settings";
+import CookieSettingsForm from "@/components/landing-settings/cookie-settings-form";
+import EMailSettingsForm from "@/components/landing-settings/email-settings-form";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,6 +20,8 @@ const LandingPageSettings = () => {
               <TabsTrigger value="terms">Terms & Condition</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="socials">Social Media</TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="email">Email SMTP setting</TabsTrigger>
               {activeTab === "cookie" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
@@ -31,6 +34,9 @@ const LandingPageSettings = () => {
               {activeTab === "socials" && (
                 <div className="w-32 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[310px]" />
               )}
+              {activeTab === "email" && (
+                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[110px]" />
+              )}
             </TabsList>
             <TabsContent value="cookie">
               <CookieSettingsForm />
@@ -38,6 +44,9 @@ const LandingPageSettings = () => {
             <TabsContent value="privacy">two</TabsContent>
             <TabsContent value="terms">three</TabsContent>
             <TabsContent value="socials">four</TabsContent>
+            <TabsContent value="email">
+              <EMailSettingsForm />
+            </TabsContent>
           </Tabs>
         </div>
       </main>
