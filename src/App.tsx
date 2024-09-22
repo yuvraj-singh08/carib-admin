@@ -5,12 +5,14 @@ import ManageAirlinesPage from "./pages/manage-airlines";
 import { UserManagementPage } from "./pages/user-management";
 import SettingsPage from "./pages/settings";
 import LandingPageSettings from "./pages/landing-page-settings";
+import ProfilePage from "./pages/profile";
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/supplier" element={<SupplierFirewallPage />} />
         <Route path="/manage-airlines" element={<ManageAirlinesPage />} />
         <Route path="/manage-user" element={<UserManagementPage />} />
