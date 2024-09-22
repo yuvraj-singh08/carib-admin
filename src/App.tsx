@@ -6,6 +6,7 @@ import { UserManagementPage } from "./pages/user-management";
 import SettingsPage from "./pages/settings";
 import LandingPageSettings from "./pages/landing-page-settings";
 import ProfilePage from "./pages/profile";
+import CustomerDetailsPage from "./pages/customers-details";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/manage-user" element={<UserManagementPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/landing-settings" element={<LandingPageSettings />} />
+        <Route path="/customer-details" element={<CustomerDetailsPage />} />
       </Routes>
     </>
   );
