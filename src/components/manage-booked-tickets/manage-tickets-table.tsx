@@ -22,15 +22,9 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, Search, Trash2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { DatePickerWithRange } from "../ui/date-range-picker";
 import { Input } from "../ui/input";
+import TicketDetailsDialog from "./tieket-dialog";
 
 interface Ticket {
   id: string;
@@ -72,6 +66,9 @@ const BookingTicketsTableWithDateFilter = () => {
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
+  const [selectedTicket, setSelectedTicket] = React.useState<Ticket | null>(
+    null
+  );
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -237,57 +234,13 @@ const BookingTicketsTableWithDateFilter = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="ghost" className="bg-orange-400/20">
-                          <Eye size={16} className="text-orange-500" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Ticket Details</DialogTitle>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <label className="text-right font-medium">
-                              Title
-                            </label>
-                            <div className="col-span-3">{item.subject}</div>
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <label className="text-right font-medium">
-                              Name
-                            </label>
-                            <div className="col-span-3">
-                              {item.requesterName}
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <label className="text-right font-medium">
-                              Email
-                            </label>
-                            <div className="col-span-3">demo@example.com</div>
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <label className="text-right font-medium">
-                              Status
-                            </label>
-                            <div className="col-span-3">{item.status}</div>
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <label className="text-right font-medium">
-                              Description
-                            </label>
-                            <div className="col-span-3">
-                              Please enter the details of your request. Never
-                              share passwords and avoid sensitive information
-                              unless necessary.
-                            </div>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
+                    <Button
+                      variant="ghost"
+                      className="bg-orange-400/20"
+                      onClick={() => setSelectedTicket(item)}
+                    >
+                      <Eye size={16} className="text-orange-500" />
+                    </Button>
                     <Button
                       variant="ghost"
                       className="bg-red-400/20"
@@ -302,6 +255,15 @@ const BookingTicketsTableWithDateFilter = () => {
           </TableBody>
         </Table>
       </ScrollArea>
+
+      {selectedTicket && (
+        <TicketDetailsDialog
+          ticket={selectedTicket}
+          isOpen={!!selectedTicket}
+          onClose={() => setSelectedTicket(null)}
+        />
+      )}
+
       <div className="flex items-center justify-between space-x-2 py-4">
         <div>
           <Select
