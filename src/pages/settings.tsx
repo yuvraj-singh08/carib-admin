@@ -1,4 +1,5 @@
 import CouponManagementSystemTable from "@/components/settings/manage-deals-table";
+import ManagePaymentGateway from "@/components/settings/manage-payment-gateway";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,7 +34,9 @@ const SettingsPage = () => {
             <TabsContent value="deals">
                 <CouponManagementSystemTable/>
             </TabsContent>
-            <TabsContent value="payment">two</TabsContent>
+            <TabsContent value="payment">
+            <ManagePaymentGateway/>
+            </TabsContent>
           </Tabs>
         </div>
       </main>

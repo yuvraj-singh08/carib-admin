@@ -589,40 +589,6 @@ const CouponManagementSystemTable = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Coupon View Dialog */}
-      {selectedCoupon && (
-        <Dialog
-          open={Boolean(selectedCoupon)}
-          onOpenChange={() => setSelectedCoupon(null)}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Coupon Details</DialogTitle>
-            </DialogHeader>
-            <div>
-              <p>
-                <strong>Title:</strong> {selectedCoupon.title}
-              </p>
-              <p>
-                <strong>Code:</strong> {selectedCoupon.code}
-              </p>
-              <p>
-                <strong>User Limit:</strong> {selectedCoupon.userLimit}
-              </p>
-              <p>
-                <strong>Used:</strong> {selectedCoupon.used}
-              </p>
-              <p>
-                <strong>Expiry Date:</strong>{" "}
-                {format(selectedCoupon.expiryDate, "PPP")}
-              </p>
-              <p>
-                <strong>Status:</strong> {selectedCoupon.status}
-              </p>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };
