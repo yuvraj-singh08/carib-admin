@@ -47,9 +47,9 @@ const couponFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   image: z.string(),
   description: z.string().optional(),
-  discount: z.number().min(0).optional(),
+  discount: z.string().min(0, "Discount is required"),
   discountType: z.enum(["percentage", "fixed"]),
-  limit: z.number().int().min(0),
+  limit: z.string().min(0, "Limit is required"),
   code: z.string().min(1, "Coupon code is required"),
   way: z.string(),
   origin: z.string().optional(),
@@ -72,8 +72,8 @@ const initialCoupons: Coupon[] = [
     description: "Get 20% off your next purchase",
     code: "SPRING20",
     discountType: "percentage",
-    discount: 20,
-    limit: 100,
+    discount: "20",
+    limit: "10",
     used: 50,
     expiryDate: new Date("2024-09-30"),
     status: "active",
@@ -99,9 +99,9 @@ const CouponManagementSystemTable = () => {
     defaultValues: {
       title: "",
       description: "",
-      discount: 0,
+      discount: "",
       discountType: "percentage",
-      limit: 0,
+      limit: "",
       code: "",
       way: "One way",
       origin: "",
@@ -131,7 +131,7 @@ const CouponManagementSystemTable = () => {
     } else {
       setCoupons([
         ...coupons,
-        { id: Date.now(), ...values, used: 0, userLimit: values.limit },
+        { id: Date.now(), ...values, used: 0, userLimit: Number(values.limit) },
       ]);
     }
     setIsDialogOpen(false);
@@ -178,9 +178,9 @@ const CouponManagementSystemTable = () => {
             form.reset({
               title: "",
               description: "",
-              discount: 0,
+              discount: "",
               discountType: "percentage",
-              limit: 0,
+              limit: "",
               code: "",
               way: "One way",
               origin: "",
