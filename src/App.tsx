@@ -3,6 +3,7 @@ import HomePage from "./pages/dashboard";
 import SupplierFirewallPage from "./pages/supplier-firewall";
 import ManageAirlinesPage from "./pages/manage-airlines";
 import { UserManagementPage } from "./pages/user-management";
+import SettingsPage from "./pages/settings";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/supplier" element={<SupplierFirewallPage />} />
         <Route path="/manage-airlines" element={<ManageAirlinesPage />} />
         <Route path="/manage-user" element={<UserManagementPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </>
   );

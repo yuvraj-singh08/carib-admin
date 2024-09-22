@@ -1,15 +1,14 @@
-import FeesCommissionManagerTable from "@/components/manage-airlines/manage-airlines-commison-table"
-import { ContentLayout } from "@/components/shared/content-layout"
-
+import FeesCommissionManagerTable from "@/components/manage-airlines/manage-airlines-commison-table";
+import { ContentLayout } from "@/components/shared/content-layout";
 
 const ManageAirlinesPage = () => {
-    return (
-        <ContentLayout>
+  return (
+    <ContentLayout>
       <main className="w-full min-h-screen flex flex-col gap-4">
-<FeesCommissionManagerTable/>
+        <FeesCommissionManagerTable />
       </main>
     </ContentLayout>
-    )
-}
+  );
+};
 
-export default ManageAirlinesPage
+export default ManageAirlinesPage;
