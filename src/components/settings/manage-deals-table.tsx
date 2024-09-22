@@ -61,6 +61,7 @@ const couponFormSchema = z.object({
 });
 
 type CouponUsage = {
+  username:string;
   userId: number;
   usedCount: number;
   usedDate: Date;
@@ -88,29 +89,10 @@ const initialCoupons: Coupon[] = [
     image: "https://via.placeholder.com/150",
     way: "One way",
     usageDetails: [
-      { userId: 101, usedCount: 1, usedDate: new Date("2024-03-15") },
-      { userId: 102, usedCount: 2, usedDate: new Date("2024-04-01") },
-      { userId: 103, usedCount: 1, usedDate: new Date("2024-05-20") },
+      { username:"xyz",userId: 101, usedCount: 1, usedDate: new Date("2024-03-15") },
     ],
   },
-  {
-    id: 2,
-    title: "Summer Clearance",
-    description: "Get $10 off on orders over $50",
-    code: "SUMMER10",
-    discountType: "fixed",
-    discount: "10",
-    limit: "20",
-    used: 12,
-    expiryDate: new Date("2024-08-15"),
-    userLimit: 50,
-    image: "https://via.placeholder.com/150",
-    way: "Two way",
-    usageDetails: [
-      { userId: 201, usedCount: 1, usedDate: new Date("2024-06-10") },
-      { userId: 202, usedCount: 1, usedDate: new Date("2024-07-05") },
-    ],
-  },
+
 ];
 
 const CouponManagementSystemTable = () => {

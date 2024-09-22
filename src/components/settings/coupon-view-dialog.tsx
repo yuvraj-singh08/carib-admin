@@ -144,8 +144,8 @@ export const CoupnViewDialog = ({
             <Table>
               <TableHeader className="bg-[#EFEFFF]">
                 <TableRow>
-                  <TableHead>User ID</TableHead>
-                  <TableHead>Used Count</TableHead>
+                  <TableHead>User </TableHead>
+                  <TableHead>Uses</TableHead>
                   <TableHead>Used Date</TableHead>
                 </TableRow>
               </TableHeader>
@@ -153,6 +153,7 @@ export const CoupnViewDialog = ({
                 {selectedCoupon.usageDetails.map(
                   (
                     usage: {
+                      username:string
                       userId: string;
                       usedCount: number;
                       usedDate: Date;
@@ -160,7 +161,7 @@ export const CoupnViewDialog = ({
                     index: number
                   ) => (
                     <TableRow key={index}>
-                      <TableCell>{usage.userId}</TableCell>
+                      <TableCell>{usage.username}</TableCell>
                       <TableCell>{usage.usedCount}</TableCell>
                       <TableCell>
                         {format(usage.usedDate, "dd-MM-yyyy")}
