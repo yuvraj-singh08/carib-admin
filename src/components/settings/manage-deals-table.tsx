@@ -223,7 +223,9 @@ const CouponManagementSystemTable = () => {
             <TableHead>Used</TableHead>
             <TableHead>Expiry Date</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="flex items-center justify-center">Action</TableHead>
+            <TableHead className="flex items-center justify-center">
+              Action
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -251,16 +253,24 @@ const CouponManagementSystemTable = () => {
               </TableCell>
               <TableCell className="flex items-center justify-center">
                 <div className="flex items-center space-x-2">
-                  <Button variant="ghost" className="bg-orange-400/20" onClick={() => handleView(coupon)}>
+                  <Button
+                    variant="ghost"
+                    className="bg-orange-400/20"
+                    onClick={() => handleView(coupon)}
+                  >
                     <Eye size={16} className="text-orange-500" />
                   </Button>
-                  <Button variant="ghost" className="bg-green-400/20" onClick={() => handleEdit(coupon)}>
+                  <Button
+                    variant="ghost"
+                    className="bg-green-400/20"
+                    onClick={() => handleEdit(coupon)}
+                  >
                     <Pencil size={16} className="text-green-500" />
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleDelete(coupon.id)}
-                    className="bg-red-400/20"
+                    className="text-red-500"
                   >
                     <Trash2 size={16} className="text-red-500" />
                   </Button>
@@ -589,6 +599,106 @@ const CouponManagementSystemTable = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Coupon View Dialog */}
+      {selectedCoupon && (
+        <Dialog
+          open={Boolean(selectedCoupon)}
+          onOpenChange={() => setSelectedCoupon(null)}
+        >
+          <DialogContent className="max-w-5xl">
+            <DialogHeader>
+              <DialogTitle className="text-blue">Coupon Details</DialogTitle>
+            </DialogHeader>
+            <div className="w-full flex items-start gap-4 mt-3">
+              <div className="w-1/2 flex flex-col gap-4">
+                <div className="w-full grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-3 ">
+                    <h1 className="text-[15px] font-medium text-blue">Title</h1>
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Discount
+                    </h1>
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Coupon Code
+                    </h1>
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Origin
+                    </h1>
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Airline code
+                    </h1>
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Expiry Date
+                    </h1>
+                  </div>
+                  <div className="flex flex-col gap-[13px]">
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.title}
+                    </h1>
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.discount}
+                    </h1>
+                    <h1 className="text-[14px] text-customBlue">
+                      {selectedCoupon.code}
+                    </h1>
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.origin}
+                    </h1>
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.airlineCode}
+                    </h1>
+                    <h1 className="text-[14px] text-[#777980]">
+                      {format(selectedCoupon.expiryDate, "dd-MM-yyyy")}
+                    </h1>
+                  </div>
+                </div>
+              </div>
+              <Separator orientation="vertical" className="h-[220px] -mt-3" />
+              <div className="w-1/2 flex flex-col gap-4">
+                <div className="w-full grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-3 ">
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Description
+                    </h1>
+                    <h1 className="text-[15px] font-medium text-blue">Limit</h1>
+                    <h1 className="text-[15px] font-medium text-blue">Way</h1>
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Destination
+                    </h1>
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Flight code
+                    </h1>
+                    <h1 className="text-[15px] font-medium text-blue">Image</h1>
+                  </div>
+                  <div className="flex flex-col gap-[13px]">
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.description}
+                    </h1>
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.limit}
+                    </h1>
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.way}
+                    </h1>
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.destination}
+                    </h1>
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.flightCode}
+                    </h1>
+                    <div className="w-16 h-auto object-contain rounded-md">
+                      <img
+                        src="icons/coupn.png"
+                        alt="coupon"
+                        className="w-24 h-auto"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
