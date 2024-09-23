@@ -1,5 +1,4 @@
 import CookieSettingsForm from "@/components/landing-settings/cookie-settings-form";
-import EMailSettingsForm from "@/components/landing-settings/email-settings-form";
 import SocialProvidersForm from "@/components/landing-settings/socials-settings";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
