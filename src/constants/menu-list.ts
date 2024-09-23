@@ -1,7 +1,6 @@
 import {
   Settings,
   LucideIcon,
-  ShoppingCart,
   UserRound,
   Package,
   CircleGauge,
@@ -10,7 +9,6 @@ import {
   LifeBuoy,
   ChartColumn,
 } from "lucide-react";
-
 
 type Submenu = {
   href: string;
@@ -49,56 +47,25 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "",
-          label: "Flights",
-          active: pathname.includes("/flights"),
-          icon: ShoppingCart,
-          submenus: [
-            {
-              href: "/menu1",
-              label: "Sub menu",
-              active: pathname === "/sub-menu",
-            },
-          ],
-        },
-        {
-          href: "/bookings",
-          label: "Bookings",
-          active: pathname.includes("/bookings"),
+          href: "/supplier",
+          label: "Firewall Setting",
+          active: pathname.includes("/supplier"),
           icon: UserRound,
-          submenus: [
-            {
-              href: "/menu1",
-              label: "Sub menu",
-              active: pathname === "/sub-menu",
-            },
-          ],
+          submenus: [],
         },
         {
-          href: "/payment",
-          label: "Payment",
-          active: pathname.includes("/payment"),
+          href: "/customer-details",
+          label: "Customer details",
+          active: pathname.includes("/customer-details"),
           icon: Package,
-          submenus: [
-            {
-              href: "/menu1",
-              label: "Sub menu",
-              active: pathname === "/sub-menu",
-            },
-          ],
+          submenus: [],
         },
         {
-          href: "/reports",
-          label: "Reports & Analytics",
-          active: pathname.includes("/reports"),
+          href: "/manage-airlines",
+          label: "Commission management",
+          active: pathname.includes("/manage-airlines"),
           icon: ChartColumn,
-          submenus: [
-            {
-              href: "/menu1",
-              label: "Sub menu",
-              active: pathname === "/sub-menu",
-            },
-          ],
+          submenus: [],
         },
       ],
     },
@@ -118,9 +85,9 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/Ticket",
-          label: "Ticket",
-          active: pathname.includes("/Ticket"),
+          href: "/tickets",
+          label: "Ticket System",
+          active: pathname.includes("/tickets"),
           icon: MessageSquare,
           submenus: [],
         },
@@ -130,9 +97,9 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/support",
-          label: "Support",
-          active: pathname.includes("/support"),
+          href: "/landing-settings",
+          label: "Landing Page",
+          active: pathname.includes("/landing-settings"),
           icon: LifeBuoy,
           submenus: [],
         },
@@ -145,6 +112,18 @@ export function getMenuList(pathname: string): Group[] {
           href: "/settings",
           label: "Settings",
           active: pathname.includes("/settings"),
+          icon: Settings,
+          submenus: [],
+        },
+      ],
+    },
+    {
+      groupLabel: "",
+      menus: [
+        {
+          href: "/",
+          label: "Support",
+          active: pathname.includes("/xyz"),
           icon: Settings,
           submenus: [],
         },

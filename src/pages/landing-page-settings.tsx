@@ -22,7 +22,7 @@ const LandingPageSettings = () => {
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="socials">Social Media</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
-              <TabsTrigger value="email">Email SMTP setting</TabsTrigger>
+              {/* <TabsTrigger value="email">Email SMTP setting</TabsTrigger> */}
               {activeTab === "cookie" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
@@ -35,9 +35,9 @@ const LandingPageSettings = () => {
               {activeTab === "socials" && (
                 <div className="w-32 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[310px]" />
               )}
-              {activeTab === "email" && (
+              {/* {activeTab === "email" && (
                 <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[110px]" />
-              )}
+              )} */}
             </TabsList>
             <TabsContent value="cookie">
               <CookieSettingsForm />
@@ -47,9 +47,9 @@ const LandingPageSettings = () => {
             <TabsContent value="socials">
               <SocialProvidersForm />
             </TabsContent>
-            <TabsContent value="email">
+            {/* <TabsContent value="email">
               <EMailSettingsForm />
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
         </div>
       </main>

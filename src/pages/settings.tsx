@@ -1,3 +1,4 @@
+import EMailSettingsForm from "@/components/landing-settings/email-settings-form";
 import CouponManagementSystemTable from "@/components/settings/manage-deals-table";
 import ManagePaymentGateway from "@/components/settings/manage-payment-gateway";
 import { ContentLayout } from "@/components/shared/content-layout";
@@ -24,11 +25,16 @@ const SettingsPage = () => {
               >
                 Payment Gateway setting
               </TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="email">Email SMTP setting</TabsTrigger>
               {activeTab === "deals" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
               {activeTab === "payment" && (
                 <div className="w-48 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-48" />
+              )}
+              {activeTab === "email" && (
+                <div className="w-48 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[380px]" />
               )}
             </TabsList>
             <TabsContent value="deals">
@@ -36,6 +42,9 @@ const SettingsPage = () => {
             </TabsContent>
             <TabsContent value="payment">
             <ManagePaymentGateway/>
+            </TabsContent>
+            <TabsContent value="email">
+              <EMailSettingsForm />
             </TabsContent>
           </Tabs>
         </div>

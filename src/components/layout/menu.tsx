@@ -1,6 +1,6 @@
 import { Ellipsis } from "lucide-react";
-import { TbFlag2 } from "react-icons/tb";
-import { AiOutlineQuestionCircle } from "react-icons/ai";
+// import { TbFlag2 } from "react-icons/tb";
+// import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { cn } from "@/lib/utils";
 
 import {
@@ -113,7 +113,7 @@ export function Menu({ isOpen }: MenuProps) {
               )}
             </li>
           ))}
-        <div className="flex flex-col gap-1 w-full">
+        {/* <div className="flex flex-col gap-1 w-full">
         <li className="w-full grow flex items-end">
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
@@ -170,7 +170,7 @@ export function Menu({ isOpen }: MenuProps) {
               </Tooltip>
             </TooltipProvider>
           </li>
-        </div>
+        </div> */}
         </ul>
       </nav>
     </ScrollArea>
