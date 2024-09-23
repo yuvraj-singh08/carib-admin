@@ -31,6 +31,7 @@ import { Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Switch from "./switch";
 import { Separator } from "../ui/separator";
+import { useConfirm } from "@/hooks/use-confirm";
 
 const roleFormSchema = z.object({
   name: z.string().min(1, "Role name is required"),
@@ -173,6 +174,11 @@ export default function CompleteRoleManagementComponent() {
     Array(defaultRoles.length).fill(false)
   );
 
+  const [ConfirmDialogue, confirm] = useConfirm(
+    "Delete Role",
+    "Are you sure you want to delete this role? This action cannot be undone."
+  );
+
   const handleHeaderCheckboxChange = (checked: boolean) => {
     setCheckedRows(checkedRows.map(() => checked)); // Set all checkboxes to the same state
   };
@@ -200,8 +206,11 @@ export default function CompleteRoleManagementComponent() {
     },
   });
 
-  const handleDelete = (id: number) => {
-    setRoles(roles.filter((role) => role.id !== id));
+  const handleDelete = async (id: number) => {
+    const ok = await confirm();
+    if (ok) {
+      setRoles(roles.filter((role) => role.id !== id));
+    }
   };
 
   const openPermissionDialog = (role: Role) => {
@@ -312,6 +321,8 @@ export default function CompleteRoleManagementComponent() {
   };
 
   return (
+    <>
+    <ConfirmDialogue />
     <div className="w-full bg-white px-3 rounded-lg space-y-6 py-5">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold text-blue">Role Management</h2>
@@ -394,7 +405,11 @@ export default function CompleteRoleManagementComponent() {
                 </Button>
               </TableCell>
               <TableCell>
-                <Button variant="ghost" onClick={() => handleDelete(role.id)}>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleDelete(role.id)}
+                  className="bg-red-400/20 hover:bg-red-400/40"
+                >
                   <Trash2 size={16} className="text-red-500" />
                 </Button>
               </TableCell>
@@ -519,6 +534,6 @@ export default function CompleteRoleManagementComponent() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </div></>
   );
 }

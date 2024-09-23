@@ -34,6 +34,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
+import { useConfirm } from "@/hooks/use-confirm";
 
 const userFormSchema = z
   .object({
@@ -81,7 +82,14 @@ export default function UserManagementPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
-  const [checkedRows, setCheckedRows] = useState<boolean[]>(Array(defaultUsers.length).fill(false));
+  const [checkedRows, setCheckedRows] = useState<boolean[]>(
+    Array(defaultUsers.length).fill(false)
+  );
+
+  const [ConfirmDialogue, confirm] = useConfirm(
+    "Delete User",
+    "Are you sure you want to delete this user? This action cannot be undone."
+  );
 
   const form = useForm({
     resolver: zodResolver(userFormSchema),
@@ -119,9 +127,12 @@ export default function UserManagementPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    setUsers(users.filter((user) => user.id !== id));
-    setCheckedRows(checkedRows.filter((_, index) => users[index].id !== id)); // Update checked rows on delete
+  const handleDelete = async (id: number) => {
+    const ok = await confirm();
+    if (ok) {
+      setUsers(users.filter((user) => user.id !== id));
+      setCheckedRows(checkedRows.filter((_, index) => users[index].id !== id));
+    }
   };
 
   const totalPages = Math.ceil(users.length / pageSize);
@@ -143,6 +154,8 @@ export default function UserManagementPage() {
   const isAllChecked = checkedRows.every((checked) => checked);
 
   return (
+    <>
+    <ConfirmDialogue />
     <div className="w-full bg-white px-3 rounded-lg space-y-6 py-5">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold text-blue">User Management</h2>
@@ -365,8 +378,14 @@ export default function UserManagementPage() {
               <TableCell>
                 <input
                   type="checkbox"
-                  checked={checkedRows[(currentPage - 1) * pageSize + index] || false}
-                  onChange={() => handleRowCheckboxChange((currentPage - 1) * pageSize + index)}
+                  checked={
+                    checkedRows[(currentPage - 1) * pageSize + index] || false
+                  }
+                  onChange={() =>
+                    handleRowCheckboxChange(
+                      (currentPage - 1) * pageSize + index
+                    )
+                  }
                 />
               </TableCell>
               <TableCell>{user.uniqueId}</TableCell>
@@ -384,10 +403,18 @@ export default function UserManagementPage() {
               </TableCell>
               <TableCell>
                 <div className="flex items-center space-x-2">
-                  <Button variant="ghost" onClick={() => handleEdit(user)}>
-                    <Pencil size={16} className="text-blue-500" />
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleEdit(user)}
+                    className="bg-green-400/20 hover:bg-green-400/40"
+                  >
+                    <Pencil size={16} className="text-green-500" />
                   </Button>
-                  <Button variant="ghost" onClick={() => handleDelete(user.id)}>
+                  <Button
+                    variant="ghost"
+                    className="bg-red-400/20 hover:bg-red-400/40"
+                    onClick={() => handleDelete(user.id)}
+                  >
                     <Trash2 size={16} className="text-red-500" />
                   </Button>
                 </div>
@@ -443,6 +470,6 @@ export default function UserManagementPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </div></>
   );
 }

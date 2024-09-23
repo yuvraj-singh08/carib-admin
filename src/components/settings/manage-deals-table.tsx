@@ -42,6 +42,7 @@ import {
 import { format } from "date-fns";
 import { Separator } from "../ui/separator";
 import { CoupnViewDialog } from "./coupon-view-dialog";
+import { useConfirm } from "@/hooks/use-confirm";
 
 // Define the schema for the coupon form
 const couponFormSchema = z.object({
@@ -61,7 +62,7 @@ const couponFormSchema = z.object({
 });
 
 type CouponUsage = {
-  username:string;
+  username: string;
   userId: number;
   usedCount: number;
   usedDate: Date;
@@ -89,10 +90,14 @@ const initialCoupons: Coupon[] = [
     image: "https://via.placeholder.com/150",
     way: "One way",
     usageDetails: [
-      { username:"xyz",userId: 101, usedCount: 1, usedDate: new Date("2024-03-15") },
+      {
+        username: "xyz",
+        userId: 101,
+        usedCount: 1,
+        usedDate: new Date("2024-03-15"),
+      },
     ],
   },
-
 ];
 
 const CouponManagementSystemTable = () => {
@@ -105,6 +110,11 @@ const CouponManagementSystemTable = () => {
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
+
+  const [ConfirmDialogue, confirm] = useConfirm(
+    "Delete Deal",
+    "Are you sure you want to delete this deal? This action cannot be undone."
+  );
 
   const form = useForm<z.infer<typeof couponFormSchema>>({
     resolver: zodResolver(couponFormSchema),
@@ -165,8 +175,11 @@ const CouponManagementSystemTable = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    setCoupons(coupons.filter((coupon) => coupon.id !== id));
+  const handleDelete = async (id: number) => {
+    const ok = await confirm();
+    if (ok) {
+      setCoupons(coupons.filter((coupon) => coupon.id !== id));
+    }
   };
 
   const handleView = (coupon: Coupon) => {
@@ -186,420 +199,432 @@ const CouponManagementSystemTable = () => {
   const isAllChecked = checkedRows.every((checked) => checked);
 
   return (
-    <div className="p-4 bg-white rounded-xl">
-      <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-bold text-blue">Special Deals</h1>
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => {
-              setEditingCoupon(null);
-              form.reset({
-                title: "",
-                description: "",
-                discount: "",
-                discountType: "percentage",
-                limit: "",
-                code: "",
-                way: "One way",
-                origin: "",
-                destination: "",
-                airlineCode: "",
-                flightCode: "",
-                expiryDate: new Date(),
-              });
-              setIsDialogOpen(true);
-            }}
-          >
-            <CirclePlus size={16} className="mr-2 fill-white text-blue" />
-            Add Special Deal
-          </Button>
-          <div className="relative hidden md:block">
-            <Input
-              placeholder="Search..."
-              className="w-[180px] rounded-xl h-10 pl-9"
-            />
-            <Search className="size-5 shrink-0 text-gray absolute top-2.5 left-2" />
+    <>
+      <ConfirmDialogue />
+      <div className="p-4 bg-white rounded-xl">
+        <div className="flex justify-between mb-4">
+          <h1 className="text-2xl font-bold text-blue">Special Deals</h1>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => {
+                setEditingCoupon(null);
+                form.reset({
+                  title: "",
+                  description: "",
+                  discount: "",
+                  discountType: "percentage",
+                  limit: "",
+                  code: "",
+                  way: "One way",
+                  origin: "",
+                  destination: "",
+                  airlineCode: "",
+                  flightCode: "",
+                  expiryDate: new Date(),
+                });
+                setIsDialogOpen(true);
+              }}
+            >
+              <CirclePlus size={16} className="mr-2 fill-white text-blue" />
+              Add Special Deal
+            </Button>
+            <div className="relative hidden md:block">
+              <Input
+                placeholder="Search..."
+                className="w-[180px] rounded-xl h-10 pl-9"
+              />
+              <Search className="size-5 shrink-0 text-gray absolute top-2.5 left-2" />
+            </div>
           </div>
         </div>
-      </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]">
-              <input
-                type="checkbox"
-                checked={isAllChecked}
-                onChange={(e) => handleHeaderCheckboxChange(e.target.checked)}
-              />
-            </TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>User Limit</TableHead>
-            <TableHead>Used</TableHead>
-            <TableHead>Expiry Date</TableHead>
-            <TableHead className="flex items-center justify-center">
-              Action
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedCoupons.map((coupon, index) => (
-            <TableRow key={coupon.id}>
-              <TableCell>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
                 <input
                   type="checkbox"
-                  checked={checkedRows[index] || false}
-                  onChange={() => handleRowCheckboxChange(index)}
+                  checked={isAllChecked}
+                  onChange={(e) => handleHeaderCheckboxChange(e.target.checked)}
                 />
-              </TableCell>
-              <TableCell>{coupon.title}</TableCell>
-              <TableCell className="text-customBlue">{coupon.code}</TableCell>
-              <TableCell>{coupon.userLimit}</TableCell>
-              <TableCell>{coupon.used}</TableCell>
-              <TableCell>{format(coupon.expiryDate, "dd-MM-yyyy")}</TableCell>
-              <TableCell className="flex items-center justify-center">
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    className="bg-orange-400/20"
-                    onClick={() => handleView(coupon)}
-                  >
-                    <Eye size={16} className="text-orange-500" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="bg-green-400/20"
-                    onClick={() => handleEdit(coupon)}
-                  >
-                    <Pencil size={16} className="text-green-500" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleDelete(coupon.id)}
-                    className="text-red-500"
-                  >
-                    <Trash2 size={16} className="text-red-500" />
-                  </Button>
-                </div>
-              </TableCell>
+              </TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Code</TableHead>
+              <TableHead>User Limit</TableHead>
+              <TableHead>Used</TableHead>
+              <TableHead>Expiry Date</TableHead>
+              <TableHead className="flex items-center justify-center">
+                Action
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {paginatedCoupons.map((coupon, index) => (
+              <TableRow key={coupon.id}>
+                <TableCell>
+                  <input
+                    type="checkbox"
+                    checked={checkedRows[index] || false}
+                    onChange={() => handleRowCheckboxChange(index)}
+                  />
+                </TableCell>
+                <TableCell>{coupon.title}</TableCell>
+                <TableCell className="text-customBlue">{coupon.code}</TableCell>
+                <TableCell>{coupon.userLimit}</TableCell>
+                <TableCell>{coupon.used}</TableCell>
+                <TableCell>{format(coupon.expiryDate, "dd-MM-yyyy")}</TableCell>
+                <TableCell className="flex items-center justify-center">
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      className="bg-orange-400/20 hover:bg-orange-400/40"
+                      onClick={() => handleView(coupon)}
+                    >
+                      <Eye size={16} className="text-orange-500" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="bg-green-400/20 hover:bg-green-400/40"
+                      onClick={() => handleEdit(coupon)}
+                    >
+                      <Pencil size={16} className="text-green-500" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleDelete(coupon.id)}
+                      className="bg-red-400/20 hover:bg-red-400/40"
+                    >
+                      <Trash2 size={16} className="text-red-500" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-4">
-        <div>
-          <Select
-            value={pageSize.toString()}
-            onValueChange={(value) => setPageSize(Number(value))}
-          >
-            <SelectTrigger className="w-[80px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[10, 20, 30, 40, 50].map((size) => (
-                <SelectItem key={size} value={size.toString()}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-x-2">
-          <Button
-            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-            disabled={currentPage === 1}
-            className="px-2 py-1 border rounded bg-transparent text-black"
-          >
-            Previous
-          </Button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        {/* Pagination */}
+        <div className="flex items-center justify-between mt-4">
+          <div>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => setPageSize(Number(value))}
+            >
+              <SelectTrigger className="w-[80px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 20, 30, 40, 50].map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-x-2">
             <Button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              variant={currentPage === page ? "default" : "outline"}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1}
+              className="px-2 py-1 border rounded bg-transparent text-black"
             >
-              {page}
+              Previous
             </Button>
-          ))}
-          <Button
-            onClick={() =>
-              setCurrentPage((page) => Math.min(totalPages, page + 1))
-            }
-            disabled={currentPage === totalPages}
-            className="px-2 py-1 border rounded bg-transparent hover:text-white text-black"
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-
-      {/* Create / Edit Coupon Modal */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[800px] max-w-xl">
-          <DialogHeader>
-            <DialogTitle className="text-blue">
-              {editingCoupon ? "Edit" : "Create"} Coupon
-            </DialogTitle>
-            <Separator />
-          </DialogHeader>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="w-full flex flex-col gap-4"
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                variant={currentPage === page ? "default" : "outline"}
+              >
+                {page}
+              </Button>
+            ))}
+            <Button
+              onClick={() =>
+                setCurrentPage((page) => Math.min(totalPages, page + 1))
+              }
+              disabled={currentPage === totalPages}
+              className="px-2 py-1 border rounded bg-transparent hover:text-white text-black"
             >
-              {/* Title Field */}
-              <div className="flex items-start gap-4 w-full">
-                <div className="flex flex-col gap-3">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Coupon Title" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+              Next
+            </Button>
+          </div>
+        </div>
 
-                  {/* Code Field */}
-                  <FormField
-                    control={form.control}
-                    name="code"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Coupon Code</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Coupon Code" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Discount Type Field */}
-                  <div className="flex space-x-4">
+        {/* Create / Edit Coupon Modal */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="w-[800px] max-w-xl">
+            <DialogHeader>
+              <DialogTitle className="text-blue">
+                {editingCoupon ? "Edit" : "Create"} Coupon
+              </DialogTitle>
+              <Separator />
+            </DialogHeader>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="w-full flex flex-col gap-4"
+              >
+                {/* Title Field */}
+                <div className="flex items-start gap-4 w-full">
+                  <div className="flex flex-col gap-3">
                     <FormField
                       control={form.control}
-                      name="discount"
+                      name="title"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Discount</FormLabel>
+                          <FormLabel>Title</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Coupon Title" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Code Field */}
+                    <FormField
+                      control={form.control}
+                      name="code"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Coupon Code</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Coupon Code" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Discount Type Field */}
+                    <div className="flex space-x-4">
+                      <FormField
+                        control={form.control}
+                        name="discount"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Discount</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="Enter discount"
+                                {...field}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="discountType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Discount Type</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select discount type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="percentage">
+                                  Percentage
+                                </SelectItem>
+                                <SelectItem value="fixed">Fixed</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Limit Field */}
+                    <FormField
+                      control={form.control}
+                      name="limit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>User Limit</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              placeholder="Enter discount"
                               {...field}
+                              type="number"
+                              placeholder="User Limit"
                             />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Expiry Date Field */}
+                    <FormField
+                      control={form.control}
+                      name="expiryDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Expiry Date</FormLabel>
+                          <FormControl>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className={`w-full justify-start ${
+                                    field.value ? "" : "text-muted-foreground"
+                                  }`}
+                                >
+                                  {field.value
+                                    ? format(field.value, "PPP")
+                                    : "Pick a date"}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="p-0">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) =>
+                                    date < new Date()
+                                  } /* Optional to disable past dates */
+                                />
+                              </PopoverContent>
+                            </Popover>
                           </FormControl>
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="discountType"
+                      name="destination"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Discount Type</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select discount type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="percentage">
-                                Percentage
-                              </SelectItem>
-                              <SelectItem value="fixed">Fixed</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Coupon Description"
+                            />
+                          </FormControl>
                         </FormItem>
                       )}
                     />
                   </div>
+                  <div className="flex flex-col gap-3">
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Coupon Description"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    {/* Way */}
+                    <FormField
+                      control={form.control}
+                      name="way"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Way</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter way" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
 
-                  {/* Limit Field */}
-                  <FormField
-                    control={form.control}
-                    name="limit"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>User Limit</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            placeholder="User Limit"
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                    {/* Origin */}
+                    <FormField
+                      control={form.control}
+                      name="origin"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Origin</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter origin" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
 
-                  {/* Expiry Date Field */}
-                  <FormField
-                    control={form.control}
-                    name="expiryDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Expiry Date</FormLabel>
-                        <FormControl>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={`w-full justify-start ${
-                                  field.value ? "" : "text-muted-foreground"
-                                }`}
-                              >
-                                {field.value
-                                  ? format(field.value, "PPP")
-                                  : "Pick a date"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="p-0">
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date()
-                                } /* Optional to disable past dates */
-                              />
-                            </PopoverContent>
-                          </Popover>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="destination"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Coupon Description" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                    {/* Airline Code */}
+                    <FormField
+                      control={form.control}
+                      name="airlineCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Airline Code</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter airline code"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Flight Code */}
+                    <FormField
+                      control={form.control}
+                      name="flightCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Flight Code</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter flight code" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="image"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Image</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  // Handle file upload logic here
+                                  // For now, we'll just set the filename
+                                  field.onChange(file.name);
+                                }
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Coupon Description" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  {/* Way */}
-                  <FormField
-                    control={form.control}
-                    name="way"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Way</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter way" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
 
-                  {/* Origin */}
-                  <FormField
-                    control={form.control}
-                    name="origin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Origin</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter origin" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                {/* Submit Button */}
+                <Button type="submit" className="w-full">
+                  {editingCoupon ? "Update" : "Create"} Coupon
+                </Button>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
 
-                  {/* Airline Code */}
-                  <FormField
-                    control={form.control}
-                    name="airlineCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Airline Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter airline code" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Flight Code */}
-                  <FormField
-                    control={form.control}
-                    name="flightCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Flight Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter flight code" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="image"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Image</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                // Handle file upload logic here
-                                // For now, we'll just set the filename
-                                field.onChange(file.name);
-                              }
-                            }}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <Button type="submit" className="w-full">
-                {editingCoupon ? "Update" : "Create"} Coupon
-              </Button>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {selectedCoupon && (
-        <CoupnViewDialog
-          selectedCoupon={selectedCoupon}
-          setSelectedCoupon={setSelectedCoupon}
-        />
-      )}
-    </div>
+        {selectedCoupon && (
+          <CoupnViewDialog
+            selectedCoupon={selectedCoupon}
+            setSelectedCoupon={setSelectedCoupon}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

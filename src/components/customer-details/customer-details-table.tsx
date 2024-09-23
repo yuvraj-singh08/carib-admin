@@ -25,6 +25,7 @@ import {
 } from "../ui/select";
 import { Eye, Trash2 } from "lucide-react";
 import { Separator } from "../ui/separator";
+import { useConfirm } from "@/hooks/use-confirm";
 
 interface CoTraveler {
   name: string;
@@ -123,7 +124,7 @@ const initialCustomers = [
 const UserInfoDialog = ({ user }: { user: User }) => (
   <Dialog>
     <DialogTrigger asChild>
-      <Button variant="ghost" className="bg-orange-400/20">
+      <Button variant="ghost" className="bg-orange-400/20 hover:bg-orange-400/40">
         <Eye size={16} className="text-orange-500" />
       </Button>
     </DialogTrigger>
@@ -224,6 +225,10 @@ const CustomerDetailsTable = () => {
   const [customers, setCustomers] = useState(initialCustomers);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [ConfirmDialogue, confirm] = useConfirm(
+    "Delete Customer Details",
+    "Are you sure you want to delete this customer details? This action cannot be undone."
+  );
 
   const paginatedCustomers = customers.slice(
     (currentPage - 1) * pageSize,
@@ -232,11 +237,16 @@ const CustomerDetailsTable = () => {
 
   const totalPages = Math.ceil(customers.length / pageSize);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
+  const ok = await confirm()
+  if(ok){
     setCustomers((prev) => prev.filter((customer) => customer.id !== id));
+  }
   };
 
   return (
+  <>
+  <ConfirmDialogue />
     <div className="w-full bg-white rounded-xl pt-6">
       <h2 className="text-lg font-semibold text-blue mb-3 pl-6">
         Customer details
@@ -282,7 +292,7 @@ const CustomerDetailsTable = () => {
                   <UserInfoDialog user={customer} />
                   <Button
                     variant="ghost"
-                    className="bg-red-200/40"
+                    className="bg-red-200/40 hover:bg-red-200/60"
                     onClick={() => handleDelete(customer.id)}
                   >
                     <Trash2 size={16} className="text-red-500" />
@@ -341,7 +351,7 @@ const CustomerDetailsTable = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </div></>
   );
 };
 
