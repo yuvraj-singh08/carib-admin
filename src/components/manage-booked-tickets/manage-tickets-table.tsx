@@ -227,8 +227,16 @@ const BookingTicketsTableWithDateFilter = () => {
                       handleTicketStatusChange(item.id, value)
                     }
                   >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue>{item.status}</SelectValue>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue>
+                       <div className="flex items-center gap-1">
+                       <span
+                          className={`w-3 h-3 shrink-0 rounded-full mr-1 ${
+                            statusOptions.find((option) => option.value === item.status)
+                              ?.color
+                          }`}
+                        />
+                        {item.status}</div></SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {statusOptions.map((option) => (

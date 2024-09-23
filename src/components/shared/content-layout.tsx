@@ -9,10 +9,11 @@ export function ContentLayout({ children }: ContentLayoutProps) {
 
   setTimeout(() => {
     setLoading(false);
-  }, 1400);
+  }, 1300);
 
   return (
     <div className="overflow-x-hidden">
+      {/* <Navbar /> */}
       {loading ? (
         <div className="flex justify-center items-center min-h-[90vh]">
           <div className="w-50 h-50 relative">
@@ -25,7 +26,9 @@ export function ContentLayout({ children }: ContentLayoutProps) {
           </div>
         </div>
       ) : (
-        children
+        <div className="container pt-8 pb-8 px-4 md:px-4 bg-lightGray/40">
+          {children}
+        </div>
       )}
     </div>
   );
