@@ -75,7 +75,7 @@
   /* Scrollbar styles */
   ::-webkit-scrollbar {
     width: 6px;
-    height: 4px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-thumb {

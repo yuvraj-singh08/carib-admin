@@ -83,120 +83,30 @@ const data: Booking[] = [
   },
 ];
 
-const columns: ColumnDef<Booking>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <input
-      className="cursor-pointer"
-        type="checkbox"
-        checked={table.getIsAllPageRowsSelected()}
-        onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <input
-       className="cursor-pointer"
-        type="checkbox"
-        checked={row.getIsSelected()}
-        onChange={(e) => row.toggleSelected(!!e.target.checked)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "serviceType",
-    header: "Service type",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("serviceType")}</div>
-    ),
-  },
-  {
-    accessorKey: "internalBookingId",
-    header: "Internal Booking ID",
-    cell: ({ row }) => (
-      <div className="text-[#0561FC]">{row.getValue("internalBookingId")}</div>
-    ),
-  },
-  {
-    accessorKey: "pnrNumber",
-    header: "PNR Number",
-  },
-  {
-    accessorKey: "bookingDate",
-    header: "Booking Date",
-  },
-  {
-    accessorKey: "supplier",
-    header: "Supplier",
-  },
-  {
-    accessorKey: "departureTime",
-    header: "Departure Time",
-  },
-  {
-    accessorKey: "arrivalTime",
-    header: "Arrival Time",
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
-  },
-  {
-    accessorKey: "autoCancel",
-    header: "Auto Cancel",
-  },
-  {
-    accessorKey: "bookingStatus",
-    header: "Booking Status",
-    cell: ({ row }) => (
-      <div
-        className={`capitalize bg-lightGray/30 p-0.5 px-2 rounded-lg ${getStatusColor(
-          row.getValue("bookingStatus")
-        )} `}
-      >
-        {row.getValue("bookingStatus")}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "sendEmail",
-    header: "Send Email",
-    cell: ({ row }) => (
-      <div className="text-center flex items-center justify-center">
-        {row.getValue("sendEmail") ? (
-          <FaCheckCircle className="size-4 shrink-0 fill-customGreen" />
-        ) : (
-          <Button size="icon" variant="secondary">
-            <img
-              src="/icons/plane.png"
-              alt="icon"
-              className="size-4 shrink-0"
-            />
-          </Button>
-        )}
-      </div>
-    ),
-  },
+const bookingStatuses = [
+  "Ticketed",
+  "Pending Ticketing",
+  "Pending payments",
+  "Expired",
+  "Failed Booking",
 ];
 
-function getStatusColor(status: string) {
+const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
     case "ticketed":
-      return "text-green-600";
+      return "bg-green-100 text-green-600";
     case "pending ticketing":
+      return "bg-yellow-200/40 text-orange-500";
     case "pending payments":
-      return "text-orange-600";
+      return "bg-orange-200 text-orange-600";
+    case "expired":
+      return "bg-gray text-black";
     case "failed booking":
-      return "text-red-600";
+      return "bg-red-100 text-red-600";
     default:
-      return "text-gray-600";
+      return "bg-gray-100 text-gray-600";
   }
-}
-
+};
 export default function FlightBookingsTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -204,9 +114,135 @@ export default function FlightBookingsTable() {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [bookings, setBookings] = useState(data);
+
+  const handleStatusChange = (rowIndex: number, newStatus: string) => {
+    const updatedBookings = [...bookings];
+    // const oldStatus = updatedBookings[rowIndex].bookingStatus;
+    updatedBookings[rowIndex].bookingStatus = newStatus;
+    setBookings(updatedBookings);
+
+    // alert(`Ticket status changed from ${oldStatus} to ${newStatus}`);
+  };
+
+
+  const columns: ColumnDef<Booking>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <input
+          className="cursor-pointer"
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <input
+          className="cursor-pointer"
+          type="checkbox"
+          checked={row.getIsSelected()}
+          onChange={(e) => row.toggleSelected(!!e.target.checked)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "serviceType",
+      header: "Service type",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("serviceType")}</div>
+      ),
+    },
+    {
+      accessorKey: "internalBookingId",
+      header: "Internal Booking ID",
+      cell: ({ row }) => (
+        <div className="text-[#0561FC]">
+          {row.getValue("internalBookingId")}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "pnrNumber",
+      header: "PNR Number",
+    },
+    {
+      accessorKey: "bookingDate",
+      header: "Booking Date",
+    },
+    {
+      accessorKey: "supplier",
+      header: "Supplier",
+    },
+    {
+      accessorKey: "departureTime",
+      header: "Departure Time",
+    },
+    {
+      accessorKey: "arrivalTime",
+      header: "Arrival Time",
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
+    },
+    {
+      accessorKey: "autoCancel",
+      header: "Auto Cancel",
+    },
+    {
+      accessorKey: "bookingStatus",
+      header: "Booking Status",
+      cell: ({ row }) => {
+        const status = row.getValue("bookingStatus") as string;
+        return (
+          <Select
+            value={status}
+            onValueChange={(value) => handleStatusChange(row.index, value)}
+          >
+            <SelectTrigger
+              className={`w-full ${getStatusColor(status)}`}
+            >
+              <SelectValue>{status}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {bookingStatuses.map((statusOption) => (
+                <SelectItem key={statusOption} value={statusOption}>
+                  {statusOption}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      },
+    },
+    {
+      accessorKey: "sendEmail",
+      header: "Send Email",
+      cell: ({ row }) => (
+        <div className="text-center flex items-center justify-center">
+          {row.getValue("sendEmail") ? (
+            <FaCheckCircle className="size-4 shrink-0 fill-customGreen" />
+          ) : (
+            <Button size="icon" variant="secondary">
+              <img
+                src="/icons/plane.png"
+                alt="icon"
+                className="size-4 shrink-0"
+              />
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
 
   const table = useReactTable({
-    data,
+    data: bookings,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -316,13 +352,15 @@ export default function FlightBookingsTable() {
               ?.value as string) || ""
           }
         >
-          <SelectTrigger className="w-[110px] rounded-xl">
-            <SelectValue placeholder="Status" />
+          <SelectTrigger className="w-[150px] rounded-xl">
+            <SelectValue placeholder="Booking Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Ticketed">Ticketed</SelectItem>
-            <SelectItem value="Pending Ticketing">Pending Ticketing</SelectItem>
-            <SelectItem value="Failed Booking">Failed Booking</SelectItem>
+            {bookingStatuses.map((status) => (
+              <SelectItem key={status} value={status}>
+                {status}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select
@@ -415,7 +453,10 @@ export default function FlightBookingsTable() {
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-3 text-[#777980] py-3">
+                      <TableCell
+                        key={cell.id}
+                        className="px-3 text-[#777980] py-3"
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
