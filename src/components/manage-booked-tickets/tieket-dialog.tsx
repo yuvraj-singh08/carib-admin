@@ -16,6 +16,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ImageDialog from "./ticket-image-dialog";
 import { useState } from "react";
+import { Image } from "lucide-react";
 
 const TicketDetailsDialog = ({
   ticket,
@@ -66,10 +67,9 @@ const TicketDetailsDialog = ({
                 <div id="image" className="col-span-3">
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => setIsImageDialogOpen(true)}
                   >
-                    Show
+                    Show {ticket.images.length} <Image className="size-5 shrink-0 text-blue ml-2" />
                   </Button>
                 </div>
               </div>

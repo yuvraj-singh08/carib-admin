@@ -31,7 +31,8 @@ interface Ticket {
   subject: string;
   requesterName: string;
   requestedOn: Date;
-  status: "Open Tickets" | "Pending Tickets" | "Resolve Tickets";
+  status: "Open Tickets" | "Pending Tickets" | "Resolve Tickets",
+  images: string[];
 }
 
 const initialBookingData: Ticket[] = [
@@ -41,6 +42,16 @@ const initialBookingData: Ticket[] = [
     requesterName: "Animesh Sadh",
     requestedOn: new Date("2024-05-30T12:00:00"),
     status: "Open Tickets",
+    images: [
+     '/icons/passport.png',
+     '/icons/passport.png',
+     '/icons/passport.png',
+     '/icons/passport.png',
+     '/icons/passport.png',
+     '/icons/passport.png',
+     '/icons/passport.png',
+
+    ]
   },
   {
     id: "14253679",
@@ -48,6 +59,7 @@ const initialBookingData: Ticket[] = [
     requesterName: "John Doe",
     requestedOn: new Date("2024-05-31T10:30:00"),
     status: "Pending Tickets",
+    images: []
   },
 ];
 
