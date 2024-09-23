@@ -6,7 +6,6 @@ import {
   CircleGauge,
   Clipboard,
   MessageSquare,
-  LifeBuoy,
   ChartColumn,
 } from "lucide-react";
 
@@ -100,7 +99,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/landing-settings",
           label: "Landing Page",
           active: pathname.includes("/landing-settings"),
-          icon: LifeBuoy,
+          icon: MessageSquare,
           submenus: [],
         },
       ],
@@ -117,17 +116,17 @@ export function getMenuList(pathname: string): Group[] {
         },
       ],
     },
-    {
-      groupLabel: "",
-      menus: [
-        {
-          href: "/",
-          label: "Support",
-          active: pathname.includes("/xyz"),
-          icon: Settings,
-          submenus: [],
-        },
-      ],
-    },
+    // {
+    //   groupLabel: "",
+    //   menus: [
+    //     {
+    //       href: "/",
+    //       label: "Support",
+    //       active: pathname.includes("/xyz"),
+    //       icon: Settings,
+    //       submenus: [],
+    //     },
+    //   ],
+    // },
   ];
 }

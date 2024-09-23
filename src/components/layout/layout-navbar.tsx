@@ -17,14 +17,14 @@ export function Navbar({ className }: NavbarProps) {
           <SheetMenu />
         </div>
         <div className="flex flex-1 items-center justify-end gap-3 md:gap-5">
-          <div className="relative hidden md:block">
+          {/* <div className="relative hidden md:block">
             <Input
               placeholder="Search product..."
               className="w-[210px] rounded-xl h-10 pl-9"
             />
             <Search className="size-5 shrink-0 text-gray absolute top-2.5 left-2" />
-          </div>
-          <div className="size-9 shrink-0 rounded-full flex items-center justify-center relative cursor-pointer">
+          </div> */}
+          {/* <div className="size-9 shrink-0 rounded-full flex items-center justify-center relative cursor-pointer">
             <img
               src="/icons/bell.png"
               alt="bell"
@@ -33,7 +33,7 @@ export function Navbar({ className }: NavbarProps) {
             <span className="size-5  shrink-0 absolute flex items-center text-white justify-center -top-2 -right-1 rounded-full bg-gradient-to-r from-[rgba(43,178,254,1)] to-[rgba(34,202,173,1)] text-[12px] font-medium">
               2
             </span>
-          </div>
+          </div> */}
           <div className="size-7 md:gap-8 rounded-full flex items-center justify-center object-contain cursor-pointer">
             <img
               src="/language/english.png"
