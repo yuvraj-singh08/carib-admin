@@ -4,12 +4,14 @@ import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { SidebarLayoutWrapper } from "./components/shared/sidebar-layout-wrapper.tsx";
+import { Toaster } from "react-hot-toast";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <SidebarLayoutWrapper>
         <App />
+        <Toaster />
       </SidebarLayoutWrapper>
     </BrowserRouter>
   </React.StrictMode>

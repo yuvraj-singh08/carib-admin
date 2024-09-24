@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -26,10 +26,20 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { ArrowRightLeft, CalendarIcon, LucideIcon, Search } from "lucide-react";
+import {
+  ArrowRightLeft,
+  CalendarIcon,
+  Loader2,
+  LucideIcon,
+  Search,
+} from "lucide-react";
 import { BiReset } from "react-icons/bi";
 import { User, Baby, Luggage, Briefcase } from "lucide-react";
 import { AdminFlightSearchSchema } from "@/schemas/admin-flight-search";
+import { useFlightsData } from "@/hooks/flights-search-result";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { FlightResultsDialog } from "./flight-result-dialogue";
 
 export const FlightSearchSection = () => {
   const form = useForm({
@@ -54,7 +64,8 @@ export const FlightSearchSection = () => {
   });
 
   const { control, setValue, watch, handleSubmit } = form;
-
+  const { setFlights, setLoading, loading, flights } = useFlightsData();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const fromValue = watch("from");
   const toValue = watch("to");
 
@@ -63,9 +74,34 @@ export const FlightSearchSection = () => {
     setValue("to", fromValue);
   }
 
-  function onSubmit(values: any) {
-    console.log(values);
-    // Further submission logic can go here
+  function onSubmit(data: any) {
+    setLoading(true);
+    const apiUrl =
+      "https://travel-carib-ewd6.onrender.com/flight/search-flights";
+    const requestData = {
+      originLocation: data.from,
+      destinationLocation: data.to,
+      departureDate: format(data.departureDate, "yyyy-MM-dd"),
+      passengerType: "adult",
+      cabinClass: data.flightClass,
+      maxLayovers: "2",
+    };
+
+    axios
+      .post(apiUrl, requestData)
+      .then((response) => {
+        toast.success("Flights Fetched Successfully");
+        setFlights(response.data);
+        setIsDialogOpen(true);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        toast.error("Failed to fetch flights");
+        console.error("API Error:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   function handleReset() {
@@ -361,15 +397,34 @@ export const FlightSearchSection = () => {
             />
           </div>
           <div className="w-full flex items-center justify-center gap-2">
-            <Button type="submit" variant="default" className="h-8">
-              <Search className="mr-2" />
-              Search
-            </Button>
+            {loading ? (
+              <div className="flex items-center justify-start md:justify-center md:mt-5 w-full md:w-auto">
+                <Button
+                  className="flex items-center gap-2 w-full"
+                  size="sm"
+                  type="submit"
+                >
+                  Searching..{" "}
+                  <Loader2 className="size-5 shrink-0 animate-spin" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-start md:justify-center md:mt-5 w-full md:w-auto">
+                <Button
+                  className="flex items-center gap-2 w-full"
+                  size="sm"
+                  type="submit"
+                >
+                  <Search className="size-5 shrink-0" />
+                  Search
+                </Button>
+              </div>
+            )}
             <Button
               type="button"
               onClick={handleReset}
               variant="outline"
-              className="h-8"
+              className="h-9 mt-5"
             >
               <BiReset className="mr-2" />
               Reset
@@ -377,6 +432,11 @@ export const FlightSearchSection = () => {
           </div>
         </form>
       </Form>
+      <FlightResultsDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        flights={flights}
+      />
     </div>
   );
 };
