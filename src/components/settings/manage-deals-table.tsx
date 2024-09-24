@@ -43,6 +43,8 @@ import { format } from "date-fns";
 import { Separator } from "../ui/separator";
 import { CoupnViewDialog } from "./coupon-view-dialog";
 import { useConfirm } from "@/hooks/use-confirm";
+import { HiOutlineRefresh } from "react-icons/hi";
+import { generateRandomCouponCode } from "@/lib/utils";
 
 // Define the schema for the coupon form
 const couponFormSchema = z.object({
@@ -115,6 +117,13 @@ const CouponManagementSystemTable = () => {
     "Delete Deal",
     "Are you sure you want to delete this deal? This action cannot be undone."
   );
+
+  const [couponCode, setCouponCode] = useState("");
+
+  const handleGenerateCode = () => {
+    const newCode = generateRandomCouponCode();
+    setCouponCode(newCode);
+  };
 
   const form = useForm<z.infer<typeof couponFormSchema>>({
     resolver: zodResolver(couponFormSchema),
@@ -386,15 +395,30 @@ const CouponManagementSystemTable = () => {
                       control={form.control}
                       name="code"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="relative">
                           <FormLabel>Coupon Code</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Coupon Code" />
+                            <Input
+                              {...field}
+                              placeholder="Coupon Code"
+                              value={couponCode || field.value}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                setCouponCode(e.target.value);
+                              }}
+                            />
                           </FormControl>
+                          <Button
+                            className="absolute top-6 right-0"
+                            size="sm"
+                            onClick={handleGenerateCode}
+                            type="button" // Prevent form submission
+                          >
+                            <HiOutlineRefresh className="text-white size-5 shrink-0" />
+                          </Button>
                         </FormItem>
                       )}
                     />
-
                     {/* Discount Type Field */}
                     <div className="flex space-x-4">
                       <FormField
