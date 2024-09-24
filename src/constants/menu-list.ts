@@ -7,6 +7,7 @@ import {
   Clipboard,
   MessageSquare,
   ChartColumn,
+  Search,
 } from "lucide-react";
 
 type Submenu = {
@@ -116,17 +117,17 @@ export function getMenuList(pathname: string): Group[] {
         },
       ],
     },
-    // {
-    //   groupLabel: "",
-    //   menus: [
-    //     {
-    //       href: "/",
-    //       label: "Support",
-    //       active: pathname.includes("/xyz"),
-    //       icon: Settings,
-    //       submenus: [],
-    //     },
-    //   ],
-    // },
+    {
+      groupLabel: "",
+      menus: [
+        {
+          href: "/search-management",
+          label: "Search Management",
+          active: pathname.includes("/search-management"),
+          icon: Search,
+          submenus: [],
+        },
+      ],
+    },
   ];
 }

@@ -8,6 +8,7 @@ import LandingPageSettings from "./pages/landing-page-settings";
 import ProfilePage from "./pages/profile";
 import CustomerDetailsPage from "./pages/customers-details";
 import TicketsPage from "./pages/tickets";
+import SearchManagementPage from "./pages/search-management";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/landing-settings" element={<LandingPageSettings />} />
         <Route path="/customer-details" element={<CustomerDetailsPage />} />
         <Route path="/tickets" element={<TicketsPage />} />
+        <Route path="/search-management" element={<SearchManagementPage />} />
       </Routes>
     </>
   );

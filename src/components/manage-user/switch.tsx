@@ -21,6 +21,7 @@ const Switch = ({
       style={{
         backgroundColor: checked ? '#052E73' : '#24252d50',
       }}
+      type='button'
     >
       <span
         className={cn(
