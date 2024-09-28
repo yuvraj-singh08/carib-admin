@@ -533,21 +533,6 @@ const CouponManagementSystemTable = () => {
                     />
                   </div>
                   <div className="flex flex-col gap-3">
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Coupon Description"
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
                     {/* Way */}
                     <FormField
                       control={form.control}
