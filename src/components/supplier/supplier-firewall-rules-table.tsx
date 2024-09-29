@@ -41,7 +41,6 @@ import { BiReset } from "react-icons/bi";
 import { format } from "date-fns";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useTableLoader } from "@/hooks/loader";
 
 const formSchema = z.object({
   rulesTitle: z.string().min(1, "Rules title is required"),
@@ -124,7 +123,7 @@ export default function FlightRulesManager() {
   const [flightRules, setFlightRules] = useState<FlightRule[]>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [pageSize, setPageSize] = useState(10);
-  const { loading, setLoading } = useTableLoader();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),

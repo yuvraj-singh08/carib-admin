@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
 import {
   Table,
   TableBody,
@@ -36,50 +35,32 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CirclePlus, Pencil, Trash2 } from "lucide-react";
 import { useConfirm } from "@/hooks/use-confirm";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const formSchema = z.object({
   type: z.string().min(1, "Type is required"),
   commissionTitle: z.string().min(1, "Commission title is required"),
   supplier: z.string().min(1, "Supplier is required"),
   commissionFees: z.string().min(1, "Commission/Fees is required"),
-  feeType: z.enum(["percent", "fixed"]),
+  feeType: z.enum(["PERCENT", "FIXED"]),
 });
 
-const initialTypes = ["Airline", "Hotel", "Car Rental"];
+const Types = ["AIRLINE", "HOTEL", "CAR_RENTAL"];
 
-const defaultFees = [
-  {
-    id: 1,
-    type: "Airline",
-    commissionTitle: "Standard Flight Commission",
-    supplier: "Amadeus",
-    commissionFees: "10",
-    feeType: "percent",
-    lastUpdate: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    type: "Hotel",
-    commissionTitle: "Luxury Hotel Booking Fee",
-    supplier: "Kiusys",
-    commissionFees: "25",
-    feeType: "fixed",
-    lastUpdate: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    type: "Car Rental",
-    commissionTitle: "Economy Car Commission",
-    supplier: "Duffel",
-    commissionFees: "5",
-    feeType: "percent",
-    lastUpdate: new Date().toISOString(),
-  },
-];
+interface CommissionType {
+  id: string;
+  type: string;
+  commissionTitle: string;
+  supplier: string;
+  commissionFees: string;
+  feeType: string;
+  lastUpdate: string;
+}
 
 export default function FeesCommissionManagerTable() {
-  const [fees, setFees] = useState(defaultFees);
-  const [types, setTypes] = useState(initialTypes);
+  const [fees, setFees] = useState<CommissionType[] | null>(null);
+  const [types, setTypes] = useState(Types);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(false);
   const [newType, setNewType] = useState("");
@@ -88,7 +69,7 @@ export default function FeesCommissionManagerTable() {
   const [editingFee, setEditingFee] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
+  const [ loading, setLoading ] = useState(false);
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Commission",
     "Are you sure you want to delete this commission? This action cannot be undone."
@@ -105,25 +86,77 @@ export default function FeesCommissionManagerTable() {
     },
   });
 
-  const onSubmit = (values: any) => {
+  const onSubmit = async (values: any) => {
     if (editingFee) {
-      setFees(
-        fees.map((fee) =>
-          fee.id === editingFee.id
-            ? { ...fee, ...values, lastUpdate: new Date().toISOString() }
-            : fee
-        )
-      );
+      setLoading(true);
+      const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
+      const data = {
+        id: editingFee.id,
+        type: values.type,
+        commissionTitle: values.commissionTitle,
+        supplier: values.supplier,
+        commissionFees: values.commissionFees,
+        feeType: values.feeType,
+      };
+      try {
+        await axios
+          .post(`${apiUrl}/admin/update-commission`, data)
+          .then((res) => {
+            toast.success("Commission updated successfully");
+            console.log(res.data.commission);
+          });
+      } catch (err: any) {
+        console.log(err.response.data.message);
+        toast.error(err.response.data.message);
+      } finally {
+        setLoading(false);
+        toast.dismiss();
+      }
     } else {
-      setFees([
-        ...fees,
-        { id: Date.now(), ...values, lastUpdate: new Date().toISOString() },
-      ]);
+      setLoading(true);
+      const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
+      toast.loading("Creating new commission...");
+
+      const data = {
+        type: values.type,
+        commissionTitle: values.commissionTitle,
+        supplier: values.supplier,
+        commissionFees: values.commissionFees,
+        feeType: values.feeType,
+      };
+      try {
+        await axios.post(`${apiUrl}/admin/add-commission`, data).then((res) => {
+          toast.success("Commission created successfully");
+          console.log(res.data.commission);
+        });
+      } catch (err: any) {
+        console.log(err.response.data.message);
+        toast.error(err.response.data.message);
+      } finally {
+        setLoading(false);
+        toast.dismiss();
+      }
     }
     setIsDialogOpen(false);
     setEditingFee(null);
     form.reset();
+    window.location.reload();
   };
+
+  useEffect(() => {
+    setLoading(true);
+    async function fetchCommisions() {
+      const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
+      try {
+        const response = await axios.get(`${apiUrl}/admin/commission`);
+        setFees(response.data.commission);
+      } catch (error: any) {
+        console.error(error.message);
+      }
+    }
+    fetchCommisions();
+    setLoading(false);
+  }, []);
 
   const addType = () => {
     if (newType && !types.includes(newType)) {
@@ -146,12 +179,12 @@ export default function FeesCommissionManagerTable() {
     setTypes(types.filter((type) => type !== typeToDelete));
   };
 
-  const handleDelete = async (id: number) => {
-    const ok = await confirm();
-    if (ok) {
-      setFees(fees.filter((fee) => fee.id !== id));
-    }
-  };
+  // const handleDelete = async (id: number) => {
+  //   const ok = await confirm();
+  //   if (ok) {
+  //     setFees((fees ?? []).filter((fee) => fee.id !== id.toString()));
+  //   }
+  // };
 
   const toggleSelectRow = (id: number) => {
     setSelectedIds((prev) =>
@@ -167,7 +200,7 @@ export default function FeesCommissionManagerTable() {
     if (selectedIds.length === paginatedFees.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(paginatedFees.map((fee) => fee.id));
+      setSelectedIds(paginatedFees.map((fee) => Number(fee.id)));
     }
   };
 
@@ -177,8 +210,32 @@ export default function FeesCommissionManagerTable() {
     setIsDialogOpen(true);
   };
 
-  const totalPages = Math.ceil(fees.length / pageSize);
-  const paginatedFees = fees.slice(
+  const handleDelete = async (id: string) => {
+    const ok = await confirm();
+    if (ok) {
+      setLoading(true);
+      try {
+        const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
+        await axios
+          .post(`${apiUrl}/admin/delete-commission/`, { id: id })
+          .then((res) => {
+            if(res.data.success) {
+              toast.success("Commission deleted successfully");
+              setFees((fees ?? []).filter((fee) => fee.id !== id));
+            }
+          });
+      } catch (err: any) {
+        console.log(err.response.data.message);
+        toast.error(err.response.data.message);
+      } finally {
+        setLoading(false);
+        toast.dismiss();
+      }
+    }
+  };
+
+  const totalPages = Math.ceil((fees?.length ?? 0) / pageSize);
+  const paginatedFees = (fees ?? []).slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -284,9 +341,9 @@ export default function FeesCommissionManagerTable() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="amadeus">Amadeus</SelectItem>
-                            <SelectItem value="kiusys">Kiusys</SelectItem>
-                            <SelectItem value="duffel">Duffel</SelectItem>
+                            <SelectItem value="AMADEUS">Amadeus</SelectItem>
+                            <SelectItem value="KIUSYS">Kiusys</SelectItem>
+                            <SelectItem value="DUFFEL">Duffel</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormItem>
@@ -315,24 +372,27 @@ export default function FeesCommissionManagerTable() {
                             <input
                               type="radio"
                               {...field}
-                              value="percent"
-                              checked={field.value === "percent"}
+                              value="PERCENT"
+                              checked={field.value === "PERCENT"}
+                              onChange={() => field.onChange("PERCENT")}
                             />
-                            <span>%</span>
+                            <span>Percentage</span>
                           </label>
                           <label className="flex items-center space-x-2">
                             <input
                               type="radio"
                               {...field}
-                              value="fixed"
-                              checked={field.value === "fixed"}
+                              value="FIXED"
+                              checked={field.value === "FIXED"}
+                              onChange={() => field.onChange("FIXED")}
                             />
-                            <span>$</span>
+                            <span>Fixed</span>
                           </label>
                         </div>
                       </FormItem>
                     )}
                   />
+
                   <div className="flex justify-end space-x-2">
                     <Button
                       type="button"
@@ -341,8 +401,8 @@ export default function FeesCommissionManagerTable() {
                     >
                       Cancel
                     </Button>
-                    <Button type="submit">
-                      {editingFee ? "Update" : "Apply"}
+                    <Button disabled={loading} type="submit">
+                      {editingFee ? "Update" : "Create"}
                     </Button>
                   </div>
                 </form>
@@ -418,18 +478,19 @@ export default function FeesCommissionManagerTable() {
               <TableHead>Commission Title</TableHead>
               <TableHead>Supplier</TableHead>
               <TableHead>Commission/Fees</TableHead>
+              <TableHead>Fee Type</TableHead>
               <TableHead>Last Update</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedFees.map((fee) => (
-              <TableRow key={fee.id}>
+            {paginatedFees.map((fee, index) => (
+              <TableRow key={index}>
                 <TableCell>
                   <input
                     type="checkbox"
-                    checked={isSelected(fee.id)}
-                    onChange={() => toggleSelectRow(fee.id)}
+                    checked={isSelected(Number(fee.id))}
+                    onChange={() => toggleSelectRow(Number(fee.id))}
                     aria-label="Select row"
                   />
                 </TableCell>
@@ -437,11 +498,12 @@ export default function FeesCommissionManagerTable() {
                 <TableCell>{fee.commissionTitle}</TableCell>
                 <TableCell>{fee.supplier}</TableCell>
                 <TableCell>
-                  {fee.commissionFees} {fee.feeType === "percent" ? "%" : "$"}
+                  {fee.commissionFees} {fee.feeType === "PERCENT" ? "%" : "$"}
                 </TableCell>
                 <TableCell>
-                  {format(new Date(fee.lastUpdate), "dd-MM-yyyy")}
+                  {fee.feeType === "PERCENT" ? "Percentage" : "Fixed Amount"}
                 </TableCell>
+                <TableCell>{fee.lastUpdate}</TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
                     <div className="size-7 rounded-md bg-green-200/50 flex items-center justify-center">
