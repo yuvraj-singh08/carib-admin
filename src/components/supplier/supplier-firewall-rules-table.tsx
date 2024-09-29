@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -39,6 +39,9 @@ import {
 } from "@/components/ui/form";
 import { BiReset } from "react-icons/bi";
 import { format } from "date-fns";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useTableLoader } from "@/hooks/loader";
 
 const formSchema = z.object({
   rulesTitle: z.string().min(1, "Rules title is required"),
@@ -51,16 +54,14 @@ const formSchema = z.object({
 
 type FlightRule = {
   id: string;
-  rulesTitle: string;
-  supplierName: string;
-  airlinesCode: string;
+  title: string;
+  supplier: string;
+  code: string;
   flightNumber: string;
-  fromAirport: string;
-  toAirport: string;
-  lastUpdate: string;
+  from: string;
+  to: string;
+  updateTime: Date;
 };
-
-
 
 const columns: ColumnDef<FlightRule>[] = [
   {
@@ -85,15 +86,15 @@ const columns: ColumnDef<FlightRule>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "rulesTitle",
+    accessorKey: "title",
     header: "Rules title",
   },
   {
-    accessorKey: "supplierName",
+    accessorKey: "supplier",
     header: "Supplier name",
   },
   {
-    accessorKey: "airlinesCode",
+    accessorKey: "code",
     header: "Airlines Code",
   },
   {
@@ -101,15 +102,15 @@ const columns: ColumnDef<FlightRule>[] = [
     header: "Flight number",
   },
   {
-    accessorKey: "fromAirport",
+    accessorKey: "from",
     header: "From Airport",
   },
   {
-    accessorKey: "toAirport",
+    accessorKey: "to",
     header: "To Airport",
   },
   {
-    accessorKey: "lastUpdate",
+    accessorKey: "updateTime",
     header: "Last Update",
     cell: ({ getValue }) => {
       const value = getValue() as string;
@@ -117,14 +118,13 @@ const columns: ColumnDef<FlightRule>[] = [
       return formattedDate;
     },
   },
-  
 ];
-
 
 export default function FlightRulesManager() {
   const [flightRules, setFlightRules] = useState<FlightRule[]>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [pageSize, setPageSize] = useState(10);
+  const { loading, setLoading } = useTableLoader();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -155,21 +155,53 @@ export default function FlightRulesManager() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const newRule: FlightRule = {
-      ...values,
-      id: Date.now().toString(),
-      lastUpdate: new Date().toLocaleString(),
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+    const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
+    toast.loading("Creating new firewall rule...");
+
+    const data = {
+      title: values.rulesTitle,
+      supplier: values.supplierName,
+      code: values.airlinesCode,
+      flightNumber: values.flightNumber,
+      from: values.fromAirport,
+      to: values.toAirport,
     };
-    setFlightRules([...flightRules, newRule]);
+    try {
+      await axios.post(`${apiUrl}/admin/add-firewall`, data).then((res) => {
+        console.log(res.data);
+        toast.success("Firewall rule created successfully");
+      });
+    } catch (error: any) {
+      console.error(error.message);
+      toast.error("Failed to create firewall rule");
+    } finally {
+      setLoading(false);
+      toast.dismiss();
+    }
     form.reset();
   }
 
   function handleResetAll() {
-    setFlightRules([]);
     form.reset();
     setGlobalFilter("");
   }
+
+  useEffect(() => {
+    setLoading(true);
+    async function fetchFlightRules() {
+      const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
+      try {
+        const response = await axios.get(`${apiUrl}/admin/firewall`);
+        setFlightRules(response.data.firewall);
+      } catch (error: any) {
+        console.error(error.message);
+      }
+    }
+    fetchFlightRules();
+    setLoading(false);
+  }, [flightRules]);
 
   return (
     <div className="w-full bg-white px-3 rounded-xl space-y-6 py-5">
@@ -205,9 +237,9 @@ export default function FlightRulesManager() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="amadeus">Amadeus</SelectItem>
-                      <SelectItem value="kiusys">Kiusys</SelectItem>
-                      <SelectItem value="duffel">Duffel</SelectItem>
+                      <SelectItem value="AMADEUS">Amadeus</SelectItem>
+                      <SelectItem value="KIUSYS">Kiusys</SelectItem>
+                      <SelectItem value="DUFFEL">Duffel</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -268,7 +300,12 @@ export default function FlightRulesManager() {
             />
           </div>
           <div className="flex justify-end gap-4 items-center">
-            <Button type="submit" className="bg-blue text-white" size={"sm"}>
+            <Button
+              disabled={loading}
+              type="submit"
+              className="bg-blue text-white"
+              size={"sm"}
+            >
               Create Rules
             </Button>
 

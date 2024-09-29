@@ -1,16 +1,11 @@
-import { useState } from "react";
+import { useTableLoader } from "@/hooks/loader";
 
 interface ContentLayoutProps {
   children: React.ReactNode;
 }
 
 export function ContentLayout({ children }: ContentLayoutProps) {
-  const [loading, setLoading] = useState(true);
-  
-
-  setTimeout(() => {
-    setLoading(false);
-  }, 1300);
+  const { loading } = useTableLoader();
 
   return (
     <div className="overflow-x-hidden">
