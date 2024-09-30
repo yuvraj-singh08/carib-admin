@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import flightRulesReducer from "../redux/flight-rules-firewall";
+import feesCommissionReducer from "../redux/fees-commison";
 
 export const store = configureStore({
   reducer: {
     flightRules: flightRulesReducer,
+    feesCommission: feesCommissionReducer,
   },
 });
 

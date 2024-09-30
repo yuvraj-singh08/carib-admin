@@ -113,64 +113,6 @@ export function Menu({ isOpen }: MenuProps) {
               )}
             </li>
           ))}
-        {/* <div className="flex flex-col gap-1 w-full">
-        <li className="w-full grow flex items-end">
-            <TooltipProvider disableHoverableContent>
-              <Tooltip delayDuration={100}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => {}}
-                    variant="ghost"
-                    className="w-full justify-start h-10 mt-5 text-gray"
-                  >
-                    <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      <TbFlag2 size={18} />
-                    </span>
-                    <p
-                      className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                      )}
-                    >
-                      Report Bug
-                    </p>
-                  </Button>
-                </TooltipTrigger>
-                {isOpen === false && (
-                  <TooltipContent side="right">Report Bug</TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
-          </li>
-          <li className="w-full grow flex items-end">
-            <TooltipProvider disableHoverableContent>
-              <Tooltip delayDuration={100}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => {}}
-                    variant="ghost"
-                    className="w-full justify-start h-10 -mt-1 text-gray"
-                  >
-                    <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      <AiOutlineQuestionCircle size={18} />
-                    </span>
-                    <p
-                      className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                      )}
-                    >
-                      FAQ
-                    </p>
-                  </Button>
-                </TooltipTrigger>
-                {isOpen === false && (
-                  <TooltipContent side="right">FAQ</TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
-          </li>
-        </div> */}
         </ul>
       </nav>
     </ScrollArea>
