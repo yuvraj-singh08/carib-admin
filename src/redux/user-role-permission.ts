@@ -58,7 +58,7 @@ export const updateRole = createAsyncThunk(
   }
 );
 
-// Slice for roles
+
 const rolesSlice = createSlice({
   name: "roles",
   initialState: {
@@ -92,7 +92,7 @@ const rolesSlice = createSlice({
           (role) => role.id === updatedRole.id
         );
         if (index !== -1) {
-          state.roles[index] = updatedRole; // Update the specific role in the state
+          state.roles[index] = updatedRole; 
         }
       });
   },
