@@ -63,7 +63,7 @@ const formSchema = z.object({
 
 export default function FlightRulesManager() {
   const dispatch = useDispatch<AppDispatch>();
-  const { rules, status, error } = useSelector(
+  const { rules, status } = useSelector(
     (state: RootState) => state.flightRules
   );
 
@@ -228,9 +228,6 @@ export default function FlightRulesManager() {
     return <TableLoader />;
   }
 
-  if (status === "failed") {
-    return <div>Error: {error}</div>;
-  }
 
   return (
     <>
