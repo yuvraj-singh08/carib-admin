@@ -1,5 +1,6 @@
 import CookieSettingsForm from "@/components/landing-settings/cookie-settings-form";
 import SocialProvidersForm from "@/components/landing-settings/socials-settings";
+import PrivacyPolicyForm from "@/components/privacy-policy/text-editor";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,7 +42,9 @@ const LandingPageSettings = () => {
             <TabsContent value="cookie">
               <CookieSettingsForm />
             </TabsContent>
-            <TabsContent value="privacy">two</TabsContent>
+            <TabsContent value="privacy">
+              <PrivacyPolicyForm />
+            </TabsContent>
             <TabsContent value="terms">three</TabsContent>
             <TabsContent value="socials">
               <SocialProvidersForm />
