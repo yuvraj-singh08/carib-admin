@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   addSocialSettings,
   updateSocialSettings,
@@ -24,49 +23,29 @@ import {
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 
-// Define the structure of social settings
 interface SocialSettings {
   id: string;
   socialsEnable: boolean;
-  platforms: {
-    [key: string]: {
-      url: string;
-      enabled: boolean;
-    };
-  };
+  socialPlatforms: Record<string, { url: string; enabled: boolean }>;
 }
 
-// Define the structure for social permission group
-interface SocialPermissionGroup {
-  socialsEnable: boolean;
-  platforms: {
-    [key: string]: {
-      url: string;
-      enabled: boolean;
-    };
-  };
-}
-
-// Switch component
 const Switch: React.FC<{
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
 }> = ({ checked, onCheckedChange, disabled }) => (
   <button
-    className={`relative h-5 w-10 cursor-pointer rounded-full duration-200`}
+    className="relative h-5 w-10 cursor-pointer rounded-full duration-200"
     onClick={() => onCheckedChange(!checked)}
-    style={{
-      backgroundColor: checked ? "#052E73" : "#24252d50",
-    }}
+    style={{ backgroundColor: checked ? "#052E73" : "#24252d50" }}
     disabled={disabled}
     type="button"
   >
     <span
       className={cn(
-        `absolute right-3 top-0 rounded-full bg-white shadow-lg transition-all duration-200`,
+        "absolute right-3 top-0 rounded-full bg-white shadow-lg transition-all duration-200",
         checked
-          ? "translate-x-full transform "
+          ? "translate-x-full transform"
           : "translate-x-0 transform left-0",
         "size-3 m-1"
       )}
@@ -87,7 +66,6 @@ const socialMediaPlatforms = [
   "Snapchat",
 ] as const;
 
-
 // Zod schema for form validation
 const formSchema = z.object({
   socialsEnable: z.boolean(),
@@ -98,14 +76,16 @@ const formSchema = z.object({
         enabled: z.boolean(),
       })
     )
-    .refine((data) => {
-      return Object.entries(data).every(([_, platform]) =>
-        !platform.enabled || (platform.enabled && platform.url !== "")
-      );
-    }, {
-      message: "URL is required when the platform is enabled",
-      path: ["platforms"],
-    }),
+    .refine(
+      (data) =>
+        Object.values(data).every(
+          (platform) => !platform.enabled || platform.url !== ""
+        ),
+      {
+        message: "URL is required when the platform is enabled",
+        path: ["platforms"],
+      }
+    ),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -113,7 +93,6 @@ type FormValues = z.infer<typeof formSchema>;
 const SocialProvidersForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { settings, status } = useSelector((state: RootState) => state.socials);
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -133,18 +112,30 @@ const SocialProvidersForm: React.FC = () => {
 
   useEffect(() => {
     if (settings.length > 0) {
-      const socialData = settings[0] as unknown as SocialSettings;
+      const socialData = settings[0];
+      const formattedSocialPlatforms = socialData.socialPlatforms.reduce(
+        (acc, platform) => {
+          acc[platform.platform] = {
+            url: platform.url,
+            enabled: platform.enabled,
+          };
+          return acc;
+        },
+        {} as Record<string, { url: string; enabled: boolean }>
+      );
+
       form.reset({
         socialsEnable: socialData.socialsEnable,
-        platforms: socialData.platforms,
+        platforms: formattedSocialPlatforms,
       });
     }
   }, [settings, form]);
 
   const onSubmit = (data: FormValues) => {
-    const socialData: SocialPermissionGroup = {
+    const socialData: SocialSettings = {
+      id: settings.length > 0 ? settings[0].id : "",
       socialsEnable: data.socialsEnable,
-      platforms: data.platforms,
+      socialPlatforms: data.platforms,
     };
 
     if (settings.length > 0) {
@@ -152,10 +143,12 @@ const SocialProvidersForm: React.FC = () => {
         updateSocialSettings({
           id: settings[0].id,
           socialsEnable: socialData.socialsEnable,
-          socialPlatforms: Object.entries(socialData.platforms).map(([key, value]) => ({
-            platform: key,
-            ...value,
-          })),
+          socialPlatforms: Object.entries(socialData.socialPlatforms).map(
+            ([key, value]) => ({
+              platform: key,
+              ...value,
+            })
+          ),
         })
       );
       toast.success("Social settings updated successfully");
@@ -163,10 +156,12 @@ const SocialProvidersForm: React.FC = () => {
       dispatch(
         addSocialSettings({
           socialsEnable: socialData.socialsEnable,
-          socialPlatforms: Object.entries(socialData.platforms).map(([key, value]) => ({
-            platform: key,
-            ...value,
-          })),
+          socialPlatforms: Object.entries(socialData.socialPlatforms).map(
+            ([key, value]) => ({
+              platform: key,
+              ...value,
+            })
+          ),
         })
       );
       toast.success("Social settings added successfully");
