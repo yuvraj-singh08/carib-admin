@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -35,6 +35,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { useConfirm } from "@/hooks/use-confirm";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRoles } from "@/redux/user-role-permission";
+import { AppDispatch } from "@/provider/redux-provider";
 
 const userFormSchema = z
   .object({
@@ -73,10 +76,23 @@ const defaultUsers: User[] = [
     role: "Manager",
     status: "active",
   },
-  // Add more default users as needed
 ];
 
 export default function UserManagementPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const roles = useSelector(
+    (state: { roles: { roles: any[]; status: string } }) => state.roles.roles
+  );
+  const status = useSelector(
+    (state: { roles: { status: string } }) => state.roles.status
+  );
+
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchRoles());
+    }
+  }, [status, dispatch]);
+
   const [users, setUsers] = useState(defaultUsers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -155,321 +171,324 @@ export default function UserManagementPage() {
 
   return (
     <>
-    <ConfirmDialogue />
-    <div className="w-full bg-white px-3 rounded-lg space-y-6 py-5">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold text-blue">User Management</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              onClick={() => {
-                setEditingUser(null);
-                form.reset({
-                  uniqueId: "",
-                  name: "",
-                  contact: "",
-                  email: "",
-                  role: "",
-                  address: "",
-                  password: "",
-                  confirmPassword: "",
-                  status: "active",
-                });
-                setIsDialogOpen(true);
-              }}
-            >
-              Add User
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle className="text-blue">
-                {editingUser ? "Edit User" : "Add User"}
-              </DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-4"
+      <ConfirmDialogue />
+      <div className="w-full bg-white px-3 rounded-lg space-y-6 py-5">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold text-blue">User Management</h2>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                onClick={() => {
+                  setEditingUser(null);
+                  form.reset({
+                    uniqueId: "",
+                    name: "",
+                    contact: "",
+                    email: "",
+                    role: "",
+                    address: "",
+                    password: "",
+                    confirmPassword: "",
+                    status: "active",
+                  });
+                  setIsDialogOpen(true);
+                }}
               >
-                <div className="flex w-full items-start gap-6">
-                  <div className="flex flex-col gap-3">
-                    <FormField
-                      control={form.control}
-                      name="uniqueId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Unique ID</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="contact"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Contact</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem className="mt-2">
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="email" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <div className="flex space-x-4">
-                            <label className="flex items-center space-x-2">
-                              <input
-                                type="radio"
-                                {...field}
-                                value="active"
-                                checked={field.value === "active"}
-                              />
-                              <span>Active</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                              <input
-                                type="radio"
-                                {...field}
-                                value="inactive"
-                                checked={field.value === "inactive"}
-                              />
-                              <span>Inactive</span>
-                            </label>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    <FormField
-                      control={form.control}
-                      name="role"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Role</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
+                Add User
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle className="text-blue">
+                  {editingUser ? "Edit User" : "Add User"}
+                </DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="flex flex-col gap-4"
+                >
+                  <div className="flex w-full items-start gap-6">
+                    <div className="flex flex-col gap-3">
+                      <FormField
+                        control={form.control}
+                        name="uniqueId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Unique ID</FormLabel>
                             <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select role" />
-                              </SelectTrigger>
+                              <Input {...field} />
                             </FormControl>
-                            <SelectContent>
-                              <SelectItem value="manager">Manager</SelectItem>
-                              <SelectItem value="employee">Employee</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Address</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="password" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem className="-mt-1">
-                          <FormLabel>Confirm Password</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="password" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="contact"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem className="mt-2">
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="email" />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <div className="flex space-x-4">
+                              <label className="flex items-center space-x-2">
+                                <input
+                                  type="radio"
+                                  {...field}
+                                  value="active"
+                                  checked={field.value === "active"}
+                                />
+                                <span>Active</span>
+                              </label>
+                              <label className="flex items-center space-x-2">
+                                <input
+                                  type="radio"
+                                  {...field}
+                                  value="inactive"
+                                  checked={field.value === "inactive"}
+                                />
+                                <span>Inactive</span>
+                              </label>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <FormField
+                        control={form.control}
+                        name="role"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Role</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {roles.map((role) => (
+                                  <SelectItem key={role.id} value={role.id}>
+                                    {role.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Address</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="password" />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem className="-mt-1">
+                            <FormLabel>Confirm Password</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="password" />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex justify-center  space-x-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit">
-                    {editingUser ? "Update" : "Save"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
+                  <div className="flex justify-center  space-x-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit">
+                      {editingUser ? "Update" : "Save"}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]">
-              <input
-                type="checkbox"
-                checked={isAllChecked}
-                onChange={(e) => handleHeaderCheckboxChange(e.target.checked)}
-              />
-            </TableHead>
-            <TableHead>User ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Contact</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedUsers.map((user, index) => (
-            <TableRow key={user.id}>
-              <TableCell>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
                 <input
                   type="checkbox"
-                  checked={
-                    checkedRows[(currentPage - 1) * pageSize + index] || false
-                  }
-                  onChange={() =>
-                    handleRowCheckboxChange(
-                      (currentPage - 1) * pageSize + index
-                    )
-                  }
+                  checked={isAllChecked}
+                  onChange={(e) => handleHeaderCheckboxChange(e.target.checked)}
                 />
-              </TableCell>
-              <TableCell>{user.uniqueId}</TableCell>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.contact}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell>
-                <span
-                  className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                    user.status === "active" ? "bg-green-500" : "bg-red-500"
-                  }`}
-                ></span>
-                {user.status}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleEdit(user)}
-                    className="bg-green-400/20 hover:bg-green-400/40"
-                  >
-                    <Pencil size={16} className="text-green-500" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="bg-red-400/20 hover:bg-red-400/40"
-                    onClick={() => handleDelete(user.id)}
-                  >
-                    <Trash2 size={16} className="text-red-500" />
-                  </Button>
-                </div>
-              </TableCell>
+              </TableHead>
+              <TableHead>User ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Contact</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Action</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {paginatedUsers.map((user, index) => (
+              <TableRow key={user.id}>
+                <TableCell>
+                  <input
+                    type="checkbox"
+                    checked={
+                      checkedRows[(currentPage - 1) * pageSize + index] || false
+                    }
+                    onChange={() =>
+                      handleRowCheckboxChange(
+                        (currentPage - 1) * pageSize + index
+                      )
+                    }
+                  />
+                </TableCell>
+                <TableCell>{user.uniqueId}</TableCell>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.contact}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                      user.status === "active" ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  ></span>
+                  {user.status}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleEdit(user)}
+                      className="bg-green-400/20 hover:bg-green-400/40"
+                    >
+                      <Pencil size={16} className="text-green-500" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="bg-red-400/20 hover:bg-red-400/40"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      <Trash2 size={16} className="text-red-500" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-      <div className="flex items-center justify-between mt-4">
-        <div>
-          <Select
-            value={pageSize.toString()}
-            onValueChange={(value) => setPageSize(Number(value))}
-          >
-            <SelectTrigger className="w-[80px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[10, 20, 30, 40, 50].map((size) => (
-                <SelectItem key={size} value={size.toString()}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-x-2">
-          <Button
-            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-            disabled={currentPage === 1}
-            className="px-2 py-1 border rounded bg-transparent text-black"
-          >
-            Previous
-          </Button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <Button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              variant={currentPage === page ? "default" : "outline"}
+        <div className="flex items-center justify-between mt-4">
+          <div>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => setPageSize(Number(value))}
             >
-              {page}
+              <SelectTrigger className="w-[80px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 20, 30, 40, 50].map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-x-2">
+            <Button
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1}
+              className="px-2 py-1 border rounded bg-transparent text-black"
+            >
+              Previous
             </Button>
-          ))}
-          <Button
-            onClick={() =>
-              setCurrentPage((page) => Math.min(totalPages, page + 1))
-            }
-            disabled={currentPage === totalPages}
-            className="px-2 py-1 border rounded bg-transparent hover:text-white text-black"
-          >
-            Next
-          </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                variant={currentPage === page ? "default" : "outline"}
+              >
+                {page}
+              </Button>
+            ))}
+            <Button
+              onClick={() =>
+                setCurrentPage((page) => Math.min(totalPages, page + 1))
+              }
+              disabled={currentPage === totalPages}
+              className="px-2 py-1 border rounded bg-transparent hover:text-white text-black"
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
-    </div></>
+    </>
   );
 }
