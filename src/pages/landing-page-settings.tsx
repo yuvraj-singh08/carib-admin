@@ -35,9 +35,6 @@ const LandingPageSettings = () => {
               {activeTab === "socials" && (
                 <div className="w-32 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-[550px]" />
               )}
-              {/* {activeTab === "email" && (
-                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[110px]" />
-              )} */}
             </TabsList>
             <TabsContent value="cookie">
               <CookieSettingsForm />
