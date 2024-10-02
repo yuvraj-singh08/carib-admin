@@ -37,124 +37,149 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchRoles } from "@/redux/user-role-permission";
-import { AppDispatch } from "@/provider/redux-provider";
+import toast from "react-hot-toast";
+import {
+  addUser,
+  deleteUser,
+  fetchUsers,
+  updateUser,
+  User,
+} from "@/redux/manage-user";
+import { AppDispatch, RootState } from "@/provider/redux-provider";
 
 const userFormSchema = z
   .object({
     uniqueId: z.string().min(1, "Unique ID is required"),
     name: z.string().min(1, "Name is required"),
-    contact: z.string().min(1, "Contact is required"),
     email: z.string().email("Invalid email address"),
     role: z.string().min(1, "Role is required"),
     address: z.string().min(1, "Address is required"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm Password is required"),
-    status: z.enum(["active", "inactive"]),
+    status: z.enum(["ACTIVE", "INACTIVE"]),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
 
-type User = {
-  id: number;
-  uniqueId: string;
-  name: string;
-  contact: string;
-  email: string;
-  role: string;
-  status: "active" | "inactive";
-};
-
-const defaultUsers: User[] = [
-  {
-    id: 1,
-    uniqueId: "58632553",
-    name: "Animesh Sadh",
-    contact: "6263584921",
-    email: "animeshsadh@gmail.com",
-    role: "Manager",
-    status: "active",
-  },
-];
+type FormValues = z.infer<typeof userFormSchema>;
 
 export default function UserManagementPage() {
   const dispatch = useDispatch<AppDispatch>();
   const roles = useSelector(
-    (state: { roles: { roles: any[]; status: string } }) => state.roles.roles
+    (state: RootState) => (state.roles as { roles: any[] }).roles
   );
-  const status = useSelector(
-    (state: { roles: { status: string } }) => state.roles.status
-  );
+  const rolesStatus = useSelector((state: RootState) => state.roles.status);
+  const users = useSelector((state: RootState) => state.users.users);
+  const usersStatus = useSelector((state: RootState) => state.users.status);
 
-  useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchRoles());
-    }
-  }, [status, dispatch]);
-
-  const [users, setUsers] = useState(defaultUsers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(50);
-  const [checkedRows, setCheckedRows] = useState<boolean[]>(
-    Array(defaultUsers.length).fill(false)
-  );
 
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete User",
     "Are you sure you want to delete this user? This action cannot be undone."
   );
 
-  const form = useForm({
+  const form = useForm<FormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
       uniqueId: "",
       name: "",
-      contact: "",
       email: "",
       role: "",
       address: "",
       password: "",
       confirmPassword: "",
-      status: "active",
+      status: "ACTIVE",
     },
   });
 
-  const onSubmit = (values: any) => {
-    if (editingUser) {
-      setUsers(
-        users.map((user) =>
-          user.id === editingUser.id ? { ...user, ...values } : user
-        )
-      );
-    } else {
-      setUsers([...users, { id: Date.now(), ...values }]);
+  // Fetch roles and users on component mount
+  useEffect(() => {
+    if (rolesStatus === "idle") {
+      dispatch(fetchRoles());
     }
-    setIsDialogOpen(false);
-    setEditingUser(null);
-    form.reset();
+    if (usersStatus === "idle") {
+      dispatch(fetchUsers());
+    }
+  }, [rolesStatus, usersStatus, dispatch]);
+
+  // Handle toast notifications based on user actions
+  useEffect(() => {
+    if (usersStatus === "failed") {
+      toast.error("Failed to fetch users");
+    }
+  }, [usersStatus]);
+
+  const onSubmit = async (values: FormValues) => {
+    const userData = {
+      uniqueId: values.uniqueId,
+      name: values.name,
+      address: values.address,
+      email: values.email,
+      password: values.password, // Send password (hashing will happen on the backend)
+      role: values.role, // Send the role ID
+      status: values.status,
+    };
+
+    try {
+      if (editingUser) {
+        // Update user logic
+        await dispatch(updateUser({ ...userData, id: editingUser.id })).unwrap();
+        toast.success("User updated successfully");
+      } else {
+        // Add new user logic
+        await dispatch(addUser(userData)).unwrap();
+        toast.success("User added successfully");
+      }
+      setIsDialogOpen(false);
+      setEditingUser(null);
+      form.reset();
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred");
+    }
   };
 
-  const handleEdit = (user: any) => {
+  const handleEdit = (user: User) => {
     setEditingUser(user);
-    form.reset(user);
+    form.reset({
+      uniqueId: user.uniqueId,
+      name: user.name,
+      email: user.email,
+      role: user.role, 
+      address: user.address,
+      password: "", 
+      confirmPassword: "",
+      status: user.status,
+    });
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     const ok = await confirm();
     if (ok) {
-      setUsers(users.filter((user) => user.id !== id));
-      setCheckedRows(checkedRows.filter((_, index) => users[index].id !== id));
+      try {
+        await dispatch(deleteUser(id)).unwrap();
+        toast.success("User deleted successfully");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to delete user");
+      }
     }
   };
 
+  // Pagination logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const totalPages = Math.ceil(users.length / pageSize);
   const paginatedUsers = users.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
+  );
+
+  const [checkedRows, setCheckedRows] = useState<boolean[]>(
+    Array(paginatedUsers.length).fill(false)
   );
 
   const handleHeaderCheckboxChange = (checked: boolean) => {
@@ -167,7 +192,8 @@ export default function UserManagementPage() {
     setCheckedRows(newCheckedRows);
   };
 
-  const isAllChecked = checkedRows.every((checked) => checked);
+  const isAllChecked =
+    checkedRows.length > 0 && checkedRows.every((checked) => checked);
 
   return (
     <>
@@ -183,13 +209,12 @@ export default function UserManagementPage() {
                   form.reset({
                     uniqueId: "",
                     name: "",
-                    contact: "",
                     email: "",
                     role: "",
                     address: "",
                     password: "",
                     confirmPassword: "",
-                    status: "active",
+                    status: "ACTIVE",
                   });
                   setIsDialogOpen(true);
                 }}
@@ -210,6 +235,7 @@ export default function UserManagementPage() {
                 >
                   <div className="flex w-full items-start gap-6">
                     <div className="flex flex-col gap-3">
+                      {/* Unique ID */}
                       <FormField
                         control={form.control}
                         name="uniqueId"
@@ -222,6 +248,7 @@ export default function UserManagementPage() {
                           </FormItem>
                         )}
                       />
+                      {/* Name */}
                       <FormField
                         control={form.control}
                         name="name"
@@ -234,7 +261,8 @@ export default function UserManagementPage() {
                           </FormItem>
                         )}
                       />
-                      <FormField
+                      {/* Contact */}
+                      {/* <FormField
                         control={form.control}
                         name="contact"
                         render={({ field }) => (
@@ -245,7 +273,8 @@ export default function UserManagementPage() {
                             </FormControl>
                           </FormItem>
                         )}
-                      />
+                      /> */}
+                      {/* Email */}
                       <FormField
                         control={form.control}
                         name="email"
@@ -258,6 +287,7 @@ export default function UserManagementPage() {
                           </FormItem>
                         )}
                       />
+                      {/* Status */}
                       <FormField
                         control={form.control}
                         name="status"
@@ -265,30 +295,30 @@ export default function UserManagementPage() {
                           <FormItem>
                             <FormLabel>Status</FormLabel>
                             <div className="flex space-x-4">
-                              <label className="flex items-center space-x-2">
-                                <input
-                                  type="radio"
-                                  {...field}
-                                  value="active"
-                                  checked={field.value === "active"}
-                                />
-                                <span>Active</span>
-                              </label>
-                              <label className="flex items-center space-x-2">
-                                <input
-                                  type="radio"
-                                  {...field}
-                                  value="inactive"
-                                  checked={field.value === "inactive"}
-                                />
-                                <span>Inactive</span>
-                              </label>
+                              {["ACTIVE", "INACTIVE"].map((status) => (
+                                <label
+                                  key={status}
+                                  className="flex items-center space-x-2"
+                                >
+                                  <input
+                                    type="radio"
+                                    {...field}
+                                    value={status}
+                                    checked={field.value === status}
+                                  />
+                                  <span>
+                                    {status.charAt(0).toUpperCase() +
+                                      status.slice(1)}
+                                  </span>
+                                </label>
+                              ))}
                             </div>
                           </FormItem>
                         )}
                       />
                     </div>
                     <div className="flex flex-col gap-4">
+                      {/* Role */}
                       <FormField
                         control={form.control}
                         name="role"
@@ -305,7 +335,7 @@ export default function UserManagementPage() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {roles.map((role) => (
+                                {roles.map((role: any) => (
                                   <SelectItem key={role.id} value={role.id}>
                                     {role.name}
                                   </SelectItem>
@@ -315,6 +345,7 @@ export default function UserManagementPage() {
                           </FormItem>
                         )}
                       />
+                      {/* Address */}
                       <FormField
                         control={form.control}
                         name="address"
@@ -327,6 +358,7 @@ export default function UserManagementPage() {
                           </FormItem>
                         )}
                       />
+                      {/* Password */}
                       <FormField
                         control={form.control}
                         name="password"
@@ -339,6 +371,7 @@ export default function UserManagementPage() {
                           </FormItem>
                         )}
                       />
+                      {/* Confirm Password */}
                       <FormField
                         control={form.control}
                         name="confirmPassword"
@@ -353,7 +386,8 @@ export default function UserManagementPage() {
                       />
                     </div>
                   </div>
-                  <div className="flex justify-center  space-x-2">
+                  {/* Form Actions */}
+                  <div className="flex justify-center space-x-2">
                     <Button
                       type="button"
                       variant="outline"
@@ -371,6 +405,7 @@ export default function UserManagementPage() {
           </Dialog>
         </div>
 
+        {/* Users Table */}
         <Table>
           <TableHeader>
             <TableRow>
@@ -381,72 +416,75 @@ export default function UserManagementPage() {
                   onChange={(e) => handleHeaderCheckboxChange(e.target.checked)}
                 />
               </TableHead>
-              <TableHead>User ID</TableHead>
+              <TableHead>Unique ID</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Contact</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Action</TableHead>
+              <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedUsers.map((user, index) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={
-                      checkedRows[(currentPage - 1) * pageSize + index] || false
-                    }
-                    onChange={() =>
-                      handleRowCheckboxChange(
-                        (currentPage - 1) * pageSize + index
-                      )
-                    }
-                  />
-                </TableCell>
-                <TableCell>{user.uniqueId}</TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.contact}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role}</TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                      user.status === "active" ? "bg-green-500" : "bg-red-500"
-                    }`}
-                  ></span>
-                  {user.status}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleEdit(user)}
-                      className="bg-green-400/20 hover:bg-green-400/40"
-                    >
-                      <Pencil size={16} className="text-green-500" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="bg-red-400/20 hover:bg-red-400/40"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      <Trash2 size={16} className="text-red-500" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {paginatedUsers.map((user: any, index: number) => {
+              const roleName =
+                roles.find((role: any) => role.id === user.roleId)?.name ||
+                "N/A";
+              return (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      checked={checkedRows[index] || false}
+                      onChange={() => handleRowCheckboxChange(index)}
+                    />
+                  </TableCell>
+                  <TableCell>{user.uniqueId}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.contact}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{roleName}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                        user.status === "ACTIVE" ? "bg-green-500" : "bg-red-500"
+                      }`}
+                    ></span>
+                    {user.status}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleEdit(user)}
+                        className="bg-green-400/20 hover:bg-green-400/40"
+                      >
+                        <Pencil size={16} className="text-green-500" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="bg-red-400/20 hover:bg-red-400/40"
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        <Trash2 size={16} className="text-red-500" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
 
+        {/* Pagination Controls */}
         <div className="flex items-center justify-between mt-4">
           <div>
             <Select
               value={pageSize.toString()}
-              onValueChange={(value) => setPageSize(Number(value))}
+              onValueChange={(value) => {
+                setPageSize(Number(value));
+                setCurrentPage(1); // Reset to first page when page size changes
+              }}
             >
               <SelectTrigger className="w-[80px]">
                 <SelectValue />
@@ -462,7 +500,7 @@ export default function UserManagementPage() {
           </div>
           <div className="space-x-2">
             <Button
-              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className="px-2 py-1 border rounded bg-transparent text-black"
             >
@@ -479,7 +517,7 @@ export default function UserManagementPage() {
             ))}
             <Button
               onClick={() =>
-                setCurrentPage((page) => Math.min(totalPages, page + 1))
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages}
               className="px-2 py-1 border rounded bg-transparent hover:text-white text-black"
