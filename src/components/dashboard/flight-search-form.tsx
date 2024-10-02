@@ -261,9 +261,11 @@ export const FlightSearchSection = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="amadeus">Amadeus</SelectItem>
-                      <SelectItem value="kiusys">Kiusys</SelectItem>
-                      <SelectItem value="duffel">Duffel</SelectItem>
+                    <SelectItem value="AMADEUS">Amadeus</SelectItem>
+                        <SelectItem value="KIUSYS">Kiusys</SelectItem>
+                        <SelectItem value="DUFFEL">Duffel</SelectItem>
+                        <SelectItem value="ALL">All</SelectItem>
+                        <SelectItem value="NONE">None</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

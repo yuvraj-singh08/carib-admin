@@ -1,7 +1,4 @@
-
-
-
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -73,7 +70,8 @@ export default function FeesCommissionManagerTable() {
   const [newType, setNewType] = useState("");
   const [editingType, setEditingType] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [editingCommission, setEditingCommission] = useState<CommissionType | null>(null);
+  const [editingCommission, setEditingCommission] =
+    useState<CommissionType | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -100,7 +98,9 @@ export default function FeesCommissionManagerTable() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       if (editingCommission) {
-        await dispatch(updateCommission({ ...editingCommission, ...values })).unwrap();
+        await dispatch(
+          updateCommission({ ...editingCommission, ...values })
+        ).unwrap();
         toast.success("Commission updated successfully");
       } else {
         await dispatch(addCommission(values)).unwrap();
@@ -149,7 +149,9 @@ export default function FeesCommissionManagerTable() {
 
   const toggleSelectRow = (id: string) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((selectedId) => selectedId !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((selectedId) => selectedId !== id)
+        : [...prev, id]
     );
   };
 
@@ -175,7 +177,6 @@ export default function FeesCommissionManagerTable() {
     currentPage * pageSize
   );
 
-  
   if (status === "loading") {
     return <TableLoader />;
   }
@@ -189,7 +190,9 @@ export default function FeesCommissionManagerTable() {
       <ConfirmDialogue />
       <div className="w-full bg-white px-3 rounded-lg space-y-6 py-5">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-blue">Manage Commission</h2>
+          <h2 className="text-2xl font-semibold text-blue">
+            Manage Commission
+          </h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
@@ -286,6 +289,8 @@ export default function FeesCommissionManagerTable() {
                             <SelectItem value="AMADEUS">Amadeus</SelectItem>
                             <SelectItem value="KIUSYS">Kiusys</SelectItem>
                             <SelectItem value="DUFFEL">Duffel</SelectItem>
+                            <SelectItem value="ALL">All</SelectItem>
+                            <SelectItem value="NONE">None</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormItem>
@@ -343,7 +348,7 @@ export default function FeesCommissionManagerTable() {
                     >
                       Cancel
                     </Button>
-                    <Button  type="submit">
+                    <Button type="submit">
                       {editingCommission ? "Update" : "Create"}
                     </Button>
                   </div>
@@ -366,7 +371,9 @@ export default function FeesCommissionManagerTable() {
                   onChange={(e) => setNewType(e.target.value)}
                   className="flex-grow"
                 />
-                <Button onClick={editingType ? handleUpdateType : handleAddType}>
+                <Button
+                  onClick={editingType ? handleUpdateType : handleAddType}
+                >
                   {editingType ? "Update Type" : "Add Type"}
                 </Button>
               </div>
@@ -383,14 +390,20 @@ export default function FeesCommissionManagerTable() {
                         }}
                         className="bg-green-200/50"
                       >
-                        <Pencil size={16} className="text-gray-500 cursor-pointer text-[#1AB69D]" />
+                        <Pencil
+                          size={16}
+                          className="text-gray-500 cursor-pointer text-[#1AB69D]"
+                        />
                       </Button>
                       <Button
                         className="bg-red-200/50"
                         variant="ghost"
                         onClick={() => handleDeleteType(type)}
                       >
-                        <Trash2 size={16} className="text-gray-500 cursor-pointer text-[#EB3D4D]" />
+                        <Trash2
+                          size={16}
+                          className="text-gray-500 cursor-pointer text-[#EB3D4D]"
+                        />
                       </Button>
                     </div>
                   </div>
@@ -429,7 +442,10 @@ export default function FeesCommissionManagerTable() {
               </TableRow>
             ) : status === "failed" ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-red-500 py-4">
+                <TableCell
+                  colSpan={8}
+                  className="text-center text-red-500 py-4"
+                >
                   Error: {error || "Failed to load data"}
                 </TableCell>
               </TableRow>
@@ -459,9 +475,7 @@ export default function FeesCommissionManagerTable() {
                   <TableCell>
                     {fee.feeType === "PERCENT" ? "Percentage" : "Fixed Amount"}
                   </TableCell>
-                  <TableCell>
-                    {format(fee.updateTime, "dd/MM/yyyy")}
-                  </TableCell>
+                  <TableCell>{format(fee.updateTime, "dd/MM/yyyy")}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-4">
                       <div className="size-7 rounded-md bg-green-200/50 flex items-center justify-center">
@@ -532,7 +546,6 @@ export default function FeesCommissionManagerTable() {
             </Button>
           </div>
         </div>
-      
       </div>
     </>
   );
