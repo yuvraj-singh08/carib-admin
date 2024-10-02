@@ -53,12 +53,12 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { Trash2 } from "lucide-react";
 
 const formSchema = z.object({
-  rulesTitle: z.string().min(1, "Rules title is required"),
+  rulesTitle: z.string().optional(),
   supplierName: z.string().min(1, "Flight supplier is required"),
-  airlinesCode: z.string().min(1, "Airlines code is required"),
-  flightNumber: z.string().min(1, "Flight number is required"),
-  fromAirport: z.string().min(1, "Origin airport is required"),
-  toAirport: z.string().min(1, "Destination airport is required"),
+  airlinesCode: z.string().optional(),
+  flightNumber: z.string().optional(),
+  fromAirport: z.string().optional(),
+  toAirport: z.string().optional(),
 });
 
 export default function FlightRulesManager() {
@@ -185,12 +185,12 @@ export default function FlightRulesManager() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const flightRuleData = {
-        title: values.rulesTitle,
+        title: values.rulesTitle || "",
         supplier: values.supplierName,
-        code: values.airlinesCode,
-        flightNumber: values.flightNumber,
-        from: values.fromAirport,
-        to: values.toAirport,
+        code: values.airlinesCode || "",
+        flightNumber: values.flightNumber || "",
+        from: values.fromAirport || "",
+        to: values.toAirport || "",
       };
 
       const resultAction = await dispatch(addFlightRule(flightRuleData));
