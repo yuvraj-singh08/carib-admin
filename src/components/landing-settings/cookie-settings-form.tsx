@@ -69,11 +69,11 @@ const formSchema = z.object({
   strictlyNecessaryCookies: z.boolean(),
   cookieDescription: z.string().min(1, "Cookie Description is required"),
   cookieTitle: z.string().min(1, "Cookie Title is required"),
-  strictlyCookieTitle: z.string().min(1, "Strictly Cookie Title is required"),
+  strictlyCookieTitle: z.string().optional(),
   strictlyCookieDescription: z
     .string()
-    .min(1, "Strictly Cookie Description is required"),
-  contactUsDescription: z.string().min(1, "Contact Us Description is required"),
+    .optional(),
+  contactUsDescription: z.string().optional(),
   contactUsURL: z.string().url("Invalid URL format"),
 });
 
