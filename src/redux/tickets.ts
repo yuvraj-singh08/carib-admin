@@ -51,8 +51,10 @@ export const fetchTicketById = createAsyncThunk(
 export const updateTicket = createAsyncThunk(
   "tickets/updateTicket",
   async (ticketData: Partial<Ticket> & { id: string }) => {
+    const { id, ...data } = ticketData; // Destructure id and the rest of the data
     const response = await axios.post(`${apiUrl}/admin/update-ticket`, {
-      id: ticketData.id,
+      id,
+      ...data, // Pass the rest of the ticket data to the API
     });
     return response.data.ticket;
   }

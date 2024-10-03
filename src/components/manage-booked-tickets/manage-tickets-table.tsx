@@ -34,6 +34,7 @@ import {
 
 import { Ticket } from "@/redux/tickets";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
+import toast from "react-hot-toast";
 
 const statusOptions = [
   { value: "OPEN", label: "Open Tickets", color: "bg-blue" },
@@ -121,8 +122,17 @@ const BookingTicketsTableWithDateFilter = () => {
     );
   };
 
-  const handleTicketStatusChange = (id: string, newStatus: TicketStatus) => {
-    dispatch(updateTicket({ id, status: newStatus }));
+  const handleTicketStatusChange = async (
+    id: string,
+    newStatus: TicketStatus
+  ) => {
+    try {
+      await dispatch(updateTicket({ id, status: newStatus })).unwrap();
+
+      toast.success("Ticket status updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update ticket status.");
+    }
   };
 
   React.useEffect(() => {
