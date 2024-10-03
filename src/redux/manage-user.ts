@@ -10,8 +10,10 @@ export interface User {
   name: string;
   address: string;
   email: string;
-  password: string; 
-  role: string;
+  password: string;
+  contact: string;
+  roleId: string;
+  roleName: string;
   status: "ACTIVE" | "INACTIVE";
 }
 
@@ -24,7 +26,7 @@ interface UserState {
 const initialState: UserState = {
   users: [],
   status: 'idle',
-  error: null
+  error: null,
 };
 
 // Thunks for CRUD operations
@@ -50,12 +52,12 @@ export const fetchUserById = createAsyncThunk(
 // Add new user
 export const addUser = createAsyncThunk(
   "users/addUser",
-  async (userData: Omit<User, "id" | "password"> & { role: string }) => {
+  async (userData: Omit<User, "id" | "password"> & { roleId: string }) => {
     const response = await axios.post(`${apiUrl}/admin/add-user`, {
       ...userData,
       role: {
         connect: {
-          id: userData.role,
+          id: userData.roleId,
         },
       },
     });
@@ -67,7 +69,7 @@ export const addUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "users/updateUser",
   async (userData: Partial<User> & { id: string }) => {
-    const response = await axios.put(`${apiUrl}/admin/update-user`, userData);
+    const response = await axios.post(`${apiUrl}/admin/update-user`, userData);
     return response.data.user;
   }
 );
@@ -76,12 +78,11 @@ export const updateUser = createAsyncThunk(
 export const deleteUser = createAsyncThunk(
   "users/deleteUser",
   async (id: string) => {
-    await axios.post(`${apiUrl}/admin/delete-user`,{
-      id,
-    });
+    await axios.post(`${apiUrl}/admin/delete-user`, { id });
     return id;
   }
 );
+
 // User slice with extra reducers
 const usersSlice = createSlice({
   name: "users",

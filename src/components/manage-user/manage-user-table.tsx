@@ -52,10 +52,12 @@ const userFormSchema = z
     uniqueId: z.string().min(1, "Unique ID is required"),
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address"),
-    role: z.string().min(1, "Role is required"),
+    roleId: z.string().min(1, "Role is required"),
+    roleName: z.string().min(1, "Role is required"),
     address: z.string().min(1, "Address is required"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Confirm Password is required"),
+    contact: z.string().min(1, "Contact is required"),
+    password: z.string().optional(),
+    confirmPassword: z.string().optional(),
     status: z.enum(["ACTIVE", "INACTIVE"]),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -76,6 +78,7 @@ export default function UserManagementPage() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [password, setPassword] = useState<string | null>(null);
 
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete User",
@@ -88,7 +91,8 @@ export default function UserManagementPage() {
       uniqueId: "",
       name: "",
       email: "",
-      role: "",
+      roleId: "",
+      roleName: "",
       address: "",
       password: "",
       confirmPassword: "",
@@ -118,16 +122,20 @@ export default function UserManagementPage() {
       uniqueId: values.uniqueId,
       name: values.name,
       address: values.address,
+      contact: values.contact,
       email: values.email,
-      password: values.password, // Send password (hashing will happen on the backend)
-      role: values.role, // Send the role ID
+      password: password || "", // Use the stored password or empty string
+      roleId: values.roleId,
+      roleName: values.roleName,
       status: values.status,
     };
 
     try {
       if (editingUser) {
         // Update user logic
-        await dispatch(updateUser({ ...userData, id: editingUser.id })).unwrap();
+        await dispatch(
+          updateUser({ ...userData, id: editingUser.id })
+        ).unwrap();
         toast.success("User updated successfully");
       } else {
         // Add new user logic
@@ -144,13 +152,16 @@ export default function UserManagementPage() {
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
+    setPassword(user.password); // Store the user's password without showing it
     form.reset({
       uniqueId: user.uniqueId,
       name: user.name,
       email: user.email,
-      role: user.role, 
+      roleId: user.roleId,
+      roleName: user.roleName,
       address: user.address,
-      password: "", 
+      contact: user.contact,
+      password: "",
       confirmPassword: "",
       status: user.status,
     });
@@ -210,7 +221,8 @@ export default function UserManagementPage() {
                     uniqueId: "",
                     name: "",
                     email: "",
-                    role: "",
+                    roleId: "",
+                    roleName: "",
                     address: "",
                     password: "",
                     confirmPassword: "",
@@ -262,7 +274,7 @@ export default function UserManagementPage() {
                         )}
                       />
                       {/* Contact */}
-                      {/* <FormField
+                      <FormField
                         control={form.control}
                         name="contact"
                         render={({ field }) => (
@@ -273,7 +285,7 @@ export default function UserManagementPage() {
                             </FormControl>
                           </FormItem>
                         )}
-                      /> */}
+                      />
                       {/* Email */}
                       <FormField
                         control={form.control}
@@ -318,15 +330,24 @@ export default function UserManagementPage() {
                       />
                     </div>
                     <div className="flex flex-col gap-4">
-                      {/* Role */}
+                      {/* Role Id */}
                       <FormField
                         control={form.control}
-                        name="role"
+                        name="roleId"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Role</FormLabel>
                             <Select
-                              onValueChange={field.onChange}
+                              onValueChange={(value) => {
+                                const selectedRole = roles.find(
+                                  (role) => role.id === value
+                                );
+                                field.onChange(value); // Update roleId
+                                form.setValue(
+                                  "roleName",
+                                  selectedRole ? selectedRole.name : ""
+                                ); // Update roleName
+                              }}
                               value={field.value}
                             >
                               <FormControl>
@@ -335,7 +356,7 @@ export default function UserManagementPage() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {roles.map((role: any) => (
+                                {roles.map((role) => (
                                   <SelectItem key={role.id} value={role.id}>
                                     {role.name}
                                   </SelectItem>
@@ -345,6 +366,7 @@ export default function UserManagementPage() {
                           </FormItem>
                         )}
                       />
+
                       {/* Address */}
                       <FormField
                         control={form.control}
@@ -359,31 +381,35 @@ export default function UserManagementPage() {
                         )}
                       />
                       {/* Password */}
-                      <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="password" />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                      {!editingUser && (
+                        <FormField
+                          control={form.control}
+                          name="password"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Password</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="password" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
                       {/* Confirm Password */}
-                      <FormField
-                        control={form.control}
-                        name="confirmPassword"
-                        render={({ field }) => (
-                          <FormItem className="-mt-1">
-                            <FormLabel>Confirm Password</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="password" />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                      {!editingUser && (
+                        <FormField
+                          control={form.control}
+                          name="confirmPassword"
+                          render={({ field }) => (
+                            <FormItem className="-mt-1">
+                              <FormLabel>Confirm Password</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="password" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     </div>
                   </div>
                   {/* Form Actions */}
