@@ -3,7 +3,8 @@ import flightRulesReducer from "../redux/flight-rules-firewall";
 import feesCommissionReducer from "../redux/fees-commison";
 import rolesReducer from "../redux/user-role-permission";
 import socialSettingsSlice from "../redux/socials";
-import usersSlice from "../redux/manage-user"; 
+import usersSlice from "../redux/manage-user";
+import ticketsSlice from "../redux/tickets"; // Import the new tickets slice
 
 // Configuring the store with the reducers
 export const store = configureStore({
@@ -12,7 +13,8 @@ export const store = configureStore({
     feesCommission: feesCommissionReducer,
     roles: rolesReducer,
     socials: socialSettingsSlice,
-    users: usersSlice, // Adding the users slice to the store
+    users: usersSlice,
+    tickets: ticketsSlice, // Add the tickets slice to the store
   },
 });
 

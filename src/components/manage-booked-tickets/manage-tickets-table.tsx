@@ -1,6 +1,5 @@
-"use client";
-
-import * as React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -22,71 +21,77 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, Search, Trash2 } from "lucide-react";
-import  DatePickerWithRange  from "../ui/date-range-picker";
+import DatePickerWithRange from "../ui/date-range-picker";
 import { Input } from "../ui/input";
 import TicketDetailsDialog from "./tieket-dialog";
 import { useConfirm } from "@/hooks/use-confirm";
+import {
+  fetchTickets,
+  updateTicket,
+  deleteTicket,
+  TicketStatus,
+} from "@/redux/tickets";
 
-interface Ticket {
-  id: string;
-  subject: string;
-  requesterName: string;
-  requestedOn: Date;
-  status: "Open Tickets" | "Pending Tickets" | "Resolve Tickets";
-  images: string[];
-}
-
-const initialBookingData: Ticket[] = [
-  {
-    id: "14253678",
-    subject: "For failed ticket issue",
-    requesterName: "Animesh Sadh",
-    requestedOn: new Date("2024-05-30T12:00:00"),
-    status: "Open Tickets",
-    images: [
-      "/icons/passport.png",
-      "/icons/passport.png",
-      "/icons/passport.png",
-      "/icons/passport.png",
-      "/icons/passport.png",
-      "/icons/passport.png",
-      "/icons/passport.png",
-    ],
-  },
-  {
-    id: "14253679",
-    subject: "For payment issue",
-    requesterName: "John Doe",
-    requestedOn: new Date("2024-05-31T10:30:00"),
-    status: "Pending Tickets",
-    images: [],
-  },
-];
+import { Ticket } from "@/redux/tickets";
+import { AppDispatch, RootState } from "@/provider/redux-provider";
 
 const statusOptions = [
-  { value: "Open Tickets", color: "bg-blue" },
-  { value: "Pending Tickets", color: "bg-[#9A37CC]" },
-  { value: "Resolve Tickets", color: "bg-[#EB3D4D]" },
+  { value: "OPEN", label: "Open Tickets", color: "bg-blue" },
+  { value: "PENDING", label: "Pending Tickets", color: "bg-[#9A37CC]" },
+  { value: "RESOLVE", label: "Resolve Tickets", color: "bg-[#EB3D4D]" },
 ];
 
 const BookingTicketsTableWithDateFilter = () => {
-  const [data, setData] = React.useState<Ticket[]>(initialBookingData);
-  const [filteredData, setFilteredData] = React.useState<Ticket[]>(data);
-  const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = React.useState<string>("");
-  const [statusFilter, setStatusFilter] = React.useState<string>("all");
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>();
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [itemsPerPage, setItemsPerPage] = React.useState(10);
-  const [selectedTicket, setSelectedTicket] = React.useState<Ticket | null>(
-    null
-  );
+  const dispatch: AppDispatch = useDispatch();
+  const tickets = useSelector((state: RootState) => state.tickets.tickets);
+  const ticketStatus = useSelector((state: RootState) => state.tickets.status);
+
+  const [filteredData, setFilteredData] = useState(tickets);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Ticket",
     "Are you sure you want to delete this ticket? This action cannot be undone."
   );
 
+  useEffect(() => {
+    if (ticketStatus === "idle") {
+      dispatch(fetchTickets());
+    }
+  }, [ticketStatus, dispatch]);
+
+  useEffect(() => {
+    filterTickets(searchTerm, statusFilter, dateRange);
+  }, [tickets, searchTerm, statusFilter, dateRange]);
+
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const filterTickets = (
+    searchTerm: string,
+    status: string,
+    range: DateRange | undefined
+  ) => {
+    const filtered = tickets.filter((ticket) => {
+      const matchesSearch = Object.values(ticket).some((value) =>
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      const matchesStatus = status === "all" || ticket.status === status;
+      const matchesDate =
+        !range?.from ||
+        !range?.to ||
+        (new Date(ticket.requestedOn) >= range.from &&
+          new Date(ticket.requestedOn) <= range.to);
+
+      return matchesSearch && matchesStatus && matchesDate;
+    });
+    setFilteredData(filtered);
+  };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -103,34 +108,10 @@ const BookingTicketsTableWithDateFilter = () => {
     filterTickets(searchTerm, statusFilter, range);
   };
 
-  const filterTickets = (
-    searchTerm: string,
-    status: string,
-    range: DateRange | undefined
-  ) => {
-    const filtered = data.filter((ticket) => {
-      const matchesSearch = Object.values(ticket).some((value) =>
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      const matchesStatus = status === "all" || ticket.status === status;
-      const matchesDate =
-        !range?.from ||
-        !range?.to ||
-        (ticket.requestedOn >= range.from && ticket.requestedOn <= range.to);
-
-      return matchesSearch && matchesStatus && matchesDate;
-    });
-    setFilteredData(filtered);
-  };
-
   const handleDelete = async (id: string) => {
     const ok = await confirm();
-
     if (ok) {
-      const updatedData = data.filter((ticket) => ticket.id !== id);
-      setData(updatedData);
-      setFilteredData(updatedData);
-      setSelectedItems(selectedItems.filter((item) => item !== id));
+      dispatch(deleteTicket(id));
     }
   };
 
@@ -140,19 +121,13 @@ const BookingTicketsTableWithDateFilter = () => {
     );
   };
 
-  const handleTicketStatusChange = (id: string, newStatus: string) => {
-    const updatedData = data.map((ticket) =>
-      ticket.id === id
-        ? { ...ticket, status: newStatus as Ticket["status"] }
-        : ticket
-    );
-    setData(updatedData);
-    setFilteredData(updatedData);
+  const handleTicketStatusChange = (id: string, newStatus: TicketStatus) => {
+    dispatch(updateTicket({ id, status: newStatus }));
   };
 
   React.useEffect(() => {
     filterTickets(searchTerm, statusFilter, dateRange);
-  }, [data, searchTerm, statusFilter, dateRange]);
+  }, [tickets, searchTerm, statusFilter, dateRange]);
 
   return (
     <>
@@ -224,7 +199,7 @@ const BookingTicketsTableWithDateFilter = () => {
                       onCheckedChange={() => handleCheckboxChange(item.id)}
                     />
                   </TableCell>
-                  <TableCell>{item.id}</TableCell>
+                  <TableCell className="text-[13px]">{item.id}</TableCell>
                   <TableCell>{item.subject}</TableCell>
                   <TableCell>{item.requesterName}</TableCell>
                   <TableCell>
@@ -234,7 +209,7 @@ const BookingTicketsTableWithDateFilter = () => {
                     <Select
                       value={item.status}
                       onValueChange={(value) =>
-                        handleTicketStatusChange(item.id, value)
+                        handleTicketStatusChange(item.id, value as TicketStatus)
                       }
                     >
                       <SelectTrigger className="w-[200px]">
