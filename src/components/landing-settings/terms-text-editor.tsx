@@ -22,7 +22,7 @@ import {
   addPrivacyPolicy,
   updatePrivacyPolicy,
   getPrivacyPolicies,
-} from "@/redux/privacy-settings"; 
+} from "@/redux/privacy-settings";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
@@ -93,7 +93,6 @@ const TermsConditionsForm: React.FC = () => {
   ];
 
   const formatContent = (content: string): string => {
-    // This function ensures proper HTML formatting
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
     return doc.body.innerHTML;
@@ -104,7 +103,7 @@ const TermsConditionsForm: React.FC = () => {
     const formData = {
       isEnabled: data.isEnabled,
       content: data.isEnabled
-        ? [{ type: "privacy-policies", value: formattedContent }]
+        ? [{ type: "terms-conditions", value: formattedContent }]
         : [],
     };
 
@@ -169,7 +168,9 @@ const TermsConditionsForm: React.FC = () => {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">Terms & Conditions</FormLabel>
+                    <FormLabel className="text-base">
+                      Terms & Conditions
+                    </FormLabel>
                     <FormDescription>
                       Enable or disable the terms & conditions on the frontend
                     </FormDescription>
