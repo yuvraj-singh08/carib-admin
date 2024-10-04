@@ -51,7 +51,7 @@ export const getEmailSMTPs = createAsyncThunk(
 export const getEmailSMTPById = createAsyncThunk(
   "emailSMTP/getEmailSMTPById",
   async (id: string) => {
-    const response = await axios.post(`${API_BASE_URL}/admin/email/`, { id });
+    const response = await axios.post(`${API_BASE_URL}/admin/email`, { id });
     return response.data.emailSMTP;
   }
 );

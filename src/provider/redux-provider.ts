@@ -6,8 +6,9 @@ import socialSettingsSlice from "../redux/socials";
 import usersSlice from "../redux/manage-user";
 import ticketsSlice from "../redux/tickets"; //
 import emailSMTPSlice from "../redux/email-smtp";
+import privacyPolicySlice from "../redux/privacy-settings";
 
-// Configuring the store with the reducers
+
 export const store = configureStore({
   reducer: {
     flightRules: flightRulesReducer,
@@ -17,9 +18,9 @@ export const store = configureStore({
     users: usersSlice,
     tickets: ticketsSlice,
     emailSmtp: emailSMTPSlice,
+    privacy: privacyPolicySlice,
   },
 });
-
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

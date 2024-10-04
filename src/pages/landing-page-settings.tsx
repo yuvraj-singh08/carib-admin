@@ -1,6 +1,6 @@
 import CookieSettingsForm from "@/components/landing-settings/cookie-settings-form";
 import SocialProvidersForm from "@/components/landing-settings/socials-settings";
-import PrivacyPolicyForm from "@/components/privacy-policy/text-editor";
+import PrivacyPolicyForm from "@/components/landing-settings/text-editor";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,7 +22,6 @@ const LandingPageSettings = () => {
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="socials">Social Media</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
-              {/* <TabsTrigger value="email">Email SMTP setting</TabsTrigger> */}
               {activeTab === "cookie" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
@@ -46,9 +45,6 @@ const LandingPageSettings = () => {
             <TabsContent value="socials">
               <SocialProvidersForm />
             </TabsContent>
-            {/* <TabsContent value="email">
-              <EMailSettingsForm />
-            </TabsContent> */}
           </Tabs>
         </div>
       </main>
