@@ -3,6 +3,8 @@ import axios from "axios";
 
 const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 
+
+
 // Enum for ticket status
 export enum TicketStatus {
   OPEN = "OPEN",
@@ -112,3 +114,18 @@ const ticketsSlice = createSlice({
 });
 
 export default ticketsSlice.reducer;
+
+
+export const selectTicketStatusCounts = (state: { tickets: TicketState }) => {
+  const ticketCounts = {
+    [TicketStatus.OPEN]: 0,
+    [TicketStatus.PENDING]: 0,
+    [TicketStatus.RESOLVE]: 0,
+  };
+
+  state.tickets.tickets.forEach(ticket => {
+    ticketCounts[ticket.status]++;
+  });
+
+  return ticketCounts;
+};
