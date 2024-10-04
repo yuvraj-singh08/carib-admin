@@ -1,10 +1,11 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
 import {
   Form,
   FormField,
@@ -13,6 +14,14 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  getEmailSMTPs,
+  addEmailSMTP,
+  updateEmailSMTP,
+} from "@/redux/email-smtp";
+import { AppDispatch, RootState } from "@/provider/redux-provider"; // Update this path
+import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   mailDriver: z.string().min(1, "Mail Driver is required"),
@@ -26,6 +35,11 @@ const formSchema = z.object({
 });
 
 const EMailSettingsForm = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { emailSMTPs, status } = useSelector(
+    (state: RootState) => state.emailSmtp
+  );
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,10 +54,29 @@ const EMailSettingsForm = () => {
     },
   });
 
+  useEffect(() => {
+    dispatch(getEmailSMTPs());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (emailSMTPs.length > 0) {
+      const existingSettings = emailSMTPs[0];
+      form.reset(existingSettings);
+    }
+  }, [emailSMTPs, form]);
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const isValid = await form.trigger();
     if (isValid) {
-      console.log("Form submitted:", data);
+      if (emailSMTPs.length > 0) {
+        dispatch(updateEmailSMTP({ ...data, id: emailSMTPs[0].id }))
+          .then(() => toast.success("SMTP settings updated successfully!"))
+          .catch(() => toast.error("Failed to update SMTP settings"));
+      } else {
+        dispatch(addEmailSMTP(data))
+          .then(() => toast.success("SMTP settings saved successfully!"))
+          .catch(() => toast.error("Failed to save SMTP settings"));
+      }
     }
   };
 
@@ -52,9 +85,12 @@ const EMailSettingsForm = () => {
     if (isValid) {
       const formData = form.getValues();
       console.log("Send Test Mail:", formData);
+
+      toast.success("Test mail sent successfully!");
+    } else {
+      toast.error("Please fill the form correctly before sending a test mail.");
     }
   };
-
   return (
     <Form {...form}>
       <form
@@ -179,7 +215,16 @@ const EMailSettingsForm = () => {
             Send test mail
           </Button>
           <Button type="submit" className="bg-blue text-white">
-            Save Changes
+            {emailSMTPs.length > 0
+              ? status === "loading"
+                ? "Updating"
+                : "Update Changes"
+              : status === "loading"
+              ? "Saving"
+              : "Save Changes"}
+            {status === "loading" && (
+              <Loader2 className="size-5 shrink-0 animate-spin text-white ml-1" />
+            )}
           </Button>
         </div>
       </form>
