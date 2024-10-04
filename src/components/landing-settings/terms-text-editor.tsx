@@ -18,13 +18,14 @@ import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/provider/redux-provider";
-import {
-  addPrivacyPolicy,
-  updatePrivacyPolicy,
-  getPrivacyPolicies,
-} from "@/redux/privacy-settings";
+
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import {
+  addTermsAndConditions,
+  getTermsAndConditions,
+  updateTermsAndConditions,
+} from "@/redux/terms-settings"; // Make sure this import path is correct
 
 const formSchema = z.object({
   isEnabled: z.boolean().default(false),
@@ -38,10 +39,10 @@ const formSchema = z.object({
 
 const TermsConditionsForm: React.FC = () => {
   const dispatch = useDispatch();
-  const privacyPolicies = useSelector(
-    (state: RootState) => state.privacy.privacyPolicies
+  const termsAndConditions = useSelector(
+    (state: RootState) => state.terms.termsAndConditions
   );
-  const status = useSelector((state: RootState) => state.privacy.status);
+  const status = useSelector((state: RootState) => state.terms.status);
 
   const [ConfirmDialogue, confirm] = useConfirm(
     "Reset Terms & Conditions",
@@ -59,18 +60,18 @@ const TermsConditionsForm: React.FC = () => {
   const { isEnabled } = form.watch();
 
   useEffect(() => {
-    dispatch(getPrivacyPolicies() as any);
+    dispatch(getTermsAndConditions() as any);
   }, [dispatch]);
 
   useEffect(() => {
-    if (privacyPolicies.length > 0) {
-      const latestPolicy = privacyPolicies[0];
+    if (termsAndConditions.length > 0) {
+      const latestTerms = termsAndConditions[0];
       form.reset({
-        isEnabled: latestPolicy.isEnabled,
-        content: latestPolicy.content[0]?.value || "",
+        isEnabled: latestTerms.isEnabled,
+        content: latestTerms.content[0]?.value || "",
       });
     }
-  }, [privacyPolicies, form]);
+  }, [termsAndConditions, form]);
 
   const modules = {
     toolbar: [
@@ -108,17 +109,20 @@ const TermsConditionsForm: React.FC = () => {
     };
 
     try {
-      if (privacyPolicies.length > 0) {
+      if (termsAndConditions.length > 0) {
         await dispatch(
-          updatePrivacyPolicy({ ...formData, id: privacyPolicies[0].id }) as any
+          updateTermsAndConditions({
+            ...formData,
+            id: termsAndConditions[0].id,
+          }) as any
         );
-        toast.success("Privacy policy updated successfully.");
+        toast.success("Terms and conditions updated successfully.");
       } else {
-        await dispatch(addPrivacyPolicy(formData) as any);
-        toast.success("Privacy policy added successfully.");
+        await dispatch(addTermsAndConditions(formData) as any);
+        toast.success("Terms and conditions added successfully.");
       }
     } catch (error) {
-      toast.error("Failed to save privacy policy. Please try again.");
+      toast.error("Failed to save terms and conditions. Please try again.");
     }
   };
 
@@ -133,22 +137,22 @@ const TermsConditionsForm: React.FC = () => {
       form.reset(resetData);
 
       try {
-        if (privacyPolicies.length > 0) {
+        if (termsAndConditions.length > 0) {
           await dispatch(
-            updatePrivacyPolicy({
+            updateTermsAndConditions({
               ...resetData,
               content: [],
-              id: privacyPolicies[0].id,
+              id: termsAndConditions[0].id,
             }) as any
           );
           toast.success(
-            "Privacy policy has been reset and updated in the database."
+            "Terms and conditions have been reset and updated in the database."
           );
         } else {
-          toast.success("Privacy policy form has been reset.");
+          toast.success("Terms and conditions form has been reset.");
         }
       } catch (error) {
-        toast.error("Failed to reset privacy policy. Please try again.");
+        toast.error("Failed to reset terms and conditions. Please try again.");
       }
     }
   };
@@ -215,7 +219,7 @@ const TermsConditionsForm: React.FC = () => {
                 Reset
               </Button>
               <Button type="submit" disabled={status === "loading"}>
-                {privacyPolicies.length > 0
+                {termsAndConditions.length > 0
                   ? status === "loading"
                     ? "Updating"
                     : "Update Changes"
