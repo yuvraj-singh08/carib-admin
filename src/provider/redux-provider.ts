@@ -7,7 +7,7 @@ import usersSlice from "../redux/manage-user";
 import ticketsSlice from "../redux/tickets"; //
 import emailSMTPSlice from "../redux/email-smtp";
 import privacyPolicySlice from "../redux/privacy-settings";
-
+import dealsSlice from "../redux/deals";
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +19,7 @@ export const store = configureStore({
     tickets: ticketsSlice,
     emailSmtp: emailSMTPSlice,
     privacy: privacyPolicySlice,
+    deals: dealsSlice,
   },
 });
 
