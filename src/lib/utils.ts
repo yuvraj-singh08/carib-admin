@@ -9,15 +9,22 @@ export function cn(...inputs: ClassValue[]) {
 
 const seasons = ["SPRING", "SUMMER", "WINTER"];
 
-export function  generateRandomCouponCode(): string {
+export function generateRandomCouponCode(): string {
+  // Get a random season
   const randomSeason = seasons[Math.floor(Math.random() * seasons.length)];
-  const randomNumber = Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, "0");
-  const couponCode = `${randomSeason}${randomNumber}`;
-  return couponCode.slice(0, 8); 
-}
 
+  // Generate a secure random number between 0 and 65535
+  const randomValue = window.crypto.getRandomValues(new Uint16Array(1))[0];
+
+  // Convert the random value to a hexadecimal string and take the first 4 chars
+  const randomHex = randomValue.toString(16).toUpperCase().padStart(4, "0");
+
+  // Combine the season with the random hex code
+  const couponCode = `${randomSeason}${randomHex}`;
+
+  // Return the first 8 characters
+  return couponCode.slice(0, 8);
+}
 
 export const getCityByCode = (cityCode: string) => {
   for (const block of flightDetailsBlocks) {
@@ -27,7 +34,6 @@ export const getCityByCode = (cityCode: string) => {
   }
   return undefined;
 };
-
 
 export const flightDuration = (departing_at: string, arriving_at: string) => {
   const departingDate = new Date(departing_at);
