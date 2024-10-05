@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -112,17 +111,17 @@ export default function SearchManagement() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       ruleTitle: "VLN-MIA 01",
-      gdsNdcSupplier: "Any",
-      ruleType: "Firewall",
-      journeyType: "Any",
-      fromOriginAirport: "Any Origin Airport",
-      toDestinationsAirport: "Any Destination Airport",
-      connectingAirports: "Connecting Airport",
+      gdsNdcSupplier: "ALL",
+      ruleType: "combination",
+      journeyType: "oneway",
+      fromOriginAirport: "",
+      toDestinationsAirport: "",
+      connectingAirports: "",
       airlinesIncluded: "Any",
       airlinesExcluded: "None",
       flightExcluded: "",
-      minConnectionTime: "60 Minutes",
-      maxConnectionTime: "480 Minutes",
+      minConnectionTime: "",
+      maxConnectionTime: "",
       status: "active",
       noteDescription: "",
       priority: "10",
@@ -289,8 +288,11 @@ export default function SearchManagement() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Any">Any</SelectItem>
-                      {/* Add more options as needed */}
+                      <SelectItem value="AMADEUS">Amadeus</SelectItem>
+                      <SelectItem value="KIUSYS">Kiusys</SelectItem>
+                      <SelectItem value="DUFFEL">Duffel</SelectItem>
+                      <SelectItem value="ALL">All</SelectItem>
+                      <SelectItem value="NONE">None</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -313,7 +315,10 @@ export default function SearchManagement() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Firewall">Firewall</SelectItem>
+                      <SelectItem value="combination">
+                        Create Combination
+                      </SelectItem>
+                      <SelectItem value="soon">Coming Soon</SelectItem>
                       {/* Add more options as needed */}
                     </SelectContent>
                   </Select>
@@ -337,7 +342,9 @@ export default function SearchManagement() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Any">Any</SelectItem>
+                      <SelectItem value="oneway">One Way</SelectItem>
+                      <SelectItem value="roundtrip">Round Trip</SelectItem>
+                      <SelectItem value="multicity">Multi City</SelectItem>
                       {/* Add more options as needed */}
                     </SelectContent>
                   </Select>
@@ -351,22 +358,11 @@ export default function SearchManagement() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>From Origin Airport</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select origin airport" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Any Origin Airport">
-                        Any Origin Airport
-                      </SelectItem>
-                      {/* Add more options as needed */}
-                    </SelectContent>
-                  </Select>
+
+                  <FormControl>
+                    <Input placeholder="origin airport" {...field} />
+                  </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -377,22 +373,11 @@ export default function SearchManagement() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>To Destinations Airport</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select destination airport" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Any Destination Airport">
-                        Any Destination Airport
-                      </SelectItem>
-                      {/* Add more options as needed */}
-                    </SelectContent>
-                  </Select>
+
+                  <FormControl>
+                    <Input placeholder="destination airport" {...field} />
+                  </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -403,22 +388,11 @@ export default function SearchManagement() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Connecting Airport(s)</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select connecting airport" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Connecting Airport">
-                        Connecting Airport
-                      </SelectItem>
-                      {/* Add more options as needed */}
-                    </SelectContent>
-                  </Select>
+
+                  <FormControl>
+                    <Input placeholder="connecting Airport" {...field} />
+                  </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -428,7 +402,7 @@ export default function SearchManagement() {
               name="airlinesIncluded"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Airlines Included</FormLabel>
+                  <FormLabel>Airlines Included (code)</FormLabel>
                   <FormControl>
                     <Input placeholder="Airlines Included" {...field} />
                   </FormControl>
@@ -441,7 +415,7 @@ export default function SearchManagement() {
               name="airlinesExcluded"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Airlines Excluded</FormLabel>
+                  <FormLabel>Airlines Excluded (code)</FormLabel>
                   <FormControl>
                     <Input placeholder="Airlines Excluded" {...field} />
                   </FormControl>
@@ -468,20 +442,11 @@ export default function SearchManagement() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Min. Connection Time</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select min connection time" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="60 Minutes">60 Minutes</SelectItem>
-                      {/* Add more options as needed */}
-                    </SelectContent>
-                  </Select>
+
+                  <FormControl>
+                    <Input placeholder="Min Connection Time" {...field} />
+                  </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -492,20 +457,11 @@ export default function SearchManagement() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Max. Connection Time</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select max connection time" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="480 Minutes">480 Minutes</SelectItem>
-                      {/* Add more options as needed */}
-                    </SelectContent>
-                  </Select>
+
+                  <FormControl>
+                    <Input placeholder="Max Connection Time" {...field} />
+                  </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}
