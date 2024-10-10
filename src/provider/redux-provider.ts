@@ -8,6 +8,7 @@ import ticketsSlice from "../redux/tickets"; //
 import emailSMTPSlice from "../redux/email-smtp";
 import privacyPolicySlice from "../redux/privacy-settings";
 import termsAndConditionsSlice from "../redux/terms-settings";
+import searchManagementSlice from "../redux/search-management";
 import dealsSlice from "../redux/deals";
 
 export const store = configureStore({
@@ -21,7 +22,8 @@ export const store = configureStore({
     emailSmtp: emailSMTPSlice,
     privacy: privacyPolicySlice,
     deals: dealsSlice,
-    terms:termsAndConditionsSlice,
+    terms: termsAndConditionsSlice,
+    searchManagement: searchManagementSlice,
   },
 });
 

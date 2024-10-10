@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,6 +10,8 @@ import {
   getPaginationRowModel,
   getFilteredRowModel,
 } from "@tanstack/react-table";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -36,14 +38,30 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+import {
+  createSearchManagement,
+  updateSearchManagement,
+  deleteSearchManagement,
+  getSearchManagement,
+  SearchManagement,
+} from "@/redux/search-management";
+import { AppDispatch, RootState } from "@/provider/redux-provider";
+import { format } from "date-fns";
 
 const formSchema = z.object({
   ruleTitle: z.string().min(1, "Rule title is required"),
-  gdsNdcSupplier: z.string().min(1, "GDS/NDC/Supplier is required"),
-  ruleType: z.string().min(1, "Rule type is required"),
-  journeyType: z.string().min(1, "Journey type is required"),
+  gdsNdcSupplier: z.enum(["AMADEUS", "KIUSYS", "DUFFEL", "ALL", "NONE"], {
+    required_error: "GDS/NDC/Supplier is required",
+  }),
+  ruleType: z.enum(["CREATE_COMBINATION", "COMING_SOON"], {
+    required_error: "Rule type is required",
+  }),
+  journeyType: z.enum(["ONEWAY", "ROUNDTRIP", "MULTIWAY"], {
+    required_error: "Journey type is required",
+  }),
   fromOriginAirport: z.string().min(1, "From origin airport is required"),
   toDestinationsAirport: z
     .string()
@@ -54,16 +72,11 @@ const formSchema = z.object({
   flightExcluded: z.string(),
   minConnectionTime: z.string().min(1, "Min. connection time is required"),
   maxConnectionTime: z.string().min(1, "Max. connection time is required"),
-  status: z.enum(["active", "inactive"]),
+  status: z.enum(["ACTIVE", "INACTIVE"]),
   noteDescription: z.string(),
-  priority: z.string().min(1, "Priority is required"),
+  priority: z.number().min(1, "Priority is required"),
   fareCodesExcluded: z.string(),
 });
-
-type SearchRule = z.infer<typeof formSchema> & {
-  id: string;
-  lastUpdate: string;
-};
 
 const Switch = ({
   checked,
@@ -101,8 +114,11 @@ const Switch = ({
   );
 };
 
-export default function SearchManagement() {
-  const [searchRules, setSearchRules] = useState<SearchRule[]>([]);
+export default function SearchManagementTable() {
+  const dispatch = useDispatch<AppDispatch>();
+  const searchRules = useSelector(
+    (state: RootState) => state.searchManagement.entries
+  );
   const [globalFilter, setGlobalFilter] = useState("");
   const [pageSize, setPageSize] = useState(50);
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
@@ -110,26 +126,29 @@ export default function SearchManagement() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      ruleTitle: "VLN-MIA 01",
-      gdsNdcSupplier: "ALL",
-      ruleType: "combination",
-      journeyType: "oneway",
+      ruleType: "CREATE_COMBINATION",
+      gdsNdcSupplier: "AMADEUS",
+      journeyType: "ONEWAY",
       fromOriginAirport: "",
       toDestinationsAirport: "",
       connectingAirports: "",
-      airlinesIncluded: "Any",
-      airlinesExcluded: "None",
+      airlinesIncluded: "",
+      airlinesExcluded: "",
       flightExcluded: "",
       minConnectionTime: "",
       maxConnectionTime: "",
-      status: "active",
+      status: "ACTIVE",
       noteDescription: "",
-      priority: "10",
-      fareCodesExcluded: "None",
+      priority: 1,
+      fareCodesExcluded: "",
     },
   });
 
-  const columns: ColumnDef<SearchRule>[] = [
+  useEffect(() => {
+    dispatch(getSearchManagement());
+  }, [dispatch]);
+
+  const columns: ColumnDef<SearchManagement>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -168,7 +187,7 @@ export default function SearchManagement() {
       header: "Status",
       cell: ({ row }) => (
         <Switch
-          checked={row.original.status === "active"}
+          checked={row.original.status === "ACTIVE"}
           onCheckedChange={(checked) =>
             handleStatusChange(row.original.id, checked)
           }
@@ -176,19 +195,34 @@ export default function SearchManagement() {
       ),
     },
     {
-      id: "edit",
+      accessorKey: "lastUpdate",
+      header: "Last Update",
+      cell: ({ row }) => format(new Date(row.original.lastUpdate), "Ppp"),
+    },
+    {
+      id: "actions",
+      header: "Actions",
       cell: ({ row }) => (
-        <Button
-          onClick={() => handleEdit(row.original)}
-          variant="ghost"
-          size="sm"
-          className="bg-green-400/30 hover:bg-green-400/40"
-        >
-          <Pencil className="h-4 w-4 text-green-600" />
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            onClick={() => handleEdit(row.original)}
+            variant="ghost"
+            size="sm"
+            className="bg-green-400/30 hover:bg-green-400/40"
+          >
+            <Pencil className="h-4 w-4 text-green-600" />
+          </Button>
+          <Button
+            onClick={() => handleDelete(row.original.id)}
+            variant="ghost"
+            size="sm"
+            className="bg-red-400/30 hover:bg-red-400/40"
+          >
+            <Trash2 className="h-4 w-4 text-red-600" />
+          </Button>
+        </div>
       ),
     },
-    { accessorKey: "lastUpdate", header: "Last Update" },
   ];
 
   const table = useReactTable({
@@ -207,51 +241,88 @@ export default function SearchManagement() {
       },
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (editingRuleId) {
-      // Update existing rule
-      setSearchRules(
-        searchRules.map((rule) =>
-          rule.id === editingRuleId
-            ? { ...rule, ...values, lastUpdate: new Date().toLocaleString() }
-            : rule
-        )
-      );
-      setEditingRuleId(null);
-    } else {
-      // Create new rule
-      const newRule: SearchRule = {
-        ...values,
-        id: Date.now().toString(),
-        lastUpdate: new Date().toLocaleString(),
-      };
-      setSearchRules([...searchRules, newRule]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      if (editingRuleId) {
+        await dispatch(
+          updateSearchManagement({
+            id: editingRuleId,
+            ...values,
+            lastUpdate: new Date(),
+          })
+        );
+        toast.success("Rule updated successfully");
+        setEditingRuleId(null);
+      } else {
+        await dispatch(createSearchManagement(values));
+        toast.success("Rule created successfully");
+      }
+      form.reset();
+      dispatch(getSearchManagement()); // Fetch updated data
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
     }
-    form.reset();
   }
 
-  function handleStatusChange(id: string, checked: boolean) {
-    setSearchRules(
-      searchRules.map((rule) =>
-        rule.id === id
-          ? {
-              ...rule,
-              status: checked ? "active" : "inactive",
-              lastUpdate: new Date().toLocaleString(),
-            }
-          : rule
-      )
-    );
+  async function handleStatusChange(id: string, checked: boolean) {
+    try {
+      const existingRule = searchRules.find((rule) => rule.id === id);
+      if (existingRule) {
+        const updatedRule = {
+          ...existingRule,
+          status: checked ? "ACTIVE" : "INACTIVE",
+          lastUpdate: new Date(),
+        };
+        await dispatch(updateSearchManagement(updatedRule));
+        toast.success("Status updated successfully");
+        dispatch(getSearchManagement()); // Fetch updated data
+      }
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
   }
 
-  function handleEdit(rule: SearchRule) {
+  function handleEdit(rule: SearchManagement) {
     setEditingRuleId(rule.id);
-    form.reset(rule);
+    form.reset({
+      ruleTitle: rule.ruleTitle,
+      gdsNdcSupplier: rule.gdsNdcSupplier as
+        | "AMADEUS"
+        | "KIUSYS"
+        | "DUFFEL"
+        | "ALL"
+        | "NONE",
+      ruleType: rule.ruleType as "CREATE_COMBINATION" | "COMING_SOON",
+      journeyType: rule.journeyType as "ONEWAY" | "ROUNDTRIP" | "MULTIWAY",
+      fromOriginAirport: rule.fromOriginAirport,
+      toDestinationsAirport: rule.toDestinationsAirport,
+      connectingAirports: rule.connectingAirports,
+      airlinesIncluded: rule.airlinesIncluded,
+      airlinesExcluded: rule.airlinesExcluded,
+      flightExcluded: rule.flightExcluded,
+      minConnectionTime: rule.minConnectionTime,
+      maxConnectionTime: rule.maxConnectionTime,
+      status: rule.status as "ACTIVE" | "INACTIVE", // Ensure this line is present
+      noteDescription: rule.noteDescription,
+      priority: rule.priority,
+      fareCodesExcluded: rule.fareCodesExcluded,
+    });
   }
 
   function handleCancelEdit() {
     setEditingRuleId(null);
     form.reset();
+  }
+
+  async function handleDelete(id: string) {
+    try {
+      await dispatch(deleteSearchManagement(id));
+      toast.success("Rule deleted successfully");
+      dispatch(getSearchManagement());
+    } catch (error) {
+      toast.error("Failed to delete rule");
+    }
   }
 
   return (
@@ -315,10 +386,10 @@ export default function SearchManagement() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="combination">
+                      <SelectItem value="CREATE_COMBINATION">
                         Create Combination
                       </SelectItem>
-                      <SelectItem value="soon">Coming Soon</SelectItem>
+                      <SelectItem value="COMING_SOON">Coming Soon</SelectItem>
                       {/* Add more options as needed */}
                     </SelectContent>
                   </Select>
@@ -342,9 +413,9 @@ export default function SearchManagement() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="oneway">One Way</SelectItem>
-                      <SelectItem value="roundtrip">Round Trip</SelectItem>
-                      <SelectItem value="multicity">Multi City</SelectItem>
+                      <SelectItem value="ONEWAY">One Way</SelectItem>
+                      <SelectItem value="ROUNDTRIP">Round Trip</SelectItem>
+                      <SelectItem value="MULTIWAY">Multi City</SelectItem>
                       {/* Add more options as needed */}
                     </SelectContent>
                   </Select>
@@ -475,22 +546,22 @@ export default function SearchManagement() {
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value} 
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="ACTIVE">Active</SelectItem>
+                        <SelectItem value="INACTIVE">Inactive</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="noteDescription"
@@ -536,7 +607,27 @@ export default function SearchManagement() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={handleCancelEdit}
+                onClick={() => {
+                  handleCancelEdit();
+                  form.reset({
+                    ruleTitle: "",
+                    gdsNdcSupplier: "AMADEUS",
+                    ruleType: "CREATE_COMBINATION",
+                    journeyType: "ONEWAY",
+                    fromOriginAirport: "",
+                    toDestinationsAirport: "",
+                    connectingAirports: "",
+                    airlinesIncluded: "",
+                    airlinesExcluded: "",
+                    flightExcluded: "",
+                    minConnectionTime: "",
+                    maxConnectionTime: "",
+                    status: "ACTIVE",
+                    noteDescription: "",
+                    priority: 0,
+                    fareCodesExcluded: "",
+                  });
+                }}
               >
                 Cancel
               </Button>
