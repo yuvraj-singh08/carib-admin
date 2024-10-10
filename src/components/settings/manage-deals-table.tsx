@@ -77,7 +77,7 @@ const CouponManagementSystemTable = () => {
   const dispatch = useDispatch<AppDispatch>();
   const deals = useSelector((state: RootState) => state.deals.deals);
   const status = useSelector((state: RootState) => state.deals.status);
-  const error = useSelector((state: RootState) => state.deals.error);
+  // const error = useSelector((state: RootState) => state.deals.error);
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<string | undefined>();
   const used = 0;
@@ -201,9 +201,6 @@ const CouponManagementSystemTable = () => {
     return <TableLoader />;
   }
 
-  if (status === "failed") {
-    return <div>Error: {error}</div>;
-  }
 
   return (
     <>
