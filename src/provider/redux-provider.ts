@@ -9,6 +9,7 @@ import privacyPolicySlice from "../redux/privacy-settings";
 import termsAndConditionsSlice from "../redux/terms-settings";
 import dealsSlice from "../redux/deals";
 import manageUsersSlice from "../redux/manage-user";
+import searchManagementSlice from "../redux/search-management";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     privacy: privacyPolicySlice,
     deals: dealsSlice,
     terms: termsAndConditionsSlice,
+    searchManagement: searchManagementSlice,
   },
 });
 
