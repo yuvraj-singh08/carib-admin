@@ -13,7 +13,7 @@ export interface Deal {
   userLimit: number;
   used: number;
   flightCode: string | null;
-  expiryDate: Date;
+  expiryDate: string;
   imageUrl: string;
   description: string;
 }

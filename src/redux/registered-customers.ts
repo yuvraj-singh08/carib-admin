@@ -17,6 +17,7 @@ export interface Customer {
   email: string;
   address?: string;
   dob?: string;
+  role: "ADMIN" | "USER";
   passportNo?: string;
   lastBooking?: string;
   country?: string;

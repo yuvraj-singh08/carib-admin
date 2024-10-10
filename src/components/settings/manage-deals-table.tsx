@@ -159,17 +159,26 @@ const CouponManagementSystemTable = () => {
   );
 
   const onSubmit: SubmitHandler<z.infer<typeof dealFormSchema>> = (values) => {
+    // Convert expiryDate to a proper Date object
+    const formattedValues = {
+      ...values,
+      expiryDate: values.expiryDate.toISOString(),
+    };
+
     if (editingDeal) {
       dispatch(
         updateDeal({
           ...editingDeal,
-          ...values,
+          ...formattedValues,
           imageUrl: image || editingDeal.imageUrl,
         })
       );
     } else {
-      dispatch(createDeal({ ...values, imageUrl: image || "", used: used }));
+      dispatch(
+        createDeal({ ...formattedValues, imageUrl: image || "", used: used })
+      );
     }
+
     setIsDialogOpen(false);
     setEditingDeal(null);
     form.reset();
@@ -200,7 +209,6 @@ const CouponManagementSystemTable = () => {
   if (status === "loading") {
     return <TableLoader />;
   }
-
 
   return (
     <>
