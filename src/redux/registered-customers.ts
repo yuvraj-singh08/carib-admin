@@ -50,6 +50,21 @@ export const fetchCustomers = createAsyncThunk("users/fetchCustomers", async () 
   return response.data;
 });
 
+export const deleteCustomer = createAsyncThunk(
+  "users/deleteCustomer",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await axios.post(`${API_BASE_URL}/user/del-user`, { id });
+      return id;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data);
+      }
+      return rejectWithValue("An error occurred while deleting the user");
+    }
+  }
+);
+
 const customerSlice = createSlice({
   name: "user",
   initialState,
@@ -69,6 +84,19 @@ const customerSlice = createSlice({
       .addCase(fetchCustomers.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || null;
+      })
+      .addCase(deleteCustomer.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteCustomer.fulfilled, (state, action: PayloadAction<string>) => {
+        state.status = "succeeded";
+        state.customers = state.customers.filter(
+          (customer) => customer.id !== action.payload
+        );
+      })
+      .addCase(deleteCustomer.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
       });
   },
 });

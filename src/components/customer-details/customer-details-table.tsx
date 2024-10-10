@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Customer, fetchCustomers } from "@/redux/registered-customers"; 
+import { Customer, deleteCustomer, fetchCustomers } from "@/redux/registered-customers"; 
 import {
   Table,
   TableBody,
@@ -173,7 +173,12 @@ const CustomerDetailsTable = () => {
   const handleDelete = async (id: string) => {
     const ok = await confirm();
     if (ok) {
-      toast.success(`${id}`);
+      try {
+        await dispatch(deleteCustomer(id)).unwrap();
+        toast.success(`User with ID ${id} has been deleted successfully`);
+      } catch (error) {
+        toast.error(`Failed to delete user: ${error}`);
+      }
     }
   };
 
