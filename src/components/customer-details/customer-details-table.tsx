@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Customer, deleteCustomer, fetchCustomers } from "@/redux/registered-customers"; 
+import {
+  Customer,
+  deleteCustomer,
+  fetchCustomers,
+} from "@/redux/registered-customers";
 import {
   Table,
   TableBody,
@@ -175,7 +179,7 @@ const CustomerDetailsTable = () => {
     if (ok) {
       try {
         await dispatch(deleteCustomer(id)).unwrap();
-        toast.success(`User with ID ${id} has been deleted successfully`);
+        toast.success("User Deleted Successfully");
       } catch (error) {
         toast.error(`Failed to delete user: ${error}`);
       }
@@ -328,9 +332,6 @@ const CustomerDetailsTable = () => {
 };
 
 export default CustomerDetailsTable;
-
-
-
 
 // import { useState } from "react";
 // import {
@@ -510,7 +511,7 @@ export default CustomerDetailsTable;
 //             alt="Passport"
 //             className="w-full rounded-lg"
 //           />
-     
+
 //           {/* <InfoItem label="Email" value={user.coTraveler.email} />
 //           <InfoItem
 //             label="Passport Number"
@@ -524,11 +525,11 @@ export default CustomerDetailsTable;
 //           </DialogTitle>
 //         <div className="w-full grid grid-cols-2 gap-2">
 //          <div className="flex flex-col gap-3">
-         
+
 //           <InfoItem label="Name" value={user.coTraveler.name} />
 //           <InfoItem label="DOB" value={user.coTraveler.dob} />
 //           <InfoItem label="Email" value={user.coTraveler.email} />
-         
+
 //          </div>
 //          <div className="flex flex-col gap-3">
 //          <InfoItem
