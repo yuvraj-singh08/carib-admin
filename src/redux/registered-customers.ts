@@ -1,14 +1,20 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-interface Cotraveler {
+interface coTraveler {
   name: string;
-  dob: string;
+  dateOfBirth: string;
   email: string;
-  passportNo: string;
+  passportNumber: string;
   phoneNumber: string;
 }
 
+interface passportDetails{
+  passportNumber: string;
+  passportImg: string;
+  expiryDate: string;
+  issuingCountry: string;
+}
 export interface Customer {
   id: string;
   firstname: string;
@@ -18,15 +24,14 @@ export interface Customer {
   address?: string;
   dob?: string;
   role: "ADMIN" | "USER";
-  passportNo?: string;
   lastBooking?: string;
   country?: string;
   gender?: string;
   pincode?: string;
   avatarSrc?: string;
-  passportImage?: string;
+  passportDetails?: passportDetails;
   password?: string;
-  cotraveler: Cotraveler[];
+  coTraveler: coTraveler[];
 }
 
 interface CustomerState {
