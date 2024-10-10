@@ -4,7 +4,7 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 
 // Defining the user interface based on Prisma model
-export interface User {
+export interface ManageUser {
   id: string;
   uniqueId: string;
   name: string;
@@ -18,7 +18,7 @@ export interface User {
 }
 
 interface UserState {
-  users: User[];
+  users: ManageUser[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -52,7 +52,7 @@ export const fetchUserById = createAsyncThunk(
 // Add new user
 export const addUser = createAsyncThunk(
   "users/addUser",
-  async (userData: Omit<User, "id" | "password"> & { roleId: string }) => {
+  async (userData: Omit<ManageUser, "id" | "password"> & { roleId: string }) => {
     const response = await axios.post(`${apiUrl}/admin/add-user`, {
       ...userData,
       role: {
@@ -68,7 +68,7 @@ export const addUser = createAsyncThunk(
 // Update user
 export const updateUser = createAsyncThunk(
   "users/updateUser",
-  async (userData: Partial<User> & { id: string }) => {
+  async (userData: Partial<ManageUser> & { id: string }) => {
     const response = await axios.post(`${apiUrl}/admin/update-user`, userData);
     return response.data.user;
   }
@@ -84,7 +84,7 @@ export const deleteUser = createAsyncThunk(
 );
 
 // User slice with extra reducers
-const usersSlice = createSlice({
+const manageUsersSlice = createSlice({
   name: "users",
   initialState,
   reducers: {},
@@ -133,4 +133,4 @@ const usersSlice = createSlice({
   },
 });
 
-export default usersSlice.reducer;
+export default manageUsersSlice.reducer;

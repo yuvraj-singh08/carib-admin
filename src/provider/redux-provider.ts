@@ -3,12 +3,12 @@ import flightRulesReducer from "../redux/flight-rules-firewall";
 import feesCommissionReducer from "../redux/fees-commison";
 import rolesReducer from "../redux/user-role-permission";
 import socialSettingsSlice from "../redux/socials";
-import usersSlice from "../redux/manage-user";
 import ticketsSlice from "../redux/tickets"; //
 import emailSMTPSlice from "../redux/email-smtp";
 import privacyPolicySlice from "../redux/privacy-settings";
 import termsAndConditionsSlice from "../redux/terms-settings";
 import dealsSlice from "../redux/deals";
+import manageUsersSlice from "../redux/manage-user";
 
 export const store = configureStore({
   reducer: {
@@ -16,12 +16,12 @@ export const store = configureStore({
     feesCommission: feesCommissionReducer,
     roles: rolesReducer,
     socials: socialSettingsSlice,
-    users: usersSlice,
+    manageUser: manageUsersSlice,
     tickets: ticketsSlice,
     emailSmtp: emailSMTPSlice,
     privacy: privacyPolicySlice,
     deals: dealsSlice,
-    terms:termsAndConditionsSlice,
+    terms: termsAndConditionsSlice,
   },
 });
 

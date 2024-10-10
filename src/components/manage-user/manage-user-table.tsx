@@ -43,7 +43,7 @@ import {
   deleteUser,
   fetchUsers,
   updateUser,
-  User,
+  ManageUser,
 } from "@/redux/manage-user";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 
@@ -73,11 +73,11 @@ export default function UserManagementPage() {
     (state: RootState) => (state.roles as { roles: any[] }).roles
   );
   const rolesStatus = useSelector((state: RootState) => state.roles.status);
-  const users = useSelector((state: RootState) => state.users.users);
-  const usersStatus = useSelector((state: RootState) => state.users.status);
+  const users = useSelector((state: RootState) => state.manageUser.users);
+  const usersStatus = useSelector((state: RootState) => state.manageUser.status);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<ManageUser | null>(null);
   const [password, setPassword] = useState<string | null>(null);
 
   const [ConfirmDialogue, confirm] = useConfirm(
@@ -150,7 +150,7 @@ export default function UserManagementPage() {
     }
   };
 
-  const handleEdit = (user: User) => {
+  const handleEdit = (user: ManageUser) => {
     setEditingUser(user);
     setPassword(user.password); // Store the user's password without showing it
     form.reset({
