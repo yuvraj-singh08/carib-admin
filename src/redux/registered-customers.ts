@@ -44,7 +44,7 @@ const initialState: CustomerState = {
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL as string;
 
-export const fetchCustomers = createAsyncThunk("users/fetchUsers", async () => {
+export const fetchCustomers = createAsyncThunk("users/fetchCustomers", async () => {
   const response = await axios.get<Customer[]>(`${API_BASE_URL}/user`);
   return response.data;
 });

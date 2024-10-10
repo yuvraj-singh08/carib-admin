@@ -10,7 +10,7 @@ import termsAndConditionsSlice from "../redux/terms-settings";
 import dealsSlice from "../redux/deals";
 import manageUsersSlice from "../redux/manage-user";
 import searchManagementSlice from "../redux/search-management";
-// import customerSlice from "../redux/registered-customers";
+import customerSlice from "../redux/registered-customers";
 
 export const store = configureStore({
   reducer: {
@@ -25,7 +25,7 @@ export const store = configureStore({
     deals: dealsSlice,
     terms: termsAndConditionsSlice,
     searchManagement: searchManagementSlice,
-    // customers: customerSlice,
+    customers: customerSlice,
   },
 });
 
