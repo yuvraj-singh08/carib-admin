@@ -5,25 +5,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "../ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "@/components/ui/table";
+// import { Button } from "../ui/button";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { format } from "date-fns";
 import { Separator } from "../ui/separator";
-import { useState } from "react";
+// import { useState } from "react";
 
 interface CouponViewDialogProps {
   selectedCoupon: any;
@@ -36,9 +36,9 @@ export const CoupnViewDialog = ({
   setSelectedCoupon,
   children,
 }: CouponViewDialogProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(50);
-  const totalPages = Math.ceil(selectedCoupon.length / pageSize);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [pageSize, setPageSize] = useState(50);
+  // const totalPages = Math.ceil(selectedCoupon.length / pageSize);
 
   return (
     <Dialog
@@ -128,7 +128,7 @@ export const CoupnViewDialog = ({
                   </h1>
                   <div className="w-16 h-auto object-contain rounded-md">
                     <img
-                      src="icons/coupn.png" // Use the image from selectedCoupon
+                      src={selectedCoupon.imageUrl}
                       alt="coupon"
                       className="w-24 h-auto"
                     />
@@ -139,7 +139,7 @@ export const CoupnViewDialog = ({
           </div>
 
           {/* Usage Details Table Section */}
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <h2 className="text-lg font-medium text-blue">Usage Details</h2>
             <Table>
               <TableHeader className="bg-[#EFEFFF]">
@@ -221,7 +221,7 @@ export const CoupnViewDialog = ({
                 </Button>
               </div>
             </div>
-          </div>
+          </div> */}
         </DialogContent>
       )}
     </Dialog>

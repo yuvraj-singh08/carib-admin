@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
 import {
   Table,
   TableBody,
@@ -36,56 +35,43 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CirclePlus, Pencil, Trash2 } from "lucide-react";
 import { useConfirm } from "@/hooks/use-confirm";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/provider/redux-provider";
+import {
+  fetchCommissions,
+  addCommission,
+  updateCommission,
+  deleteCommission,
+  addType,
+  updateType,
+  deleteType,
+  CommissionType,
+} from "@/redux/fees-commison";
+import TableLoader from "../shared/table-loader";
+import { format } from "date-fns";
 
 const formSchema = z.object({
   type: z.string().min(1, "Type is required"),
   commissionTitle: z.string().min(1, "Commission title is required"),
   supplier: z.string().min(1, "Supplier is required"),
   commissionFees: z.string().min(1, "Commission/Fees is required"),
-  feeType: z.enum(["percent", "fixed"]),
+  feeType: z.enum(["PERCENT", "FIXED"]),
 });
 
-const initialTypes = ["Airline", "Hotel", "Car Rental"];
-
-const defaultFees = [
-  {
-    id: 1,
-    type: "Airline",
-    commissionTitle: "Standard Flight Commission",
-    supplier: "Amadeus",
-    commissionFees: "10",
-    feeType: "percent",
-    lastUpdate: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    type: "Hotel",
-    commissionTitle: "Luxury Hotel Booking Fee",
-    supplier: "Kiusys",
-    commissionFees: "25",
-    feeType: "fixed",
-    lastUpdate: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    type: "Car Rental",
-    commissionTitle: "Economy Car Commission",
-    supplier: "Duffel",
-    commissionFees: "5",
-    feeType: "percent",
-    lastUpdate: new Date().toISOString(),
-  },
-];
-
 export default function FeesCommissionManagerTable() {
-  const [fees, setFees] = useState(defaultFees);
-  const [types, setTypes] = useState(initialTypes);
+  const dispatch = useDispatch<AppDispatch>();
+  const { commissions, types, status, error } = useSelector(
+    (state: RootState) => state.feesCommission
+  );
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(false);
   const [newType, setNewType] = useState("");
   const [editingType, setEditingType] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [editingFee, setEditingFee] = useState<any>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [editingCommission, setEditingCommission] =
+    useState<CommissionType | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -101,59 +87,67 @@ export default function FeesCommissionManagerTable() {
       commissionTitle: "",
       supplier: "",
       commissionFees: "",
-      feeType: "percent",
+      feeType: "PERCENT" as "PERCENT" | "FIXED",
     },
   });
 
-  const onSubmit = (values: any) => {
-    if (editingFee) {
-      setFees(
-        fees.map((fee) =>
-          fee.id === editingFee.id
-            ? { ...fee, ...values, lastUpdate: new Date().toISOString() }
-            : fee
-        )
-      );
-    } else {
-      setFees([
-        ...fees,
-        { id: Date.now(), ...values, lastUpdate: new Date().toISOString() },
-      ]);
+  useEffect(() => {
+    dispatch(fetchCommissions());
+  }, [dispatch]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (editingCommission) {
+        await dispatch(
+          updateCommission({ ...editingCommission, ...values })
+        ).unwrap();
+        toast.success("Commission updated successfully");
+      } else {
+        await dispatch(addCommission(values)).unwrap();
+        toast.success("Commission created successfully");
+      }
+      setIsDialogOpen(false);
+      setEditingCommission(null);
+      form.reset();
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred");
     }
-    setIsDialogOpen(false);
-    setEditingFee(null);
-    form.reset();
   };
 
-  const addType = () => {
+  const handleAddType = () => {
     if (newType && !types.includes(newType)) {
-      setTypes([...types, newType]);
+      dispatch(addType(newType));
       setNewType("");
       setIsTypeDialogOpen(false);
     }
   };
 
-  const updateType = () => {
+  const handleUpdateType = () => {
     if (editingType && newType && !types.includes(newType)) {
-      setTypes(types.map((type) => (type === editingType ? newType : type)));
+      dispatch(updateType({ oldType: editingType, newType }));
       setNewType("");
       setEditingType(null);
       setIsTypeDialogOpen(false);
     }
   };
 
-  const deleteType = (typeToDelete: string) => {
-    setTypes(types.filter((type) => type !== typeToDelete));
+  const handleDeleteType = (typeToDelete: string) => {
+    dispatch(deleteType(typeToDelete));
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     const ok = await confirm();
     if (ok) {
-      setFees(fees.filter((fee) => fee.id !== id));
+      try {
+        await dispatch(deleteCommission(id)).unwrap();
+        toast.success("Commission deleted successfully");
+      } catch (error: any) {
+        toast.error(error.message || "An error occurred while deleting");
+      }
     }
   };
 
-  const toggleSelectRow = (id: number) => {
+  const toggleSelectRow = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id)
         ? prev.filter((selectedId) => selectedId !== id)
@@ -161,27 +155,35 @@ export default function FeesCommissionManagerTable() {
     );
   };
 
-  const isSelected = (id: number) => selectedIds.includes(id);
+  const isSelected = (id: string) => selectedIds.includes(id);
 
   const toggleSelectAll = () => {
-    if (selectedIds.length === paginatedFees.length) {
+    if (selectedIds.length === paginatedCommissions.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(paginatedFees.map((fee) => fee.id));
+      setSelectedIds(paginatedCommissions.map((commission) => commission.id));
     }
   };
 
-  const handleEdit = (fee: any) => {
-    setEditingFee(fee);
-    form.reset(fee);
+  const handleEdit = (commission: CommissionType) => {
+    setEditingCommission(commission);
+    form.reset(commission);
     setIsDialogOpen(true);
   };
 
-  const totalPages = Math.ceil(fees.length / pageSize);
-  const paginatedFees = fees.slice(
+  const totalPages = Math.ceil((commissions?.length ?? 0) / pageSize);
+  const paginatedCommissions = (commissions ?? []).slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  if (status === "loading") {
+    return <TableLoader />;
+  }
+
+  // if (status === "failed") {
+  //   return <div>Error: {error}</div>;
+  // }
 
   return (
     <>
@@ -195,13 +197,13 @@ export default function FeesCommissionManagerTable() {
             <DialogTrigger asChild>
               <Button
                 onClick={() => {
-                  setEditingFee(null);
+                  setEditingCommission(null);
                   form.reset({
                     type: "",
                     commissionTitle: "",
                     supplier: "",
                     commissionFees: "",
-                    feeType: "percent",
+                    feeType: "PERCENT",
                   });
                   setIsDialogOpen(true);
                 }}
@@ -213,7 +215,7 @@ export default function FeesCommissionManagerTable() {
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>
-                  {editingFee ? "Edit" : "Add"} Fees & Commission
+                  {editingCommission ? "Edit" : "Add"} Fees & Commission
                 </DialogTitle>
               </DialogHeader>
               <Form {...form}>
@@ -284,9 +286,11 @@ export default function FeesCommissionManagerTable() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="amadeus">Amadeus</SelectItem>
-                            <SelectItem value="kiusys">Kiusys</SelectItem>
-                            <SelectItem value="duffel">Duffel</SelectItem>
+                            <SelectItem value="AMADEUS">Amadeus</SelectItem>
+                            <SelectItem value="KIUSYS">Kiusys</SelectItem>
+                            <SelectItem value="DUFFEL">Duffel</SelectItem>
+                            <SelectItem value="ALL">All</SelectItem>
+                            <SelectItem value="NONE">None</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormItem>
@@ -315,24 +319,27 @@ export default function FeesCommissionManagerTable() {
                             <input
                               type="radio"
                               {...field}
-                              value="percent"
-                              checked={field.value === "percent"}
+                              value="PERCENT"
+                              checked={field.value === "PERCENT"}
+                              onChange={() => field.onChange("PERCENT")}
                             />
-                            <span>%</span>
+                            <span>Percentage</span>
                           </label>
                           <label className="flex items-center space-x-2">
                             <input
                               type="radio"
                               {...field}
-                              value="fixed"
-                              checked={field.value === "fixed"}
+                              value="FIXED"
+                              checked={field.value === "FIXED"}
+                              onChange={() => field.onChange("FIXED")}
                             />
-                            <span>$</span>
+                            <span>Fixed</span>
                           </label>
                         </div>
                       </FormItem>
                     )}
                   />
+
                   <div className="flex justify-end space-x-2">
                     <Button
                       type="button"
@@ -342,7 +349,7 @@ export default function FeesCommissionManagerTable() {
                       Cancel
                     </Button>
                     <Button type="submit">
-                      {editingFee ? "Update" : "Apply"}
+                      {editingCommission ? "Update" : "Create"}
                     </Button>
                   </div>
                 </form>
@@ -350,6 +357,7 @@ export default function FeesCommissionManagerTable() {
             </DialogContent>
           </Dialog>
         </div>
+
         <Dialog open={isTypeDialogOpen} onOpenChange={setIsTypeDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -363,7 +371,9 @@ export default function FeesCommissionManagerTable() {
                   onChange={(e) => setNewType(e.target.value)}
                   className="flex-grow"
                 />
-                <Button onClick={editingType ? updateType : addType}>
+                <Button
+                  onClick={editingType ? handleUpdateType : handleAddType}
+                >
                   {editingType ? "Update Type" : "Add Type"}
                 </Button>
               </div>
@@ -388,7 +398,7 @@ export default function FeesCommissionManagerTable() {
                       <Button
                         className="bg-red-200/50"
                         variant="ghost"
-                        onClick={() => deleteType(type)}
+                        onClick={() => handleDeleteType(type)}
                       >
                         <Trash2
                           size={16}
@@ -409,7 +419,7 @@ export default function FeesCommissionManagerTable() {
               <TableHead>
                 <input
                   type="checkbox"
-                  checked={selectedIds.length === paginatedFees.length}
+                  checked={selectedIds.length === paginatedCommissions.length}
                   onChange={toggleSelectAll}
                   aria-label="Select all"
                 />
@@ -418,50 +428,75 @@ export default function FeesCommissionManagerTable() {
               <TableHead>Commission Title</TableHead>
               <TableHead>Supplier</TableHead>
               <TableHead>Commission/Fees</TableHead>
+              <TableHead>Fee Type</TableHead>
               <TableHead>Last Update</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedFees.map((fee) => (
-              <TableRow key={fee.id}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={isSelected(fee.id)}
-                    onChange={() => toggleSelectRow(fee.id)}
-                    aria-label="Select row"
-                  />
-                </TableCell>
-                <TableCell>{fee.type}</TableCell>
-                <TableCell>{fee.commissionTitle}</TableCell>
-                <TableCell>{fee.supplier}</TableCell>
-                <TableCell>
-                  {fee.commissionFees} {fee.feeType === "percent" ? "%" : "$"}
-                </TableCell>
-                <TableCell>
-                  {format(new Date(fee.lastUpdate), "dd-MM-yyyy")}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-4">
-                    <div className="size-7 rounded-md bg-green-200/50 flex items-center justify-center">
-                      <Pencil
-                        size={16}
-                        className="text-gray-500 cursor-pointer text-[#1AB69D]"
-                        onClick={() => handleEdit(fee)}
-                      />
-                    </div>
-                    <div className="size-7 rounded-md bg-red-200/50 flex items-center justify-center">
-                      <Trash2
-                        size={16}
-                        className="text-gray-500 cursor-pointer text-[#EB3D4D]"
-                        onClick={() => handleDelete(fee.id)}
-                      />
-                    </div>
-                  </div>
+            {status === "loading" ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : status === "failed" ? (
+              <TableRow>
+                <TableCell
+                  colSpan={8}
+                  className="text-center text-red-500 py-4"
+                >
+                  Error: {error || "Failed to load data"}
+                </TableCell>
+              </TableRow>
+            ) : paginatedCommissions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-4">
+                  No commissions found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              paginatedCommissions.map((fee) => (
+                <TableRow key={fee.id}>
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      checked={isSelected(fee.id)}
+                      onChange={() => toggleSelectRow(fee.id)}
+                      aria-label="Select row"
+                    />
+                  </TableCell>
+                  <TableCell>{fee.type}</TableCell>
+                  <TableCell>{fee.commissionTitle}</TableCell>
+                  <TableCell>{fee.supplier}</TableCell>
+                  <TableCell>
+                    {fee.commissionFees} {fee.feeType === "PERCENT" ? "%" : "$"}
+                  </TableCell>
+                  <TableCell>
+                    {fee.feeType === "PERCENT" ? "Percentage" : "Fixed Amount"}
+                  </TableCell>
+                  <TableCell>{format(fee.updateTime, "dd/MM/yyyy")}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-4">
+                      <div className="size-7 rounded-md bg-green-200/50 flex items-center justify-center">
+                        <Pencil
+                          size={16}
+                          className="text-gray-500 cursor-pointer text-[#1AB69D]"
+                          onClick={() => handleEdit(fee)}
+                        />
+                      </div>
+                      <div className="size-7 rounded-md bg-red-200/50 flex items-center justify-center">
+                        <Trash2
+                          size={16}
+                          className="text-gray-500 cursor-pointer text-[#EB3D4D]"
+                          onClick={() => handleDelete(fee.id)}
+                        />
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
         <div className="flex items-center justify-between mt-4">

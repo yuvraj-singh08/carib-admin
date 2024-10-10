@@ -1,13 +1,20 @@
 import BookingTicketsTable from "@/components/manage-booked-tickets/manage-tickets-table";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { TicketStatusCountsOptions } from "@/constants/dashboard";
+import { selectTicketStatusCounts } from "@/redux/tickets";
+import { useSelector } from "react-redux";
 
 const TicketsPage = () => {
+
+  const ticketCounts = useSelector(selectTicketStatusCounts);
+  const ticketStatusCountsOptions = TicketStatusCountsOptions(ticketCounts);
+
+
   return (
     <ContentLayout>
       <main className="w-full min-h-screen flex flex-col gap-4 ">
         <div className="w-full h-full grid grid-cols-8 gap-2 md:gap-4 mt-4">
-          {TicketStatusCountsOptions.map((option, index) => (
+          {ticketStatusCountsOptions.map((option, index) => (
             <div
               key={index}
               className="col-span-4 md:col-span-2 2xl:col-span-2 w-full border h-[100px] 2xl:h-[120px] bg-[#fff] rounded-xl flex items-center gap-3 justify-center"

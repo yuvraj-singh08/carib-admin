@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,27 +14,38 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addSocialSettings,
+  updateSocialSettings,
+  fetchSocialSettings,
+} from "@/redux/socials";
+import { AppDispatch, RootState } from "@/provider/redux-provider";
+import toast from "react-hot-toast";
 
-const Switch = ({
-  checked,
-  onCheckedChange,
-}: {
+interface SocialSettings {
+  id: string;
+  socialsEnable: boolean;
+  socialPlatforms: Record<string, { url: string; enabled: boolean }>;
+}
+
+const Switch: React.FC<{
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
-}) => (
+  disabled?: boolean;
+}> = ({ checked, onCheckedChange, disabled }) => (
   <button
-    className={`relative h-5 w-10 cursor-pointer rounded-full duration-200`}
+    className="relative h-5 w-10 cursor-pointer rounded-full duration-200"
     onClick={() => onCheckedChange(!checked)}
-    style={{
-      backgroundColor: checked ? "#052E73" : "#24252d50",
-    }}
+    style={{ backgroundColor: checked ? "#052E73" : "#24252d50" }}
+    disabled={disabled}
     type="button"
   >
     <span
       className={cn(
-        `absolute right-3 top-0 rounded-full bg-white shadow-lg transition-all duration-200`,
+        "absolute right-3 top-0 rounded-full bg-white shadow-lg transition-all duration-200",
         checked
-          ? "translate-x-full transform "
+          ? "translate-x-full transform"
           : "translate-x-0 transform left-0",
         "size-3 m-1"
       )}
@@ -52,41 +64,40 @@ const socialMediaPlatforms = [
   "Discord",
   "Tiktok",
   "Snapchat",
-];
+] as const;
 
+// Zod schema for form validation
 const formSchema = z.object({
   socialsEnable: z.boolean(),
-  ...Object.fromEntries(
-    socialMediaPlatforms.map((platform) => [
-      platform.toLowerCase(),
-      z
-        .object({
-          url: z
-            .string()
-            .url("Invalid URL")
-            .optional()
-            .or(z.literal("")), // Allows empty string for disabled providers
-          enabled: z.boolean(),
-        })
-        .refine(
-          (data) => !data.enabled || (data.enabled && data.url !== ""),
-          {
-            message: "URL is required when the provider is enabled",
-            path: ["url"], // Apply the error to the URL field
-          }
+  platforms: z
+    .record(
+      z.object({
+        url: z.string().url("Invalid URL").or(z.literal("")),
+        enabled: z.boolean(),
+      })
+    )
+    .refine(
+      (data) =>
+        Object.values(data).every(
+          (platform) => !platform.enabled || platform.url !== ""
         ),
-    ])
-  ),
+      {
+        message: "URL is required when the platform is enabled",
+        path: ["platforms"],
+      }
+    ),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-const SocialProvidersForm = () => {
+const SocialProvidersForm: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { settings, status } = useSelector((state: RootState) => state.socials);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      socialsEnable: true,
-      ...Object.fromEntries(
+      socialsEnable: false,
+      platforms: Object.fromEntries(
         socialMediaPlatforms.map((platform) => [
           platform.toLowerCase(),
           { url: "", enabled: false },
@@ -95,8 +106,66 @@ const SocialProvidersForm = () => {
     },
   });
 
+  useEffect(() => {
+    dispatch(fetchSocialSettings());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (settings.length > 0) {
+      const socialData = settings[0];
+      const formattedSocialPlatforms = socialData.socialPlatforms.reduce(
+        (acc, platform) => {
+          acc[platform.platform] = {
+            url: platform.url,
+            enabled: platform.enabled,
+          };
+          return acc;
+        },
+        {} as Record<string, { url: string; enabled: boolean }>
+      );
+
+      form.reset({
+        socialsEnable: socialData.socialsEnable,
+        platforms: formattedSocialPlatforms,
+      });
+    }
+  }, [settings, form]);
+
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    const socialData: SocialSettings = {
+      id: settings.length > 0 ? settings[0].id : "",
+      socialsEnable: data.socialsEnable,
+      socialPlatforms: data.platforms,
+    };
+
+    if (settings.length > 0) {
+      dispatch(
+        updateSocialSettings({
+          id: settings[0].id,
+          socialsEnable: socialData.socialsEnable,
+          socialPlatforms: Object.entries(socialData.socialPlatforms).map(
+            ([key, value]) => ({
+              platform: key,
+              ...value,
+            })
+          ),
+        })
+      );
+      toast.success("Social settings updated successfully");
+    } else {
+      dispatch(
+        addSocialSettings({
+          socialsEnable: socialData.socialsEnable,
+          socialPlatforms: Object.entries(socialData.socialPlatforms).map(
+            ([key, value]) => ({
+              platform: key,
+              ...value,
+            })
+          ),
+        })
+      );
+      toast.success("Social settings added successfully");
+    }
   };
 
   const socialsEnabled = form.watch("socialsEnable");
@@ -130,14 +199,11 @@ const SocialProvidersForm = () => {
           <CardContent className="px-0 py-2">
             <div className="grid grid-cols-2 gap-6">
               {socialMediaPlatforms.map((platform) => (
-                <div
-                  key={platform}
-                  className="flex items-end justify-between"
-                >
+                <div key={platform} className="flex items-end justify-between">
                   <div className="flex-grow pr-4">
-                    <FormField
+                    <Controller
+                      name={`platforms.${platform.toLowerCase()}.url`}
                       control={form.control}
-                      name={`${platform.toLowerCase()}.url` as any}
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="font-medium">
@@ -146,8 +212,13 @@ const SocialProvidersForm = () => {
                           <FormControl>
                             <Input
                               {...field}
-                              disabled={!socialsEnabled}
-                              placeholder="Enter URI"
+                              disabled={
+                                !socialsEnabled ||
+                                !form.watch(
+                                  `platforms.${platform.toLowerCase()}.enabled`
+                                )
+                              }
+                              placeholder="Enter URL"
                             />
                           </FormControl>
                           <FormMessage />
@@ -155,15 +226,24 @@ const SocialProvidersForm = () => {
                       )}
                     />
                   </div>
-                  <FormField
+                  <Controller
+                    name={`platforms.${platform.toLowerCase()}.enabled`}
                     control={form.control}
-                    name={`${platform.toLowerCase()}.enabled` as any}
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
                           <Switch
                             checked={field.value}
-                            onCheckedChange={field.onChange}
+                            onCheckedChange={(checked) => {
+                              field.onChange(checked);
+                              if (!checked) {
+                                form.setValue(
+                                  `platforms.${platform.toLowerCase()}.url`,
+                                  ""
+                                );
+                              }
+                            }}
+                            disabled={!socialsEnabled}
                           />
                         </FormControl>
                       </FormItem>
@@ -178,8 +258,9 @@ const SocialProvidersForm = () => {
           <Button
             type="submit"
             className="bg-blue text-white px-6 py-2 rounded"
+            disabled={status === "loading"}
           >
-            Save Changes
+            {settings.length > 0 ? "Update" : "Save"} Changes
           </Button>
         </div>
       </form>

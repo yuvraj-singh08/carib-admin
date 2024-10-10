@@ -1,9 +1,11 @@
 import CookieSettingsForm from "@/components/landing-settings/cookie-settings-form";
 import SocialProvidersForm from "@/components/landing-settings/socials-settings";
+import PrivacyPolicyForm from "@/components/landing-settings/privacy-text-editor";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import TermsConditionsForm from "@/components/landing-settings/terms-text-editor";
 
 const LandingPageSettings = () => {
   const [activeTab, setActiveTab] = useState("cookie");
@@ -21,7 +23,6 @@ const LandingPageSettings = () => {
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="socials">Social Media</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
-              {/* <TabsTrigger value="email">Email SMTP setting</TabsTrigger> */}
               {activeTab === "cookie" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
@@ -32,23 +33,21 @@ const LandingPageSettings = () => {
                 <div className="w-44 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-[350px]" />
               )}
               {activeTab === "socials" && (
-                <div className="w-32 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[310px]" />
+                <div className="w-32 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-[550px]" />
               )}
-              {/* {activeTab === "email" && (
-                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[110px]" />
-              )} */}
             </TabsList>
             <TabsContent value="cookie">
               <CookieSettingsForm />
             </TabsContent>
-            <TabsContent value="privacy">two</TabsContent>
-            <TabsContent value="terms">three</TabsContent>
+            <TabsContent value="privacy">
+              <PrivacyPolicyForm />
+            </TabsContent>
+            <TabsContent value="terms">
+              <TermsConditionsForm />
+            </TabsContent>
             <TabsContent value="socials">
               <SocialProvidersForm />
             </TabsContent>
-            {/* <TabsContent value="email">
-              <EMailSettingsForm />
-            </TabsContent> */}
           </Tabs>
         </div>
       </main>
