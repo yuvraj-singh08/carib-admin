@@ -6,7 +6,6 @@ interface ContentLayoutProps {
 
 export function ContentLayout({ children }: ContentLayoutProps) {
   const [loading, setLoading] = useState(true);
-  
 
   setTimeout(() => {
     setLoading(false);
@@ -14,7 +13,6 @@ export function ContentLayout({ children }: ContentLayoutProps) {
 
   return (
     <div className="overflow-x-hidden">
-
       {loading ? (
         <div className="flex justify-center items-center min-h-[90vh]">
           <div className="w-50 h-50 relative">
