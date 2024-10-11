@@ -12,7 +12,7 @@ export const MaxWrapper = ({ children, ...rest }: MaxWrapperProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="w-full h-full bg-white !scroll-smooth overflow-x-hidden px-20"
+        className="w-full h-full bg-white !scroll-smooth overflow-x-hidden px-5 md:px-10 lg:px-20"
         {...rest}
         style={{ scrollBehavior: "smooth" }}
       >
