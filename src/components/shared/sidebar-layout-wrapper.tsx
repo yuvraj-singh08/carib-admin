@@ -1,12 +1,18 @@
-import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import Layout from '@/pages/layout';
+import React from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import Layout from "@/pages/layout";
+import { useLocation } from "react-router-dom";
 
 interface MaxWrapperProps {
   children: React.ReactNode;
 }
 
-export const SidebarLayoutWrapper = ({ children, ...rest }: MaxWrapperProps) => {
+export const SidebarLayoutWrapper = ({
+  children,
+  ...rest
+}: MaxWrapperProps) => {
+  const location = useLocation();
+
   return (
     <AnimatePresence>
       <motion.div
@@ -17,7 +23,13 @@ export const SidebarLayoutWrapper = ({ children, ...rest }: MaxWrapperProps) => 
         {...rest}
         style={{ scrollBehavior: "smooth" }}
       >
-       <Layout>{children}</Layout>
+        {location.pathname === "/login" || location.pathname === "/signup" ? (
+          <>{children}</>
+        ) : (
+          <>
+            <Layout>{children}</Layout>
+          </>
+        )}
       </motion.div>
     </AnimatePresence>
   );

@@ -4,14 +4,22 @@ import { SheetMenu } from "./sheet-menu";
 import { UserNav } from "./user-nav";
 import { Separator } from "../ui/separator";
 import { cn } from "@/lib/utils";
+import useAuth from "@/hooks/use-auth";
 
 interface NavbarProps {
   className?: string;
 }
 
 export function Navbar({ className }: NavbarProps) {
+  const { user, logout, isLoading } = useAuth();
+
   return (
-    <header className={cn("h-14 md:h-20 flex items-center justify-between md:justify-end sticky top-0 z-10 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:shadow-secondary", className)}>
+    <header
+      className={cn(
+        "h-14 md:h-20 flex items-center justify-between md:justify-end sticky top-0 z-10 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:shadow-secondary",
+        className
+      )}
+    >
       <div className="mx-4 sm:mx-8 flex h-14 items-center w-full">
         <div className="flex items-center space-x-4 lg:space-x-0">
           <SheetMenu />
@@ -42,7 +50,7 @@ export function Navbar({ className }: NavbarProps) {
             />
           </div>
           <Separator orientation="vertical" className="h-[34px]" />
-          <UserNav />
+          <UserNav user={user} loading={isLoading} logout={logout} />
         </div>
       </div>
     </header>

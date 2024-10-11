@@ -9,11 +9,20 @@ import ProfilePage from "./pages/profile";
 import CustomerDetailsPage from "./pages/customers-details";
 import TicketsPage from "./pages/tickets";
 import SearchManagementPage from "./pages/search-management";
+import { LoginPage } from "./pages/login";
+import { SignUpPage } from "./pages/signup";
+import { useAuthMiddleware } from "./authMiddleware";
 
 function App() {
+  useAuthMiddleware();
   return (
     <>
       <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+
+        {/* Private Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/supplier" element={<SupplierFirewallPage />} />

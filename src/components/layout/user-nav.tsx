@@ -1,4 +1,4 @@
-import { LayoutGrid, LogOut, User } from "lucide-react";
+import { LayoutGrid, Loader, LogOut, User } from "lucide-react";
 import { BsFillCaretDownFill } from "react-icons/bs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,9 +16,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export function UserNav() {
+interface User {
+  firstname: string;
+  lastname: string;
+  email: string;
+  avatarSrc: string;
+  role?: string;
+}
+
+interface UserNavProps {
+  user: User | null;
+  loading: boolean;
+  logout: () => void;
+}
+
+export function UserNav({ user, loading, logout }: UserNavProps) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  if (loading) {
+    // If loading, show a spinner or placeholder
+    return (
+      <div className="flex items-center gap-3">
+        <Loader className="animate-spin size-5 text-blue" />
+      </div>
+    );
+  }
+
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -28,18 +58,20 @@ export function UserNav() {
               <div className="flex items-center gap-3 cursor-pointer">
                 <div className="relative">
                   <Avatar className="size-8 md:size-9 shrink-0">
-                    <AvatarImage src="/avtar/av1.png" alt="avtar" />
-                    <AvatarFallback className="bg-transparent">
-                      JD
+                    <AvatarImage src={user?.avatarSrc} alt="avtar" />
+                    <AvatarFallback className="bg-transparent border border-black/50">
+                      {user?.firstname[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <span className="size-4 shrink-0 absolute flex items-center text-white justify-center bottom-0 -right-1 rounded-full bg-[#22CAAD] text-[12px] font-medium border-white border-[2px]" />
                 </div>
                 <div className="flex flex-col gap-[2px] items-start">
-                  <p className="text-[14px] md:text-sm font-medium leading-none">
-                    Jay Hargudson
+                  <p className="text-[14px] md:text-sm font-medium leading-none capitalize">
+                    {user?.firstname} {user?.lastname}
                   </p>
-                  <p className="text-[10px] md:text-[14px]">Manager</p>
+                  <p className="text-[10px] md:text-[12px]">
+                    {user?.role}
+                  </p>
                 </div>
                 <BsFillCaretDownFill className="size-3 md:size-4 text-gray" />
               </div>
@@ -52,16 +84,18 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
+            <p className="text-sm font-medium leading-none">
+              {user?.firstname} {user?.lastname}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
-              johndoe@example.com
+              {user?.email}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link to="/dashboard" className="flex items-center">
+            <Link to="/" className="flex items-center">
               <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
               Dashboard
             </Link>
@@ -74,7 +108,10 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {}}>
+        <DropdownMenuItem
+          className="hover:cursor-pointer"
+          onClick={handleLogout}
+        >
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>
