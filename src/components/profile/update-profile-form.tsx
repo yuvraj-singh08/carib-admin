@@ -15,30 +15,52 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { fetchUserById, updateUserProfile } from "@/redux/useSlice"; // Adjust the import path as needed
 import { uploadImage } from "@/hooks/aws"; // Adjust the import path as needed
+import { PasswordInput } from "../ui/password-input";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
-const formSchema = z.object({
-  firstName: z
-    .string()
-    .min(2, {
-      message: "First name must be at least 2 characters.",
-    })
-    .optional(),
-  lastName: z
-    .string()
-    .min(2, {
-      message: "Last name must be at least 2 characters.",
-    })
-    .optional(),
-  avatarSrc: z.string().optional(),
-});
+const formSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, {
+        message: "First name must be at least 2 characters.",
+      })
+      .optional(),
+    lastName: z
+      .string()
+      .min(2, {
+        message: "Last name must be at least 2 characters.",
+      })
+      .optional(),
+    avatarSrc: z.string().optional(),
+    currentPassword: z
+      .string()
+      .min(1, "Current password is required")
+      .optional(),
+    newPassword: z
+      .string()
+      .min(8, "New password must be at least 8 characters")
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.currentPassword || data.newPassword) {
+        return data.currentPassword && data.newPassword;
+      }
+      return true;
+    },
+    {
+      message: "Both current and new passwords are required to change password",
+      path: ["newPassword"],
+    }
+  );
 
 export default function ProfileForm() {
   const dispatch = useDispatch<AppDispatch>();
@@ -56,6 +78,8 @@ export default function ProfileForm() {
       firstName: user?.firstname || "",
       lastName: user?.lastname || "",
       avatarSrc: user?.avatarSrc || "",
+      currentPassword: "",
+      newPassword: "",
     },
   });
 
@@ -65,6 +89,8 @@ export default function ProfileForm() {
         firstName: user.firstname || "",
         lastName: user.lastname || "",
         avatarSrc: user.avatarSrc || "",
+        currentPassword: "",
+        newPassword: "",
       });
     }
   }, [user, form]);
@@ -79,15 +105,26 @@ export default function ProfileForm() {
         updateData.lastName = values.lastName;
       if (values.avatarSrc !== user?.avatarSrc)
         updateData.avatarSrc = values.avatarSrc;
+      if (values.currentPassword && values.newPassword) {
+        updateData.currentPassword = values.currentPassword;
+        updateData.newPassword = values.newPassword;
+      }
 
       if (Object.keys(updateData).length > 0) {
-        await dispatch(updateUserProfile(updateData));
-        toast.success("Profile updated successfully");
+        const result = await dispatch(updateUserProfile(updateData));
+        if (result.meta.requestStatus === "fulfilled") {
+          toast.success("Profile updated successfully");
+          if (updateData.newPassword) {
+            form.reset({ currentPassword: "", newPassword: "" });
+          }
+        } else {
+          toast.error("Failed to update profile");
+        }
       } else {
         toast.success("No changes to update");
       }
     } catch (error) {
-      toast.error("Failed to update profile");
+      toast.error("An error occurred while updating the profile");
       console.error("Failed to update profile:", error);
     }
     setIsLoading(false);
@@ -157,6 +194,7 @@ export default function ProfileForm() {
             disabled={isImageUploading}
           />
         </Avatar>
+        {isImageUploading && <span className="ml-4">Uploading...</span>}
       </div>
 
       <Form {...form}>
@@ -202,9 +240,58 @@ export default function ProfileForm() {
               </FormItem>
             </div>
           </div>
+
+          <div className="w-full gap-4 flex flex-col md:flex-row">
+            <div className="w-full md:w-1/2 flex flex-col gap-3">
+              <FormField
+                control={form.control}
+                name="currentPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current Password</FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        placeholder="Enter current password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full md:w-1/2 flex flex-col gap-3">
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        placeholder="Enter new password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
           <Button type="submit" disabled={isLoading || isImageUploading}>
-            {isLoading ? "Updating..." : "Update"}
-            <ArrowRight className="size-4 shrink-0 text-white ml-2" />
+            {isLoading ? "Updating" : "Update"}
+            {isLoading ? (
+              <>
+                <Loader2 className="size-4 shrink-0 text-white ml-2" />
+              </>
+            ) : (
+              <>
+                {" "}
+                <ArrowRight className="size-4 shrink-0 text-white ml-2" />
+              </>
+            )}
           </Button>
         </form>
       </Form>
