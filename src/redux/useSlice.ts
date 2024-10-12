@@ -75,6 +75,7 @@ export interface UserState {
   signupStatus: "idle" | "loading" | "succeeded" | "failed";
   fetchUserStatus: "idle" | "loading" | "succeeded" | "failed";
   updateProfileStatus: "idle" | "loading" | "succeeded" | "failed";
+  updatePasswordStatus: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
@@ -84,6 +85,7 @@ const initialState: UserState = {
   signupStatus: "idle",
   fetchUserStatus: "idle",
   updateProfileStatus: "idle",
+  updatePasswordStatus: "idle",
   error: null,
 };
 
@@ -161,18 +163,19 @@ export const updateUserProfile = createAsyncThunk(
   }
 );
 
-// export const resetPasswordRequest = createAsyncThunk(
-//   'user/resetPasswordRequest',
-//   async ({ email }: { email: string }, { rejectWithValue }) => {
-//     try {
-//       console.log("....email", email);
-//       const response = await axiosInstance.put(/auth/forgetpassword, { email });
-//       return response.data;
-//     } catch (error: any) {
-//         return rejectWithValue(error.response?.data || 'update password failed');
-//     }
-//   }
-// );
+export const updateUserPassword = createAsyncThunk(
+  "user/updateUserPassword",
+  async (newPassword: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/user/update-password", {
+        password: newPassword,
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Password update failed");
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: "user",
@@ -184,9 +187,11 @@ const userSlice = createSlice({
       state.signupStatus = "idle";
       state.fetchUserStatus = "idle";
       state.updateProfileStatus = "idle";
+      state.updatePasswordStatus = "idle";
       state.error = null;
     },
   },
+
   extraReducers: (builder) => {
     // Login
     builder
@@ -242,6 +247,18 @@ const userSlice = createSlice({
         state.updateProfileStatus = "failed";
         state.error = action.payload as string;
       });
+    // update password
+    builder
+      .addCase(updateUserPassword.pending, (state) => {
+        state.updatePasswordStatus = "loading";
+      })
+      .addCase(updateUserPassword.fulfilled, (state) => {
+        state.updatePasswordStatus = "succeeded";
+      })
+      .addCase(updateUserPassword.rejected, (state, action) => {
+        state.updatePasswordStatus = "failed";
+        state.error = action.payload as string;
+      });
   },
 });
 
@@ -249,3 +266,6 @@ export const { resetUser } = userSlice.actions;
 export default userSlice.reducer;
 export const selectLoginStatus = (state: RootState): UserState["loginStatus"] =>
   state.user.loginStatus;
+export const selectUpdatePasswordStatus = (
+  state: RootState
+): UserState["updatePasswordStatus"] => state.user.updatePasswordStatus;

@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import flightRulesReducer from "../redux/flight-rules-firewall";
-import feesCommissionReducer from "../redux/fees-commison";
+import commissionManagerSlice from "../redux/fees-commison";
 import rolesReducer from "../redux/user-role-permission";
 import socialSettingsSlice from "../redux/socials";
 import ticketsSlice from "../redux/tickets"; //
@@ -13,11 +13,10 @@ import searchManagementSlice from "../redux/search-management";
 import customerSlice from "../redux/registered-customers";
 import userReducer from "../redux/useSlice";
 
-
 export const store = configureStore({
   reducer: {
     flightRules: flightRulesReducer,
-    feesCommission: feesCommissionReducer,
+    feesCommission: commissionManagerSlice,
     roles: rolesReducer,
     socials: socialSettingsSlice,
     manageUser: manageUsersSlice,

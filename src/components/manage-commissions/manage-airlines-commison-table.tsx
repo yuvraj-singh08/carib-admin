@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CirclePlus, Pencil, Trash2 } from "lucide-react";
+import { CirclePlus, Loader2, Pencil, Trash2 } from "lucide-react";
 import { useConfirm } from "@/hooks/use-confirm";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,10 +43,11 @@ import {
   addCommission,
   updateCommission,
   deleteCommission,
-  addType,
-  updateType,
-  deleteType,
   CommissionType,
+  fetchCommissionTypes,
+  addCommissionType,
+  updateCommissionType,
+  deleteCommissionType,
 } from "@/redux/fees-commison";
 import TableLoader from "../shared/table-loader";
 import { format } from "date-fns";
@@ -61,20 +62,20 @@ const formSchema = z.object({
 
 export default function FeesCommissionManagerTable() {
   const dispatch = useDispatch<AppDispatch>();
-  const { commissions, types, status, error } = useSelector(
+  const { commissions, commissionTypes, status, error } = useSelector(
     (state: RootState) => state.feesCommission
   );
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(false);
   const [newType, setNewType] = useState("");
-  const [editingType, setEditingType] = useState<string | null>(null);
+  const [editingTypeId, setEditingTypeId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingCommission, setEditingCommission] =
     useState<CommissionType | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
+  const [loading, setLoading] = useState(false);
+  const [commissionTypeLoading, setCommissionTypeLoading] = useState(false);
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Commission",
     "Are you sure you want to delete this commission? This action cannot be undone."
@@ -93,9 +94,11 @@ export default function FeesCommissionManagerTable() {
 
   useEffect(() => {
     dispatch(fetchCommissions());
+    dispatch(fetchCommissionTypes());
   }, [dispatch]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setLoading(true);
     try {
       if (editingCommission) {
         await dispatch(
@@ -108,31 +111,53 @@ export default function FeesCommissionManagerTable() {
       }
       setIsDialogOpen(false);
       setEditingCommission(null);
+      setLoading(false);
       form.reset();
     } catch (error: any) {
       toast.error(error.message || "An error occurred");
     }
   };
 
-  const handleAddType = () => {
-    if (newType && !types.includes(newType)) {
-      dispatch(addType(newType));
-      setNewType("");
-      setIsTypeDialogOpen(false);
+  const handleAddType = async () => {
+    setCommissionTypeLoading(true);
+    if (newType) {
+      try {
+        await dispatch(addCommissionType(newType)).unwrap();
+        setNewType("");
+        toast.success("Commission type added successfully");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to add commission type");
+      }
     }
+    setCommissionTypeLoading(false);
   };
 
-  const handleUpdateType = () => {
-    if (editingType && newType && !types.includes(newType)) {
-      dispatch(updateType({ oldType: editingType, newType }));
-      setNewType("");
-      setEditingType(null);
-      setIsTypeDialogOpen(false);
+  const handleUpdateType = async () => {
+    setCommissionTypeLoading(true);
+    if (editingTypeId && newType) {
+      try {
+        await dispatch(
+          updateCommissionType({ id: editingTypeId, type: newType })
+        ).unwrap();
+        setNewType("");
+        setEditingTypeId(null);
+        toast.success("Commission type updated successfully");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to update commission type");
+      }
     }
+    setCommissionTypeLoading(false);
   };
 
-  const handleDeleteType = (typeToDelete: string) => {
-    dispatch(deleteType(typeToDelete));
+  const handleDeleteType = async (id: string) => {
+    setCommissionTypeLoading(true);
+    try {
+      await dispatch(deleteCommissionType(id)).unwrap();
+      toast.success("Commission type deleted successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete commission type");
+    }
+    setCommissionTypeLoading(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -180,10 +205,6 @@ export default function FeesCommissionManagerTable() {
   if (status === "loading") {
     return <TableLoader />;
   }
-
-  // if (status === "failed") {
-  //   return <div>Error: {error}</div>;
-  // }
 
   return (
     <>
@@ -240,9 +261,9 @@ export default function FeesCommissionManagerTable() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {types.map((type) => (
-                                <SelectItem key={type} value={type}>
-                                  {type}
+                              {commissionTypes.map((type) => (
+                                <SelectItem key={type.id} value={type.type}>
+                                  {type.type}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -349,7 +370,13 @@ export default function FeesCommissionManagerTable() {
                       Cancel
                     </Button>
                     <Button type="submit">
-                      {editingCommission ? "Update" : "Create"}
+                      {loading ? (
+                        <Loader2 className="size-5 animate-spin" />
+                      ) : editingCommission ? (
+                        "Update"
+                      ) : (
+                        "Add"
+                      )}
                     </Button>
                   </div>
                 </form>
@@ -372,23 +399,30 @@ export default function FeesCommissionManagerTable() {
                   className="flex-grow"
                 />
                 <Button
-                  onClick={editingType ? handleUpdateType : handleAddType}
+                  onClick={editingTypeId ? handleUpdateType : handleAddType}
                 >
-                  {editingType ? "Update Type" : "Add Type"}
+                  {editingTypeId ? "Update Type" : "Add Type"}
+                  {commissionTypeLoading && (
+                    <Loader2 className="size-5 animate-spin ml-2" />
+                  )}
                 </Button>
               </div>
               <div className="space-y-2">
-                {types.map((type) => (
-                  <div key={type} className="flex items-center justify-between">
-                    <span>{type}</span>
+                {commissionTypes.map((type) => (
+                  <div
+                    key={type.id}
+                    className="flex items-center justify-between"
+                  >
+                    <span>{type.type}</span>
                     <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
                         onClick={() => {
-                          setEditingType(type);
-                          setNewType(type);
+                          setEditingTypeId(type.id);
+                          setNewType(type.type);
                         }}
                         className="bg-green-200/50"
+                        disabled={commissionTypeLoading}
                       >
                         <Pencil
                           size={16}
@@ -398,7 +432,8 @@ export default function FeesCommissionManagerTable() {
                       <Button
                         className="bg-red-200/50"
                         variant="ghost"
-                        onClick={() => handleDeleteType(type)}
+                        onClick={() => handleDeleteType(type.id)}
+                        disabled={commissionTypeLoading}
                       >
                         <Trash2
                           size={16}

@@ -18,13 +18,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
-import { fetchUserById, updateUserProfile } from "@/redux/useSlice"; // Adjust the import path as needed
-import { uploadImage } from "@/hooks/aws"; // Adjust the import path as needed
+import {
+  fetchUserById,
+  updateUserProfile,
+  updateUserPassword,
+} from "@/redux/useSlice";
+import { uploadImage } from "@/hooks/aws";
+import { PasswordInput } from "../ui/password-input";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
-const formSchema = z.object({
+const profileFormSchema = z.object({
   firstName: z
     .string()
     .min(2, {
@@ -40,9 +45,17 @@ const formSchema = z.object({
   avatarSrc: z.string().optional(),
 });
 
+const passwordFormSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});
+
 export default function ProfileForm() {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user.user);
+  const updatePasswordStatus = useSelector(
+    (state: RootState) => state.user.updatePasswordStatus
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
 
@@ -50,8 +63,8 @@ export default function ProfileForm() {
     dispatch(fetchUserById());
   }, [dispatch]);
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const profileForm = useForm({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: {
       firstName: user?.firstname || "",
       lastName: user?.lastname || "",
@@ -59,17 +72,25 @@ export default function ProfileForm() {
     },
   });
 
+  const passwordForm = useForm({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+    },
+  });
+
   useEffect(() => {
     if (user) {
-      form.reset({
+      profileForm.reset({
         firstName: user.firstname || "",
         lastName: user.lastname || "",
         avatarSrc: user.avatarSrc || "",
       });
     }
-  }, [user, form]);
+  }, [user, profileForm]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onProfileSubmit(values: z.infer<typeof profileFormSchema>) {
     setIsLoading(true);
     try {
       const updateData: any = {};
@@ -93,6 +114,23 @@ export default function ProfileForm() {
     setIsLoading(false);
   }
 
+  async function onPasswordSubmit(values: z.infer<typeof passwordFormSchema>) {
+    const updatePasswordToast = toast.loading("Updating password...");
+    try {
+      await dispatch(updateUserPassword(values.newPassword)).unwrap();
+      toast.success("Password updated successfully", {
+        id: updatePasswordToast,
+      });
+      passwordForm.reset();
+    } catch (error) {
+      toast.error(
+        "Failed to update password. Please check your current password and try again.",
+        { id: updatePasswordToast }
+      );
+      console.error("Failed to update password:", error);
+    }
+  }
+
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -113,10 +151,9 @@ export default function ProfileForm() {
       try {
         const imageUrl = await uploadImage(file);
         if (imageUrl) {
-          form.setValue("avatarSrc", imageUrl);
+          profileForm.setValue("avatarSrc", imageUrl);
           toast.success("Image uploaded successfully", { id: uploadToast });
-          // Trigger form submission immediately after image upload
-          await form.handleSubmit(onSubmit)();
+          await profileForm.handleSubmit(onProfileSubmit)();
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
@@ -142,7 +179,7 @@ export default function ProfileForm() {
 
       <div className="mb-6 flex justify-start">
         <Avatar className="w-24 h-24 cursor-pointer relative">
-          <AvatarImage src={form.watch("avatarSrc")} alt="Profile" />
+          <AvatarImage src={profileForm.watch("avatarSrc")} alt="Profile" />
           <AvatarFallback>{`${user?.firstname?.charAt(0) || ""}${
             user?.lastname?.charAt(0) || ""
           }`}</AvatarFallback>
@@ -156,15 +193,15 @@ export default function ProfileForm() {
         </Avatar>
       </div>
 
-      <Form {...form}>
+      <Form {...profileForm}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={profileForm.handleSubmit(onProfileSubmit)}
           className="w-full flex flex-col items-start gap-6"
         >
           <div className="w-full gap-4 flex flex-col md:flex-row">
             <div className="w-full md:w-1/2 flex flex-col gap-3">
               <FormField
-                control={form.control}
+                control={profileForm.control}
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
@@ -177,7 +214,7 @@ export default function ProfileForm() {
                 )}
               />
               <FormField
-                control={form.control}
+                control={profileForm.control}
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
@@ -200,19 +237,76 @@ export default function ProfileForm() {
             </div>
           </div>
           <Button type="submit" disabled={isLoading || isImageUploading}>
-            {isLoading ? "Updating" : "Update"}
+            {isLoading ? "Updating" : "Update Profile"}
             {isLoading ? (
-              <>
-                <Loader2 className="size-4 shrink-0 text-white ml-2 animate-spin" />
-              </>
+              <Loader2 className="size-4 shrink-0 text-white ml-2 animate-spin" />
             ) : (
-              <>
-                <ArrowRight className="size-4 shrink-0 text-white ml-2" />
-              </>
+              <ArrowRight className="size-4 shrink-0 text-white ml-2" />
             )}
           </Button>
         </form>
       </Form>
+
+      <div className="mt-12">
+        <h2 className="text-xl font-semibold text-blue mb-6">
+          Change Password
+        </h2>
+        <Form {...passwordForm}>
+          <form
+            onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
+            className="w-full flex flex-col items-start gap-6"
+          >
+            <div className="w-full gap-4 flex flex-col md:flex-row">
+              <div className="w-full md:w-1/2 flex flex-col gap-3">
+                <FormField
+                  control={passwordForm.control}
+                  name="currentPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Current Password</FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          placeholder="Enter current password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="w-full md:w-1/2 flex flex-col gap-3">
+                <FormField
+                  control={passwordForm.control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New Password</FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          placeholder="Enter new password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <Button type="submit" disabled={updatePasswordStatus === "loading"}>
+              {updatePasswordStatus === "loading"
+                ? "Updating"
+                : "Change Password"}
+              {updatePasswordStatus === "loading" ? (
+                <Loader2 className="size-4 shrink-0 text-white ml-2 animate-spin" />
+              ) : (
+                <ArrowRight className="size-4 shrink-0 text-white ml-2" />
+              )}
+            </Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import FeesCommissionManagerTable from "@/components/manage-airlines/manage-airlines-commison-table";
+import FeesCommissionManagerTable from "@/components/manage-commissions/manage-airlines-commison-table";
 import { ContentLayout } from "@/components/shared/content-layout";
 
 const ManageCommisionPage = () => {
