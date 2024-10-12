@@ -41,6 +41,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { FlightResultsDialog } from "./flight-result-dialogue";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 export const FlightSearchSection = () => {
   const form = useForm({
     resolver: zodResolver(AdminFlightSearchSchema),
@@ -76,8 +78,7 @@ export const FlightSearchSection = () => {
 
   function onSubmit(data: any) {
     setLoading(true);
-    const apiUrl =
-      "https://travel-carib-ewd6.onrender.com/flight/search-flights";
+    const apiUrl = `${BASE_URL}/flight/search-flights`;
     const requestData = {
       originLocation: data.from,
       destinationLocation: data.to,
@@ -261,11 +262,11 @@ export const FlightSearchSection = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                    <SelectItem value="AMADEUS">Amadeus</SelectItem>
-                        <SelectItem value="KIUSYS">Kiusys</SelectItem>
-                        <SelectItem value="DUFFEL">Duffel</SelectItem>
-                        <SelectItem value="ALL">All</SelectItem>
-                        <SelectItem value="NONE">None</SelectItem>
+                      <SelectItem value="AMADEUS">Amadeus</SelectItem>
+                      <SelectItem value="KIUSYS">Kiusys</SelectItem>
+                      <SelectItem value="DUFFEL">Duffel</SelectItem>
+                      <SelectItem value="ALL">All</SelectItem>
+                      <SelectItem value="NONE">None</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
