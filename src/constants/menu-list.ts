@@ -61,9 +61,9 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/manage-airlines",
+          href: "/manage-commission",
           label: "Commission management",
-          active: pathname.includes("/manage-airlines"),
+          active: pathname.includes("/manage-commission"),
           icon: ChartColumn,
           submenus: [],
         },
