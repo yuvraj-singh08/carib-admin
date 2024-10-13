@@ -5,10 +5,8 @@ import { selectTicketStatusCounts } from "@/redux/tickets";
 import { useSelector } from "react-redux";
 
 const TicketsPage = () => {
-
   const ticketCounts = useSelector(selectTicketStatusCounts);
   const ticketStatusCountsOptions = TicketStatusCountsOptions(ticketCounts);
-
 
   return (
     <ContentLayout>

@@ -20,6 +20,9 @@ export interface Ticket {
   requestedOn: string; // We'll use string for dates in the frontend
   status: TicketStatus;
   images: string[];
+  email: string;
+  title: string;
+  description: string;
 }
 
 interface TicketState {

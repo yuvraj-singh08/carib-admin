@@ -113,6 +113,7 @@ const BookingTicketsTableWithDateFilter = () => {
     const ok = await confirm();
     if (ok) {
       dispatch(deleteTicket(id));
+      toast.success("Ticket deleted successfully!");
     }
   };
 
@@ -210,7 +211,7 @@ const BookingTicketsTableWithDateFilter = () => {
                     />
                   </TableCell>
                   <TableCell className="text-[13px]">{item.id}</TableCell>
-                  <TableCell>{item.subject}</TableCell>
+                  <TableCell className="capitalize">{item.subject}</TableCell>
                   <TableCell>{item.requesterName}</TableCell>
                   <TableCell>
                     {format(new Date(item.requestedOn), "dd-MM-yyyy HH:mm")}
