@@ -178,11 +178,19 @@ export default function ProfileForm() {
       </div>
 
       <div className="mb-6 flex justify-start">
-        <Avatar className="w-24 h-24 cursor-pointer relative">
+        <Avatar className="w-24 h-24 cursor-pointer relative group">
           <AvatarImage src={profileForm.watch("avatarSrc")} alt="Profile" />
           <AvatarFallback>{`${user?.firstname?.charAt(0) || ""}${
             user?.lastname?.charAt(0) || ""
           }`}</AvatarFallback>
+
+          {/* Overlay with message, initially hidden and shown on hover */}
+          <div className="absolute top-0 left-0 w-24 h-24 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 flex text-center items-center justify-center transition-opacity duration-300 cursor-pointer">
+            <span className="text-white text-[12px] mt-2">
+              click to change
+            </span>
+          </div>
+
           <input
             type="file"
             accept=".jpg,.jpeg,.png"
