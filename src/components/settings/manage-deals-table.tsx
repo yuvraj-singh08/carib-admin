@@ -58,6 +58,7 @@ import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { uploadImage } from "@/hooks/aws";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
+// import { selectMultipleUsers } from "@/redux/useSlice";
 
 const dealFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -157,6 +158,7 @@ const CouponManagementSystemTable = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  console.log(paginatedDeals);
 
   const onSubmit: SubmitHandler<z.infer<typeof dealFormSchema>> = (values) => {
     // Convert expiryDate to a proper Date object
@@ -255,6 +257,7 @@ const CouponManagementSystemTable = () => {
               <TableHead>Title</TableHead>
               <TableHead>Code</TableHead>
               <TableHead>User Limit</TableHead>
+              <TableHead> Discount</TableHead>
               <TableHead>Used</TableHead>
               <TableHead>Expiry Date</TableHead>
               <TableHead className="flex items-center justify-center">
@@ -268,6 +271,10 @@ const CouponManagementSystemTable = () => {
                 <TableCell>{deal.title}</TableCell>
                 <TableCell className="text-customBlue">{deal.code}</TableCell>
                 <TableCell>{deal.userLimit}</TableCell>
+                <TableCell>
+                  {deal.discount}{" "}
+                  {deal.discountType === "percentage" ? "%" : "$"}
+                </TableCell>
                 <TableCell>{deal.used}</TableCell>
                 <TableCell>
                   {format(new Date(deal.expiryDate), "dd-MM-yyyy")}

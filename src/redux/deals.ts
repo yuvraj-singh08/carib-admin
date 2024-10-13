@@ -16,6 +16,7 @@ export interface Deal {
   expiryDate: string;
   imageUrl: string;
   description: string;
+  userId?:string[];
 }
 
 interface DealsState {

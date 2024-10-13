@@ -24,21 +24,27 @@ import {
 import { format } from "date-fns";
 import { Separator } from "../ui/separator";
 // import { useState } from "react";
+import { Deal } from "@/redux/deals";
 
 interface CouponViewDialogProps {
-  selectedCoupon: any;
+  selectedCoupon: Deal | undefined;
   setSelectedCoupon: (coupon: any) => void;
   children?: React.ReactNode;
+  // userUsers?: any;
 }
 
 export const CoupnViewDialog = ({
   selectedCoupon,
   setSelectedCoupon,
   children,
+  // userUsers,
 }: CouponViewDialogProps) => {
   // const [currentPage, setCurrentPage] = useState(1);
   // const [pageSize, setPageSize] = useState(50);
-  // const totalPages = Math.ceil(selectedCoupon.length / pageSize);
+  // const totalPages = selectedCoupon
+  //   ? Math.ceil(selectedCoupon.userLimit / pageSize)
+  //   : 0;
+
 
   return (
     <Dialog
@@ -63,33 +69,54 @@ export const CoupnViewDialog = ({
                   <h1 className="text-[15px] font-medium text-blue">
                     Coupon Code
                   </h1>
-                  <h1 className="text-[15px] font-medium text-blue">Origin</h1>
-                  <h1 className="text-[15px] font-medium text-blue">
-                    Airline Code
-                  </h1>
-                  <h1 className="text-[15px] font-medium text-blue">
-                    Expiry Date
-                  </h1>
+                  {selectedCoupon.origin && (
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Origin
+                    </h1>
+                  )}
+                  {selectedCoupon.airlineCode && (
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Airline Code
+                    </h1>
+                  )}
+                  {selectedCoupon.expiryDate && (
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Expiry Date
+                    </h1>
+                  )}
                 </div>
                 <div className="flex flex-col gap-[13px]">
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.title}
-                  </h1>
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.discount}
-                  </h1>
-                  <h1 className="text-[14px] text-customBlue">
-                    {selectedCoupon.code}
-                  </h1>
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.origin}
-                  </h1>
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.airlineCode}
-                  </h1>
-                  <h1 className="text-[14px] text-[#777980]">
-                    {format(selectedCoupon.expiryDate, "dd-MM-yyyy")}
-                  </h1>
+                  {selectedCoupon.title && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.title}
+                    </h1>
+                  )}
+                  {selectedCoupon.discount && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.discount}
+                      {selectedCoupon.discountType === "percentage" ? "%" : "$"}
+                    </h1>
+                  )}
+                  {selectedCoupon.code && (
+                    <h1 className="text-[14px] text-customBlue">
+                      {selectedCoupon.code}
+                    </h1>
+                  )}
+                  {selectedCoupon.origin && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.origin}
+                    </h1>
+                  )}
+                  {selectedCoupon.airlineCode && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.airlineCode}
+                    </h1>
+                  )}
+                  {selectedCoupon.expiryDate && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {format(selectedCoupon.expiryDate, "dd-MM-yyyy")}
+                    </h1>
+                  )}
                 </div>
               </div>
             </div>
@@ -97,42 +124,54 @@ export const CoupnViewDialog = ({
             <div className="w-1/2 flex flex-col gap-4">
               <div className="w-full grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-3 ">
-                  <h1 className="text-[15px] font-medium text-blue">
-                    Description
-                  </h1>
+                  {selectedCoupon.description && (
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Description
+                    </h1>
+                  )}
                   <h1 className="text-[15px] font-medium text-blue">Limit</h1>
-                  <h1 className="text-[15px] font-medium text-blue">Way</h1>
-                  <h1 className="text-[15px] font-medium text-blue">
-                    Destination
-                  </h1>
-                  <h1 className="text-[15px] font-medium text-blue">
-                    Flight Code
-                  </h1>
-                  <h1 className="text-[15px] font-medium text-blue">Image</h1>
+                  {selectedCoupon.way && (
+                    <h1 className="text-[15px] font-medium text-blue">Way</h1>
+                  )}
+                  {selectedCoupon.flightCode && (
+                    <h1 className="text-[15px] font-medium text-blue">
+                      Flight Code
+                    </h1>
+                  )}
+                  {selectedCoupon.imageUrl && (
+                    <h1 className="text-[15px] font-medium text-blue">Image</h1>
+                  )}
                 </div>
                 <div className="flex flex-col gap-[13px]">
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.description}
-                  </h1>
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.limit}
-                  </h1>
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.way}
-                  </h1>
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.destination}
-                  </h1>
-                  <h1 className="text-[14px] text-[#777980]">
-                    {selectedCoupon.flightCode}
-                  </h1>
-                  <div className="w-16 h-auto object-contain rounded-md">
-                    <img
-                      src={selectedCoupon.imageUrl}
-                      alt="coupon"
-                      className="w-24 h-auto"
-                    />
-                  </div>
+                  {selectedCoupon.description && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.description}
+                    </h1>
+                  )}
+                  {selectedCoupon.userLimit && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.userLimit}
+                    </h1>
+                  )}
+                  {selectedCoupon.way && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.way}
+                    </h1>
+                  )}
+                  {selectedCoupon.flightCode && (
+                    <h1 className="text-[14px] text-[#777980]">
+                      {selectedCoupon.flightCode}
+                    </h1>
+                  )}
+                  {selectedCoupon.imageUrl && (
+                    <div className="w-16 h-auto object-contain rounded-md">
+                      <img
+                        src={selectedCoupon.imageUrl}
+                        alt="coupon"
+                        className="w-24 h-auto"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -150,10 +189,10 @@ export const CoupnViewDialog = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {selectedCoupon.usageDetails.map(
+                {userUsers.map(
                   (
                     usage: {
-                      username:string
+                      username: string;
                       userId: string;
                       usedCount: number;
                       usedDate: Date;

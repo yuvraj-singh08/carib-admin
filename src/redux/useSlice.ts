@@ -1,9 +1,6 @@
 import { axiosInstance } from "@/provider/axios";
 import { RootState } from "@/provider/redux-provider";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
-// import { RootState} from '../store';
-// import { UseSelector } from 'react-redux';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 export interface User {
   mobileNumber: string;
@@ -71,6 +68,7 @@ interface UserProfileProps {
 
 export interface UserState {
   user: User | null;
+  users: { [key: string]: User };
   loginStatus: "idle" | "loading" | "succeeded" | "failed";
   signupStatus: "idle" | "loading" | "succeeded" | "failed";
   fetchUserStatus: "idle" | "loading" | "succeeded" | "failed";
@@ -81,6 +79,7 @@ export interface UserState {
 
 const initialState: UserState = {
   user: null,
+  users: {},
   loginStatus: "idle",
   signupStatus: "idle",
   fetchUserStatus: "idle",
@@ -183,12 +182,24 @@ const userSlice = createSlice({
   reducers: {
     resetUser: (state) => {
       state.user = null;
+      state.users = {};
       state.loginStatus = "idle";
       state.signupStatus = "idle";
       state.fetchUserStatus = "idle";
       state.updateProfileStatus = "idle";
       state.updatePasswordStatus = "idle";
       state.error = null;
+    },
+    addUser: (state, action: PayloadAction<User>) => {
+      state.users[action.payload.email] = action.payload;
+    },
+    getMultipleUsers: (state, action: PayloadAction<string[]>) => {
+      state.users = action.payload.reduce((acc, userId) => {
+        if (state.users[userId]) {
+          acc[userId] = state.users[userId];
+        }
+        return acc;
+      }, {} as { [key: string]: User });
     },
   },
 
@@ -201,6 +212,9 @@ const userSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loginStatus = "succeeded";
         state.user = action.payload;
+        if (action.payload.email) {
+          state.users[action.payload.email] = action.payload;
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.loginStatus = "failed";
@@ -215,6 +229,9 @@ const userSlice = createSlice({
       .addCase(signup.fulfilled, (state, action) => {
         state.signupStatus = "succeeded";
         state.user = action.payload;
+        if (action.payload.email) {
+          state.users[action.payload.email] = action.payload;
+        }
       })
       .addCase(signup.rejected, (state, action) => {
         state.signupStatus = "failed";
@@ -229,25 +246,33 @@ const userSlice = createSlice({
       .addCase(fetchUserById.fulfilled, (state, action) => {
         state.fetchUserStatus = "succeeded";
         state.user = action.payload;
+        if (action.payload.email) {
+          state.users[action.payload.email] = action.payload;
+        }
       })
       .addCase(fetchUserById.rejected, (state, action) => {
         state.fetchUserStatus = "failed";
         state.error = action.payload as string;
       });
-    //update profile
+
+    // Update profile
     builder
       .addCase(updateUserProfile.pending, (state) => {
         state.updateProfileStatus = "loading";
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.updateProfileStatus = "succeeded";
-        state.user = action.payload; // Update the user profile in the state with new data
+        state.user = action.payload;
+        if (action.payload.email) {
+          state.users[action.payload.email] = action.payload;
+        }
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.updateProfileStatus = "failed";
         state.error = action.payload as string;
       });
-    // update password
+
+    // Update password
     builder
       .addCase(updateUserPassword.pending, (state) => {
         state.updatePasswordStatus = "loading";
@@ -262,10 +287,21 @@ const userSlice = createSlice({
   },
 });
 
-export const { resetUser } = userSlice.actions;
+export const { resetUser, addUser, getMultipleUsers } = userSlice.actions;
 export default userSlice.reducer;
+
+// Selectors
 export const selectLoginStatus = (state: RootState): UserState["loginStatus"] =>
   state.user.loginStatus;
 export const selectUpdatePasswordStatus = (
   state: RootState
 ): UserState["updatePasswordStatus"] => state.user.updatePasswordStatus;
+export const selectUser = (state: RootState): User | null => state.user.user;
+export const selectUsers = (state: RootState): { [key: string]: User } =>
+  state.user.users;
+export const selectMultipleUsers = (state: RootState, userIds: string[]) => {
+  return userSlice.caseReducers.getMultipleUsers(state.user, {
+    type: "getMultipleUsers",
+    payload: userIds,
+  });
+};
