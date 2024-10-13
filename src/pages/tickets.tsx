@@ -1,6 +1,6 @@
 import BookingTicketsTable from "@/components/manage-booked-tickets/manage-tickets-table";
 import { ContentLayout } from "@/components/shared/content-layout";
-import { TicketStatusCountsOptions } from "@/constants/dashboard";
+import { TicketStatusCountsOptions } from "@/constants/status-count";
 import { selectTicketStatusCounts } from "@/redux/tickets";
 import { useSelector } from "react-redux";
 

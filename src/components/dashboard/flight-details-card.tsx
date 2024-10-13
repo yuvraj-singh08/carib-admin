@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { Clock, MoveRight } from "lucide-react";
-import { Button } from "../ui/button";
+// import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { flightDuration, getCityByCode, LayoverTime } from "@/lib/utils";
@@ -53,7 +53,7 @@ export const FlightdetailsCard = ({ data }: FlightdetailsCardProps) => {
               {duration}
             </p>
           </div>
-          <Button>Book Now</Button>
+          {/* <Button>Book Now</Button> */}
         </div>
       </div>
       {sliceData?.map((slice: any, sliceIndex: number) => (

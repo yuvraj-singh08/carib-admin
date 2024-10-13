@@ -2,13 +2,13 @@ import FilterFlighTable from "@/components/dashboard/filter-flights-table";
 import { FlightSearchSection } from "@/components/dashboard/flight-search-form";
 import { ContentLayout } from "@/components/shared/content-layout";
 
-import { TicketStatusCountsOptions } from "@/constants/dashboard";
+import { BookingStatusCountsOptions } from "@/constants/status-count";
 import { selectTicketStatusCounts } from "@/redux/tickets";
 import { useSelector } from "react-redux";
 
 const DashboardPage = () => {
   const ticketCounts = useSelector(selectTicketStatusCounts);
-  const ticketStatusCountsOptions = TicketStatusCountsOptions(ticketCounts);
+  const ticketStatusCountsOptions = BookingStatusCountsOptions(ticketCounts);
 
   return (
     <ContentLayout>
