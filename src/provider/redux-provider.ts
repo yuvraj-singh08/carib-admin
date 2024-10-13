@@ -12,6 +12,7 @@ import manageUsersSlice from "../redux/manage-user";
 import searchManagementSlice from "../redux/search-management";
 import customerSlice from "../redux/registered-customers";
 import userReducer from "../redux/useSlice";
+import bookingsSlice from "../redux/booking";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     searchManagement: searchManagementSlice,
     customers: customerSlice,
     user: userReducer,
+    bookings: bookingsSlice,
   },
 });
 

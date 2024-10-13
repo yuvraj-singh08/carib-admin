@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,6 +13,15 @@ import {
 import { Calendar as CalendarIcon } from "lucide-react";
 import { FaCheckCircle } from "react-icons/fa";
 import { format } from "date-fns";
+import { BiReset } from "react-icons/bi";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/provider/redux-provider";
+import {
+  fetchBookings,
+  updateBooking,
+  AdminStatus,
+  Booking,
+} from "@/redux/booking";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,93 +47,42 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "../ui/scroll-area";
-import { BiReset } from "react-icons/bi";
 
-type Booking = {
-  serviceType: string;
-  internalBookingId: string;
-  pnrNumber: string;
-  bookingDate: string;
-  supplier: string;
-  departureTime: string;
-  arrivalTime: string;
-  amount: string;
-  autoCancel: string;
-  bookingStatus: string;
-  sendEmail: boolean;
-};
-
-const data: Booking[] = [
-  {
-    serviceType: "Flight",
-    internalBookingId: "58632553",
-    pnrNumber: "15234759",
-    bookingDate: "21-04-2024",
-    supplier: "Amadeus",
-    departureTime: "11/07/2024-11:30PM",
-    arrivalTime: "11/07/2024-11:30PM",
-    amount: "$24,000",
-    autoCancel: "15-july-24 11:30PM",
-    bookingStatus: "Pending Ticketing",
-    sendEmail: false,
-  },
-  {
-    serviceType: "Flight",
-    internalBookingId: "58632553",
-    pnrNumber: "15234758",
-    bookingDate: "21-04-2024",
-    supplier: "Amadeus",
-    departureTime: "11/07/2024-11:30PM",
-    arrivalTime: "11/07/2024-11:30PM",
-    amount: "$24,000",
-    autoCancel: "15-july-24 11:30PM",
-    bookingStatus: "Ticketed",
-    sendEmail: true,
-  },
-];
-
-const bookingStatuses = [
-  "Ticketed",
-  "Pending Ticketing",
-  "Pending payments",
-  "Expired",
-  "Failed Booking",
-];
-
-const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "ticketed":
+const getStatusColor = (status: AdminStatus) => {
+  switch (status) {
+    case AdminStatus.TICKETED:
       return "bg-green-100 text-green-600";
-    case "pending ticketing":
+    case AdminStatus.PENDING_TICKET:
       return "bg-yellow-200/40 text-orange-500";
-    case "pending payments":
+    case AdminStatus.PENDING_PAYMENT:
       return "bg-orange-200 text-orange-600";
-    case "expired":
-      return "bg-gray text-black";
-    case "failed booking":
+    case AdminStatus.EXPIRED:
+      return "bg-gray/50 text-black";
+    case AdminStatus.FAILED_BOOKING:
       return "bg-red-100 text-red-600";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-gray text-gray";
   }
 };
+
 export default function FlightBookingsTable() {
+  const dispatch = useDispatch<AppDispatch>();
+  const bookings = useSelector((state: RootState) => state.bookings.bookings);
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const [bookings, setBookings] = useState(data);
 
-  const handleStatusChange = (rowIndex: number, newStatus: string) => {
-    const updatedBookings = [...bookings];
-    // const oldStatus = updatedBookings[rowIndex].bookingStatus;
-    updatedBookings[rowIndex].bookingStatus = newStatus;
-    setBookings(updatedBookings);
+  useEffect(() => {
+    dispatch(fetchBookings());
+  }, [dispatch]);
 
-    // alert(`Ticket status changed from ${oldStatus} to ${newStatus}`);
+  const handleStatusChange = (id: string, newStatus: AdminStatus) => {
+    dispatch(updateBooking({ id, adminStatus: newStatus }));
   };
-
 
   const columns: ColumnDef<Booking>[] = [
     {
@@ -151,66 +109,44 @@ export default function FlightBookingsTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "serviceType",
-      header: "Service type",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("serviceType")}</div>
-      ),
-    },
-    {
-      accessorKey: "internalBookingId",
+      accessorKey: "id",
       header: "Internal Booking ID",
       cell: ({ row }) => (
-        <div className="text-[#0561FC]">
-          {row.getValue("internalBookingId")}
-        </div>
+        <div className="text-[#0561FC]">{row.getValue("id")}</div>
       ),
     },
     {
-      accessorKey: "pnrNumber",
-      header: "PNR Number",
+      accessorKey: "contactDetail.email",
+      header: "Email",
     },
     {
-      accessorKey: "bookingDate",
-      header: "Booking Date",
+      accessorKey: "contactDetail.phone",
+      header: "Phone Number",
     },
     {
-      accessorKey: "supplier",
-      header: "Supplier",
-    },
-    {
-      accessorKey: "departureTime",
-      header: "Departure Time",
-    },
-    {
-      accessorKey: "arrivalTime",
-      header: "Arrival Time",
-    },
-    {
-      accessorKey: "amount",
+      accessorKey: "totalAmount",
       header: "Amount",
+      cell: ({ row }) => (
+        <div>{`${row.getValue("totalAmount")} ${row.original.currency}`}</div>
+      ),
     },
     {
-      accessorKey: "autoCancel",
-      header: "Auto Cancel",
-    },
-    {
-      accessorKey: "bookingStatus",
+      accessorKey: "adminStatus",
       header: "Booking Status",
       cell: ({ row }) => {
-        const status = row.getValue("bookingStatus") as string;
+        const status = row.getValue("adminStatus") as AdminStatus;
         return (
           <Select
             value={status}
-            onValueChange={(value) => handleStatusChange(row.index, value)}
+            onValueChange={(value) =>
+              handleStatusChange(row.original.id, value as AdminStatus)
+            }
           >
-            <SelectTrigger
-              className={`w-full ${getStatusColor(status)}`}
-            >
+            <SelectTrigger className={`w-full ${getStatusColor(status)}`}>
               <SelectValue>{status}</SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {bookingStatuses.map((statusOption) => (
+              {Object.values(AdminStatus).map((statusOption) => (
                 <SelectItem key={statusOption} value={statusOption}>
                   {statusOption}
                 </SelectItem>
@@ -273,28 +209,38 @@ export default function FlightBookingsTable() {
 
   const handleApplyFilters = () => {
     // Apply the filters
+    // table
+    //   .getColumn("pnrNumber")
+    //   ?.setFilterValue(
+    //     (columnFilters.find((f) => f.id === "pnrNumber")?.value as string) || ""
+    //   );
     table
-      .getColumn("pnrNumber")
+      .getColumn("id")
       ?.setFilterValue(
-        (columnFilters.find((f) => f.id === "pnrNumber")?.value as string) || ""
+        (columnFilters.find((f) => f.id === "id")?.value as string) || ""
       );
+    table;
+    // .getColumn("contactDetail.email")
+    // ?.setFilterValue(
+    //   (columnFilters.find((f) => f.id === "contactDetail.email")?.value as string) || ""
+    // );
     table
-      .getColumn("internalBookingId")
+      .getColumn("adminStatus")
       ?.setFilterValue(
-        (columnFilters.find((f) => f.id === "internalBookingId")
-          ?.value as string) || ""
+        (columnFilters.find((f) => f.id === "adminStatus")?.value as string) ||
+          ""
       );
     table
       .getColumn("supplier")
       ?.setFilterValue(
         (columnFilters.find((f) => f.id === "supplier")?.value as string) || ""
       );
-    table
-      .getColumn("bookingStatus")
-      ?.setFilterValue(
-        (columnFilters.find((f) => f.id === "bookingStatus")
-          ?.value as string) || ""
-      );
+    // table
+    //   .getColumn("bookingStatus")
+    //   ?.setFilterValue(
+    //     (columnFilters.find((f) => f.id === "bookingStatus")
+    //       ?.value as string) || ""
+    //   );
     if (date) {
       table
         .getColumn("bookingDate")
@@ -312,7 +258,7 @@ export default function FlightBookingsTable() {
   return (
     <div className="w-full bg-white px-3 rounded-xl">
       <div className="flex items-center gap-2 py-4">
-        <Input
+        {/* <Input
           placeholder="PNR"
           value={
             (columnFilters.find((f) => f.id === "pnrNumber")
@@ -325,17 +271,16 @@ export default function FlightBookingsTable() {
             ])
           }
           className="w-[120px] rounded-xl"
-        />
+        /> */}
         <Input
-          placeholder="Internal Booking ID"
+          placeholder="Booking ID"
           value={
-            (columnFilters.find((f) => f.id === "internalBookingId")
-              ?.value as string) || ""
+            (columnFilters.find((f) => f.id === "id")?.value as string) || ""
           }
           onChange={(event) =>
             setColumnFilters((prev) => [
-              ...prev.filter((f) => f.id !== "internalBookingId"),
-              { id: "internalBookingId", value: event.target.value },
+              ...prev.filter((f) => f.id !== "id"),
+              { id: "id", value: event.target.value },
             ])
           }
           className="w-[130px] rounded-xl"
@@ -343,12 +288,12 @@ export default function FlightBookingsTable() {
         <Select
           onValueChange={(value) =>
             setColumnFilters((prev) => [
-              ...prev.filter((f) => f.id !== "bookingStatus"),
-              { id: "bookingStatus", value },
+              ...prev.filter((f) => f.id !== "adminStatus"),
+              { id: "adminStatus", value },
             ])
           }
           value={
-            (columnFilters.find((f) => f.id === "bookingStatus")
+            (columnFilters.find((f) => f.id === "adminStatus")
               ?.value as string) || ""
           }
         >
@@ -356,7 +301,7 @@ export default function FlightBookingsTable() {
             <SelectValue placeholder="Booking Status" />
           </SelectTrigger>
           <SelectContent>
-            {bookingStatuses.map((status) => (
+            {Object.values(AdminStatus).map((status) => (
               <SelectItem key={status} value={status}>
                 {status}
               </SelectItem>
@@ -428,7 +373,7 @@ export default function FlightBookingsTable() {
       </div>
       <div className="rounded-md border overflow-x-auto ">
         <Table className="min-w-max scroll-visible">
-          <ScrollArea className="max-w-full overflow-x-auto ">
+          <ScrollArea className="max-w-full overflow-x-auto">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>

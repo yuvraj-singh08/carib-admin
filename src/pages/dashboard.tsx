@@ -1,21 +1,22 @@
 import FilterFlighTable from "@/components/dashboard/filter-flights-table";
 import { FlightSearchSection } from "@/components/dashboard/flight-search-form";
 import { ContentLayout } from "@/components/shared/content-layout";
+import { BookingStatusCountsOptions } from "@/constants/booking-status-count";
 
-import { BookingStatusCountsOptions } from "@/constants/status-count";
-import { selectTicketStatusCounts } from "@/redux/tickets";
+import { selectBookingStatusCounts } from "@/redux/booking";
+
 import { useSelector } from "react-redux";
 
 const DashboardPage = () => {
-  const ticketCounts = useSelector(selectTicketStatusCounts);
-  const ticketStatusCountsOptions = BookingStatusCountsOptions(ticketCounts);
+  const bookingCounts = useSelector(selectBookingStatusCounts);
+  const bookingStatusCountsOptions = BookingStatusCountsOptions(bookingCounts);
 
   return (
     <ContentLayout>
       <main className="w-full min-h-screen flex flex-col gap-4 ">
         <FlightSearchSection />
         <div className="w-full h-full grid grid-cols-8 gap-2 md:gap-4">
-          {ticketStatusCountsOptions.map((option, index) => (
+          {bookingStatusCountsOptions.map((option, index) => (
             <div
               key={index}
               className="col-span-4 md:col-span-2 2xl:col-span-2 w-full border h-[100px] 2xl:h-[120px] bg-[#fff] rounded-xl flex items-center gap-3 justify-center"
