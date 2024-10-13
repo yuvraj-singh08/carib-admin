@@ -22,12 +22,12 @@ export const TicketStatusCountsOptions = (ticketCounts: {
   {
     icon: "/icons/pending.png",
     count: ticketCounts[TicketStatus.OPEN]?.toString() || "0", // Pending Ticketing
-    label: "Pending Ticketing",
+    label: "Open Ticketing",
   },
   {
     icon: "/icons/pending-payment.png",
     count: ticketCounts[TicketStatus.PENDING]?.toString() || "0", // Pending Ticketing
-    label: "Pending Payment",
+    label: "Pending Ticketing",
   },
 ];
 
