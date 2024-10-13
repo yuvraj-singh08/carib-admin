@@ -4,7 +4,6 @@ export enum TicketStatus {
   RESOLVE = "RESOLVE",
 }
 
-
 export enum BookingStatus {
   OPEN = "OPEN",
   PENDING = "PENDING",
@@ -30,19 +29,7 @@ export const TicketStatusCountsOptions = (ticketCounts: {
     count: ticketCounts[TicketStatus.PENDING]?.toString() || "0", // Pending Ticketing
     label: "Pending Payment",
   },
-  {
-    icon: "/icons/expired.png",
-    count: "0", // Assuming you need a different logic for expired
-    label: "Expired",
-  },
-  {
-    icon: "/icons/failed.png",
-    count: "0", // Assuming you need a different logic for failed bookings
-    label: "Failed Booking",
-  },
 ];
-
-
 
 export const BookingStatusCountsOptions = (ticketCounts: {
   [key in BookingStatus]: number;
@@ -73,5 +60,3 @@ export const BookingStatusCountsOptions = (ticketCounts: {
     label: "Failed Booking",
   },
 ];
-
-

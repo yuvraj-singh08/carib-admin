@@ -280,6 +280,12 @@ const BookingTicketsTableWithDateFilter = () => {
             ticket={selectedTicket}
             isOpen={!!selectedTicket}
             onClose={() => setSelectedTicket(null)}
+            handleTicketStatusChange={(newStatus) =>
+              handleTicketStatusChange(
+                selectedTicket!.id,
+                newStatus as TicketStatus
+              )
+            }
           />
         )}
 
