@@ -15,6 +15,7 @@ export interface User {
   role?: string;
   password: string;
   avatarSrc: string;
+  provider?: string;
   passportDetails?: {
     passportNumber: string;
     issuingCountry: string;
@@ -47,6 +48,7 @@ interface UserProfileProps {
   avatarSrc?: string;
   role?: string;
   password?: string;
+  provider?: string;
   passportDetails?: {
     passportNumber: string;
     issuingCountry: string;

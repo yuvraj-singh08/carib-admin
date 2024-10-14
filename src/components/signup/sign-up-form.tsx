@@ -42,7 +42,12 @@ export function SignUpForm() {
   );
 
   function onSubmit(values: z.infer<typeof SignUpFormSchema>) {
-    dispatch(signup(values)).then((action) => {
+    const data = {
+      ...values,
+      provider: "email",
+    };
+
+    dispatch(signup(data)).then((action) => {
       if (signup.fulfilled.match(action)) {
         navigate("/login");
         toast.success("Register successful!");
