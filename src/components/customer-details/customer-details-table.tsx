@@ -35,6 +35,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { AppDispatch } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
+import { format } from "date-fns";
 
 const UserInfoDialog = ({ user }: { user: Customer }) => (
   <Dialog>
@@ -77,9 +78,9 @@ const UserInfoDialog = ({ user }: { user: Customer }) => (
             value={user?.passportDetails?.passportNumber || "N/A"}
           />
           <InfoItem label="Mobile Number" value={user.mobileNumber || "N/A"} />
-          <InfoItem label="Country" value={user.country || "N/A"} />
-          <InfoItem label="DOB" value={user.dob || "N/A"} />
+          <InfoItem label="DOB" value={user.dob ? format(new Date(user.dob), "dd MMM, yyyy") : "N/A"} />
           <InfoItem label="Gender" value={user.gender || "N/A"} />
+          <InfoItem label="Address" value={user.address || "N/A"} />
           <InfoItem label="Pincode" value={user.pincode || "N/A"} />
           {/* <InfoItem
             label="Document"
@@ -91,18 +92,14 @@ const UserInfoDialog = ({ user }: { user: Customer }) => (
           /> */}
         </div>
         <div className="space-y-4">
-          <DialogTitle className="text-lg font-bold text-blue">
+          {user?.passportDetails?.passportImg && (
+            <DialogTitle className="text-lg font-bold text-blue">
             Passport Image
           </DialogTitle>
-          {user?.passportDetails?.passportImg ? (
+          )}
+          {user?.passportDetails?.passportImg &&  (
             <img
               src={user.passportDetails.passportImg}
-              alt="Passport"
-              className="w-full rounded-lg"
-            />
-          ) : (
-            <img
-              src="/icons/passport.png"
               alt="Passport"
               className="w-full rounded-lg"
             />
