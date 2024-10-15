@@ -242,8 +242,13 @@ const CustomerDetailsTable = () => {
                 <TableCell className="font-medium">
                   <div className="flex items-center space-x-2">
                     <Avatar>
-                      <AvatarImage src={customer.avatarSrc} alt={customer.firstname} />
-                      <AvatarFallback>{customer.firstname.charAt(0)}</AvatarFallback>
+                      <AvatarImage
+                        src={customer.avatarSrc}
+                        alt={customer.firstname}
+                      />
+                      <AvatarFallback>
+                        {customer.firstname.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                     <span className="truncate">
                       {customer.firstname} {customer.lastname}
