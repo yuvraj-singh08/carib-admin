@@ -57,7 +57,7 @@ export function UserNav({ user, loading, logout }: UserNavProps) {
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-3 cursor-pointer">
                 <div className="relative">
-                  <Avatar className="size-8 md:size-9 shrink-0">
+                  <Avatar className="size-8 md:size-9 shrink-0 border border-black/50">
                     <AvatarImage src={user?.avatarSrc} alt="avtar" />
                     <AvatarFallback className="bg-transparent border border-black/50">
                       {user?.firstname[0].toUpperCase()}

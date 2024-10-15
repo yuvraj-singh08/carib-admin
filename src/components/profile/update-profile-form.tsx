@@ -178,7 +178,7 @@ export default function ProfileForm() {
       </div>
 
       <div className="mb-6 flex justify-start">
-        <Avatar className="w-24 h-24 cursor-pointer relative group">
+        <Avatar className="w-24 h-24 cursor-pointer relative group border border-black/50">
           <AvatarImage src={profileForm.watch("avatarSrc")} alt="Profile" />
           <AvatarFallback>{`${user?.firstname?.charAt(0) || ""}${
             user?.lastname?.charAt(0) || ""
