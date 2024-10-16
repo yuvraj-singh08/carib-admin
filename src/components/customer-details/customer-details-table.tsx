@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Eye, Trash2 } from "lucide-react";
+import { Eye, Image, Trash2 } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { useConfirm } from "@/hooks/use-confirm";
 import { AppDispatch } from "@/provider/redux-provider";
@@ -78,7 +78,12 @@ const UserInfoDialog = ({ user }: { user: Customer }) => (
             value={user?.passportDetails?.passportNumber || "N/A"}
           />
           <InfoItem label="Mobile Number" value={user.mobileNumber || "N/A"} />
-          <InfoItem label="DOB" value={user.dob ? format(new Date(user.dob), "dd MMM, yyyy") : "N/A"} />
+          <InfoItem
+            label="DOB"
+            value={
+              user.dob ? format(new Date(user.dob), "dd MMM, yyyy") : "N/A"
+            }
+          />
           <InfoItem label="Gender" value={user.gender || "N/A"} />
           <InfoItem label="Address" value={user.address || "N/A"} />
           <InfoItem label="Pincode" value={user.pincode || "N/A"} />
@@ -94,15 +99,44 @@ const UserInfoDialog = ({ user }: { user: Customer }) => (
         <div className="space-y-4">
           {user?.passportDetails?.passportImg && (
             <DialogTitle className="text-lg font-bold text-blue">
-            Passport Image
-          </DialogTitle>
+              Passport Image
+            </DialogTitle>
           )}
-          {user?.passportDetails?.passportImg &&  (
-            <img
-              src={user.passportDetails.passportImg}
-              alt="Passport"
-              className="w-full rounded-lg"
-            />
+          {(user?.passportDetails?.passportImg?.length ?? 0) > 0 && (
+            <Dialog>
+              <DialogTrigger>
+                <Button className="w-60" variant="outline" type="button">
+                  <Image className="size-5 mr-2" />
+                  View Images (
+                  {user?.passportDetails?.passportImg?.length ?? 0 > 0
+                    ? user?.passportDetails?.passportImg?.length
+                    : 1}
+                  )
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl w-full flex items-center">
+                {user?.passportDetails?.passportImg?.map((img, index) => (
+                  <Dialog key={index}>
+                    <DialogTrigger className="relative">
+                      <img
+                        src={img}
+                        alt={`uploaded-image-${index}`}
+                        className="w-40 h-auto aspect-square rounded-xl border border-black object-cover"
+                      />
+                    </DialogTrigger>
+                    <DialogContent className="w-full h-auto overflow-hidden">
+                      <div className="object-contain">
+                        <img
+                          src={img}
+                          alt={`uploaded-image-${index}`}
+                          className="w-full h-[60%] aspect-square rounded-xl object-cover"
+                        />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                ))}
+              </DialogContent>
+            </Dialog>
           )}
 
           {/* <InfoItem label="Email" value={user.coTraveler.email} />

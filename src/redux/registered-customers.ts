@@ -11,7 +11,7 @@ interface coTraveler {
 
 interface passportDetails {
   passportNumber: string;
-  passportImg: string;
+  passportImg: string[];
   expiryDate: string;
   issuingCountry: string;
 }
