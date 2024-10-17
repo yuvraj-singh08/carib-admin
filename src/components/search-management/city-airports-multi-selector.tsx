@@ -8,7 +8,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Command as CommandPrimitive } from "cmdk";
-import { useController } from "react-hook-form";
 
 type City = {
   value: string;
@@ -25,68 +24,50 @@ const CITIES: City[] = [
 ];
 
 export function CityAirportsMultiSelect({ field }: { field: any }) {
-  const { field: formField, fieldState } = useController({
-    name: field.name,
-    control: field.control,
-  });
-
-  const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<City[]>([]);
   const [inputValue, setInputValue] = React.useState("");
 
-  // Update selected cities when formField.value changes (e.g., when editing or resetting)
+  // Use a ref to store the previous value of field.value
+  const prevFieldValueRef = React.useRef(field.value);
+
   React.useEffect(() => {
-    if (formField.value && Array.isArray(formField.value)) {
-      const initialSelected = CITIES.filter((city) =>
-        formField.value.includes(city.value)
+    // Only update if the field value has actually changed
+    if (
+      JSON.stringify(prevFieldValueRef.current) !== JSON.stringify(field.value)
+    ) {
+      prevFieldValueRef.current = field.value;
+    }
+  }, [field.value]);
+
+  const selected = React.useMemo(() => {
+    return CITIES.filter((city) => field.value.includes(city.value));
+  }, [field.value]);
+
+  const handleUnselect = React.useCallback(
+    (city: City) => {
+      const newValue = field.value.filter(
+        (value: string) => value !== city.value
       );
-      setSelected(initialSelected);
-    } else {
-      setSelected([]);
-    }
-  }, [formField.value]);
-
-  // Sync selected cities with the form state
-  React.useEffect(() => {
-    const selectedValues = selected.map((city) => city.value);
-    formField.onChange(selectedValues);
-  }, [selected, formField]);
-
-  // Handle unselecting a city
-  const handleUnselect = (city: City) => {
-    setSelected((prev) => prev.filter((s) => s.value !== city.value));
-  };
-
-  // Handle keyboard events
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const input = inputRef.current;
-    if (input) {
-      if (e.key === "Delete" || e.key === "Backspace") {
-        if (input.value === "" && selected.length > 0) {
-          setSelected((prev) => {
-            const newSelected = [...prev];
-            newSelected.pop();
-            return newSelected;
-          });
-        }
-      }
-      if (e.key === "Escape") {
-        input.blur();
-      }
-    }
-  };
-
-  // Filter out already selected cities
-  const selectables = CITIES.filter(
-    (city) => !selected.find((s) => s.value === city.value)
+      field.onChange(newValue);
+    },
+    [field]
   );
 
+  const handleSelect = React.useCallback(
+    (city: City) => {
+      const newValue = [...field.value, city.value];
+      field.onChange(newValue);
+      setInputValue("");
+    },
+    [field]
+  );
+
+  const selectables = React.useMemo(() => {
+    return CITIES.filter((city) => !field.value.includes(city.value));
+  }, [field.value]);
+
   return (
-    <Command
-      onKeyDown={handleKeyDown}
-      className="overflow-visible bg-transparent"
-    >
+    <Command className="overflow-visible bg-transparent">
       <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
         <div className="flex flex-wrap gap-1">
           {selected.map((city) => (
@@ -101,7 +82,6 @@ export function CityAirportsMultiSelect({ field }: { field: any }) {
             </Badge>
           ))}
           <CommandPrimitive.Input
-            ref={inputRef}
             value={inputValue}
             onValueChange={setInputValue}
             onBlur={() => setOpen(false)}
@@ -111,11 +91,6 @@ export function CityAirportsMultiSelect({ field }: { field: any }) {
           />
         </div>
       </div>
-      {fieldState.error && (
-        <div className="text-red-500 text-sm mt-1">
-          {fieldState.error.message}
-        </div>
-      )}
       {open && selectables.length > 0 && (
         <div className="relative mt-2">
           <CommandList>
@@ -124,10 +99,9 @@ export function CityAirportsMultiSelect({ field }: { field: any }) {
                 {selectables.map((city) => (
                   <CommandItem
                     key={city.value}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onSelect={() => {
-                      setInputValue("");
-                      setSelected((prev) => [...prev, city]);
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSelect(city);
                     }}
                     className="cursor-pointer"
                   >
