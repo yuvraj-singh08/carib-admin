@@ -7,9 +7,9 @@ export interface SearchManagement {
   gdsNdcSupplier: "AMADEUS" | "KIUSYS" | "DUFFEL" | "ALL" | "NONE";
   ruleType: "CREATE_COMBINATION" | "COMING_SOON";
   journeyType: "ONEWAY" | "ROUNDTRIP" | "MULTIWAY";
-  fromOriginAirport: string;
-  toDestinationsAirport: string;
-  connectingAirports: string;
+  fromOriginAirport: string[];
+  toDestinationsAirport: string[];
+  connectingAirports: string[];
   airlinesIncluded: string;
   airlinesExcluded: string;
   flightExcluded: string;
@@ -73,7 +73,7 @@ export const updateSearchManagement = createAsyncThunk(
 export const deleteSearchManagement = createAsyncThunk(
   "searchManagement/delete",
   async (id: string) => {
-    await axios.post(`${API_BASE_URL}/admin/delete-search`,  { id } );
+    await axios.post(`${API_BASE_URL}/admin/delete-search`, { id });
     return id;
   }
 );

@@ -38,7 +38,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Pencil, Trash2 } from "lucide-react";
+import { Loader, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import {
@@ -50,6 +50,7 @@ import {
 } from "@/redux/search-management";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { format } from "date-fns";
+import { CityAirportsMultiSelect } from "./city-airports-multi-selector";
 
 const formSchema = z.object({
   ruleTitle: z.string().min(1, "Rule title is required"),
@@ -62,11 +63,15 @@ const formSchema = z.object({
   journeyType: z.enum(["ONEWAY", "ROUNDTRIP", "MULTIWAY"], {
     required_error: "Journey type is required",
   }),
-  fromOriginAirport: z.string().min(1, "From origin airport is required"),
+  fromOriginAirport: z
+    .array(z.string())
+    .nonempty("From origin airport is required"),
   toDestinationsAirport: z
-    .string()
-    .min(1, "To destinations airport is required"),
-  connectingAirports: z.string().min(1, "Connecting airport(s) is required"),
+    .array(z.string())
+    .nonempty("To destinations airport is required"),
+  connectingAirports: z
+    .array(z.string())
+    .nonempty("Connecting airport(s) is required"),
   airlinesIncluded: z.string().min(1, "Airlines included is required"),
   airlinesExcluded: z.string(),
   flightExcluded: z.string(),
@@ -119,6 +124,7 @@ export default function SearchManagementTable() {
   const searchRules = useSelector(
     (state: RootState) => state.searchManagement.entries
   );
+  const [loading, setLoading] = useState(false);
   const [globalFilter, setGlobalFilter] = useState("");
   const [pageSize, setPageSize] = useState(50);
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
@@ -129,9 +135,9 @@ export default function SearchManagementTable() {
       ruleType: "CREATE_COMBINATION",
       gdsNdcSupplier: "AMADEUS",
       journeyType: "ONEWAY",
-      fromOriginAirport: "",
-      toDestinationsAirport: "",
-      connectingAirports: "",
+      fromOriginAirport: [],
+      toDestinationsAirport: [],
+      connectingAirports: [],
       airlinesIncluded: "",
       airlinesExcluded: "",
       flightExcluded: "",
@@ -243,6 +249,7 @@ export default function SearchManagementTable() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
     try {
       if (editingRuleId) {
         await dispatch(
@@ -258,14 +265,19 @@ export default function SearchManagementTable() {
         await dispatch(createSearchManagement(values));
         toast.success("Rule created successfully");
       }
-      form.reset();
-      dispatch(getSearchManagement()); // Fetch updated data
+
+      resetForm();
+
+      dispatch(getSearchManagement());
     } catch (error) {
       toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
   async function handleStatusChange(id: string, checked: boolean) {
+    setLoading(true);
     try {
       const existingRule = searchRules.find((rule) => rule.id === id);
       if (existingRule) {
@@ -281,9 +293,11 @@ export default function SearchManagementTable() {
     } catch (error) {
       toast.error("Failed to update status");
     }
+    setLoading(false);
   }
 
   function handleEdit(rule: SearchManagement) {
+    setLoading(true);
     setEditingRuleId(rule.id);
     form.reset({
       ruleTitle: rule.ruleTitle,
@@ -308,6 +322,7 @@ export default function SearchManagementTable() {
       priority: rule.priority,
       fareCodesExcluded: rule.fareCodesExcluded,
     });
+    setLoading(false);
   }
 
   function handleCancelEdit() {
@@ -316,6 +331,7 @@ export default function SearchManagementTable() {
   }
 
   async function handleDelete(id: string) {
+    setLoading(true);
     try {
       await dispatch(deleteSearchManagement(id));
       toast.success("Rule deleted successfully");
@@ -323,6 +339,27 @@ export default function SearchManagementTable() {
     } catch (error) {
       toast.error("Failed to delete rule");
     }
+    setLoading(false);
+  }
+  function resetForm() {
+    form.reset({
+      ruleTitle: "",
+      gdsNdcSupplier: "AMADEUS",
+      ruleType: "CREATE_COMBINATION",
+      journeyType: "ONEWAY",
+      fromOriginAirport: [],
+      toDestinationsAirport: [],
+      connectingAirports: [],
+      airlinesIncluded: "",
+      airlinesExcluded: "",
+      flightExcluded: "",
+      minConnectionTime: "",
+      maxConnectionTime: "",
+      status: "ACTIVE",
+      noteDescription: "",
+      priority: 1,
+      fareCodesExcluded: "",
+    });
   }
 
   return (
@@ -429,11 +466,9 @@ export default function SearchManagementTable() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>From Origin Airport</FormLabel>
-
                   <FormControl>
-                    <Input placeholder="origin airport" {...field} />
+                    <CityAirportsMultiSelect field={field} />
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -444,11 +479,9 @@ export default function SearchManagementTable() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>To Destinations Airport</FormLabel>
-
                   <FormControl>
-                    <Input placeholder="destination airport" {...field} />
+                    <CityAirportsMultiSelect field={field} />
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -459,11 +492,9 @@ export default function SearchManagementTable() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Connecting Airport(s)</FormLabel>
-
                   <FormControl>
-                    <Input placeholder="connecting Airport" {...field} />
+                    <CityAirportsMultiSelect field={field} />
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -544,10 +575,7 @@ export default function SearchManagementTable() {
                 <FormItem>
                   <FormLabel>Status</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value} 
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
@@ -609,31 +637,19 @@ export default function SearchManagementTable() {
                 variant="outline"
                 onClick={() => {
                   handleCancelEdit();
-                  form.reset({
-                    ruleTitle: "",
-                    gdsNdcSupplier: "AMADEUS",
-                    ruleType: "CREATE_COMBINATION",
-                    journeyType: "ONEWAY",
-                    fromOriginAirport: "",
-                    toDestinationsAirport: "",
-                    connectingAirports: "",
-                    airlinesIncluded: "",
-                    airlinesExcluded: "",
-                    flightExcluded: "",
-                    minConnectionTime: "",
-                    maxConnectionTime: "",
-                    status: "ACTIVE",
-                    noteDescription: "",
-                    priority: 0,
-                    fareCodesExcluded: "",
-                  });
+                  resetForm();
                 }}
               >
                 Cancel
               </Button>
             )}
-            <Button type="submit" className="bg-blue text-white">
+            <Button
+              type="submit"
+              className="bg-blue text-white"
+              disabled={loading}
+            >
               {editingRuleId ? "Update Rule" : "Create Rule"}
+              {loading && <Loader className="size-5 animate-spin shrink-0" />}
             </Button>
           </div>
         </form>
