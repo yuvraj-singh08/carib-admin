@@ -9,7 +9,7 @@ export interface SearchManagement {
   journeyType: "ONEWAY" | "ROUNDTRIP" | "MULTIWAY";
   fromOriginAirport: string[];
   toDestinationsAirport: string[];
-  connectingAirports: string[];
+  connectingAirports: string[][];
   airlinesIncluded: string;
   airlinesExcluded: string;
   flightExcluded: string;

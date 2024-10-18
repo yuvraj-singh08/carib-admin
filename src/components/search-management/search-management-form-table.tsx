@@ -51,6 +51,8 @@ import {
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { format } from "date-fns";
 import { CityAirportsMultiSelect } from "./city-airports-multi-selector";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { ConnectingAirportsSelector } from "./connecting-airports-selector";
 
 const formSchema = z.object({
   ruleTitle: z.string().min(1, "Rule title is required"),
@@ -70,8 +72,8 @@ const formSchema = z.object({
     .array(z.string())
     .nonempty("To destinations airport is required"),
   connectingAirports: z
-    .array(z.string())
-    .nonempty("Connecting airport(s) is required"),
+    .array(z.array(z.string()))
+    .nonempty("Connecting airports is required"),
   airlinesIncluded: z.string().min(1, "Airlines included is required"),
   airlinesExcluded: z.string(),
   flightExcluded: z.string(),
@@ -128,6 +130,7 @@ export default function SearchManagementTable() {
   const [globalFilter, setGlobalFilter] = useState("");
   const [pageSize, setPageSize] = useState(50);
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -137,7 +140,7 @@ export default function SearchManagementTable() {
       journeyType: "ONEWAY",
       fromOriginAirport: [],
       toDestinationsAirport: [],
-      connectingAirports: [],
+      connectingAirports: [[]],
       airlinesIncluded: "",
       airlinesExcluded: "",
       flightExcluded: "",
@@ -311,7 +314,7 @@ export default function SearchManagementTable() {
       journeyType: rule.journeyType as "ONEWAY" | "ROUNDTRIP" | "MULTIWAY",
       fromOriginAirport: rule.fromOriginAirport,
       toDestinationsAirport: rule.toDestinationsAirport,
-      connectingAirports: rule.connectingAirports,
+      connectingAirports: rule.connectingAirports || [[]],
       airlinesIncluded: rule.airlinesIncluded,
       airlinesExcluded: rule.airlinesExcluded,
       flightExcluded: rule.flightExcluded,
@@ -349,7 +352,7 @@ export default function SearchManagementTable() {
       journeyType: "ONEWAY",
       fromOriginAirport: [],
       toDestinationsAirport: [],
-      connectingAirports: [],
+      connectingAirports: [[]],
       airlinesIncluded: "",
       airlinesExcluded: "",
       flightExcluded: "",
@@ -486,19 +489,32 @@ export default function SearchManagementTable() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="connectingAirports"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Connecting Airport(s)</FormLabel>
-                  <FormControl>
-                    <CityAirportsMultiSelect field={field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" type="button" className="h-10 mt-7">
+                  {form
+                    .watch("connectingAirports")
+                    ?.some((arr) => arr.length > 0)
+                    ? "Edit Connecting Airports"
+                    : "Add Connecting Airports"}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-xl min-h-[60vh]">
+                <FormField
+                  control={form.control}
+                  name="connectingAirports"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Connecting Airport(s)</FormLabel>
+                      <FormControl>
+                        <ConnectingAirportsSelector field={field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DialogContent>
+            </Dialog>
             <FormField
               control={form.control}
               name="airlinesIncluded"
