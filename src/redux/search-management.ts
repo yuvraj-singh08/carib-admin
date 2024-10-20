@@ -7,8 +7,8 @@ export interface SearchManagement {
   gdsNdcSupplier: "AMADEUS" | "KIUSYS" | "DUFFEL" | "ALL" | "NONE";
   ruleType: "CREATE_COMBINATION" | "COMING_SOON";
   journeyType: "ONEWAY" | "ROUNDTRIP" | "MULTIWAY";
-  fromOriginAirport: string[];
-  toDestinationsAirport: string[];
+  fromOriginAirport: string;
+  toDestinationsAirport: string;
   connectingAirports: string[][];
   airlinesIncluded: string;
   airlinesExcluded: string;

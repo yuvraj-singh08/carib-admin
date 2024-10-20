@@ -50,7 +50,6 @@ import {
 } from "@/redux/search-management";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { format } from "date-fns";
-import { CityAirportsMultiSelect } from "./city-airports-multi-selector";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ConnectingAirportsSelector } from "./connecting-airports-selector";
 
@@ -65,12 +64,8 @@ const formSchema = z.object({
   journeyType: z.enum(["ONEWAY", "ROUNDTRIP", "MULTIWAY"], {
     required_error: "Journey type is required",
   }),
-  fromOriginAirport: z
-    .array(z.string())
-    .nonempty("From origin airport is required"),
-  toDestinationsAirport: z
-    .array(z.string())
-    .nonempty("To destinations airport is required"),
+  fromOriginAirport: z.string().nonempty("From origin airport is required"),
+  toDestinationsAirport: z.string().nonempty("To destinations airport is required"),
   connectingAirports: z
     .array(z.array(z.string()))
     .nonempty("Connecting airports is required"),
@@ -138,8 +133,8 @@ export default function SearchManagementTable() {
       ruleType: "CREATE_COMBINATION",
       gdsNdcSupplier: "AMADEUS",
       journeyType: "ONEWAY",
-      fromOriginAirport: [],
-      toDestinationsAirport: [],
+      fromOriginAirport: "",
+      toDestinationsAirport: "",
       connectingAirports: [[]],
       airlinesIncluded: "",
       airlinesExcluded: "",
@@ -350,8 +345,8 @@ export default function SearchManagementTable() {
       gdsNdcSupplier: "AMADEUS",
       ruleType: "CREATE_COMBINATION",
       journeyType: "ONEWAY",
-      fromOriginAirport: [],
-      toDestinationsAirport: [],
+      fromOriginAirport: "",
+      toDestinationsAirport: "",
       connectingAirports: [[]],
       airlinesIncluded: "",
       airlinesExcluded: "",
@@ -470,7 +465,7 @@ export default function SearchManagementTable() {
                 <FormItem>
                   <FormLabel>From Origin Airport</FormLabel>
                   <FormControl>
-                    <CityAirportsMultiSelect field={field} />
+                    <Input placeholder="From Origin Airport" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -483,7 +478,7 @@ export default function SearchManagementTable() {
                 <FormItem>
                   <FormLabel>To Destinations Airport</FormLabel>
                   <FormControl>
-                    <CityAirportsMultiSelect field={field} />
+                   <Input placeholder="To Destinations Airport" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
