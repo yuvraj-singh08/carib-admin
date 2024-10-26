@@ -23,7 +23,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, Search, Trash2 } from "lucide-react";
 import DatePickerWithRange from "../ui/date-range-picker";
 import { Input } from "../ui/input";
-import TicketDetailsDialog from "./tieket-dialog";
 import { useConfirm } from "@/hooks/use-confirm";
 import {
   fetchTickets,
@@ -35,6 +34,7 @@ import {
 import { Ticket } from "@/redux/tickets";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
+import TicketDetails from "./tieket-dialog";
 
 const statusOptions = [
   { value: "OPEN", label: "Open Tickets", color: "bg-blue" },
@@ -55,6 +55,7 @@ const BookingTicketsTableWithDateFilter = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [showTicketDetails, setShowTicketDetails] = useState(false);
 
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Ticket",
@@ -129,16 +130,33 @@ const BookingTicketsTableWithDateFilter = () => {
   ) => {
     try {
       await dispatch(updateTicket({ id, status: newStatus })).unwrap();
-
       toast.success("Ticket status updated successfully!");
     } catch (error) {
       toast.error("Failed to update ticket status.");
     }
   };
 
-  React.useEffect(() => {
-    filterTickets(searchTerm, statusFilter, dateRange);
-  }, [tickets, searchTerm, statusFilter, dateRange]);
+  const handleViewTicket = (ticket: Ticket) => {
+    setSelectedTicket(ticket);
+    setShowTicketDetails(true);
+  };
+
+  const handleBackToList = () => {
+    setSelectedTicket(null);
+    setShowTicketDetails(false);
+  };
+
+  if (showTicketDetails && selectedTicket) {
+    return (
+      <TicketDetails
+        ticket={selectedTicket}
+        onBack={handleBackToList}
+        handleTicketStatusChange={(newStatus) =>
+          handleTicketStatusChange(selectedTicket.id, newStatus as TicketStatus)
+        }
+      />
+    );
+  }
 
   return (
     <>
@@ -171,12 +189,14 @@ const BookingTicketsTableWithDateFilter = () => {
               </SelectContent>
             </Select>
           </div>
-          <Input
-            placeholder="Search product..."
-            className="w-[210px] rounded-lg h-9 pl-9"
-            onChange={handleSearch}
-          />
-          <Search className="size-5 shrink-0 text-gray absolute top-2 left-2" />
+          <div className="relative">
+            <Input
+              placeholder="Search product..."
+              className="w-[210px] rounded-lg h-9 pl-9"
+              onChange={handleSearch}
+            />
+            <Search className="size-5 text-gray-500 absolute left-2 top-2" />
+          </div>
         </div>
 
         <ScrollArea className="h-[300px]">
@@ -256,7 +276,7 @@ const BookingTicketsTableWithDateFilter = () => {
                       <Button
                         variant="ghost"
                         className="bg-orange-400/20 hover:bg-orange-400/40"
-                        onClick={() => setSelectedTicket(item)}
+                        onClick={() => handleViewTicket(item)}
                       >
                         <Eye size={16} className="text-orange-500" />
                       </Button>
@@ -274,20 +294,6 @@ const BookingTicketsTableWithDateFilter = () => {
             </TableBody>
           </Table>
         </ScrollArea>
-
-        {selectedTicket && (
-          <TicketDetailsDialog
-            ticket={selectedTicket}
-            isOpen={!!selectedTicket}
-            onClose={() => setSelectedTicket(null)}
-            handleTicketStatusChange={(newStatus) =>
-              handleTicketStatusChange(
-                selectedTicket!.id,
-                newStatus as TicketStatus
-              )
-            }
-          />
-        )}
 
         <div className="flex items-center justify-between space-x-2 py-4">
           <div>
