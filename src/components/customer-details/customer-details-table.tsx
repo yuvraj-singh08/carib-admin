@@ -14,13 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   Select,
@@ -29,163 +23,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Eye, Image, Trash2 } from "lucide-react";
+import { ArrowLeft, Eye, Image, Trash2 } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { useConfirm } from "@/hooks/use-confirm";
 import { AppDispatch } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
 import { format } from "date-fns";
-
-const UserInfoDialog = ({ user }: { user: Customer }) => (
-  <Dialog>
-    <DialogTrigger asChild>
-      <Button
-        variant="ghost"
-        className="bg-orange-400/20 hover:bg-orange-400/40"
-      >
-        <Eye size={16} className="text-orange-500" />
-      </Button>
-    </DialogTrigger>
-    <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-hidden p-4 overflow-y-scroll">
-      <DialogHeader>
-        <DialogTitle className="text-lg font-bold text-blue">
-          Customer Details
-        </DialogTitle>
-      </DialogHeader>
-      <div className="flex items-center space-x-4">
-        <Avatar className="w-16 h-16">
-          <AvatarImage src={user?.avatarSrc} alt={user?.firstname} />
-          <AvatarFallback>{user?.firstname.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div>
-          <h3 className="font-semibold text-md">
-            {user?.firstname} {user?.lastname}
-          </h3>
-          <p className="text-gray-500">{user?.email}</p>
-        </div>
-      </div>
-      <Separator />
-
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <DialogTitle className="text-lg font-bold text-blue">
-            User Info
-          </DialogTitle>
-
-          <InfoItem
-            label="Passport Number"
-            value={user?.passportDetails?.passportNumber || "N/A"}
-          />
-          <InfoItem label="Mobile Number" value={user.mobileNumber || "N/A"} />
-          <InfoItem
-            label="DOB"
-            value={
-              user.dob ? format(new Date(user.dob), "dd MMM, yyyy") : "N/A"
-            }
-          />
-          <InfoItem label="Gender" value={user.gender || "N/A"} />
-          <InfoItem label="Address" value={user.address || "N/A"} />
-          <InfoItem label="Pincode" value={user.pincode || "N/A"} />
-          {/* <InfoItem
-            label="Document"
-            value={
-              <Button variant="link" className="p-0">
-                Show
-              </Button>
-            }
-          /> */}
-        </div>
-        <div className="space-y-4">
-          {user?.passportDetails?.passportImg && (
-            <DialogTitle className="text-lg font-bold text-blue">
-              Passport Image
-            </DialogTitle>
-          )}
-          {(user?.passportDetails?.passportImg?.length ?? 0) > 0 && (
-            <Dialog>
-              <DialogTrigger>
-                <Button className="w-60" variant="outline" type="button">
-                  <Image className="size-5 mr-2" />
-                  View Images (
-                  {user?.passportDetails?.passportImg?.length ?? 0 > 0
-                    ? user?.passportDetails?.passportImg?.length
-                    : 1}
-                  )
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl w-full flex items-center">
-                {user?.passportDetails?.passportImg?.map((img, index) => (
-                  <Dialog key={index}>
-                    <DialogTrigger className="relative">
-                      <img
-                        src={img}
-                        alt={`uploaded-image-${index}`}
-                        className="w-40 h-auto aspect-square rounded-xl border border-black object-cover"
-                      />
-                    </DialogTrigger>
-                    <DialogContent className="w-full h-auto overflow-hidden">
-                      <div className="object-contain">
-                        <img
-                          src={img}
-                          alt={`uploaded-image-${index}`}
-                          className="w-full h-[60%] aspect-square rounded-xl object-cover"
-                        />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                ))}
-              </DialogContent>
-            </Dialog>
-          )}
-
-          {/* <InfoItem label="Email" value={user.coTraveler.email} />
-          <InfoItem
-            label="Passport Number"
-            value={user.coTraveler.passportNo}
-          />
-          <InfoItem label="Phone Number" value={user.coTraveler.phoneNumber} /> */}
-        </div>
-      </div>
-      <DialogTitle className="text-lg font-bold text-blue">
-        Additional Details (Co traveler)
-      </DialogTitle>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>No.</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>DOB</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Passport No.</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {user.coTraveler && user.coTraveler.length > 0 ? (
-            user.coTraveler.map((coTraveler, index) => (
-              <TableRow key={index}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{coTraveler.name}</TableCell>
-                <TableCell>
-                  {new Date(coTraveler.dateOfBirth).toLocaleDateString()}{" "}
-                  {/* Correcting date format */}
-                </TableCell>
-                <TableCell>{coTraveler.email}</TableCell>
-                <TableCell>{coTraveler.passportNumber}</TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={4} className="text-center">
-                No Co-Travellers Found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </DialogContent>
-  </Dialog>
-);
 
 const InfoItem = ({
   label,
@@ -200,13 +44,146 @@ const InfoItem = ({
   </div>
 );
 
+const UserDetails = ({
+  user,
+  onBack,
+}: {
+  user: Customer;
+  onBack: () => void;
+}) => (
+  <div className="w-full bg-white rounded-xl p-6">
+    <div className="flex items-center justify-between mb-6">
+      <h2 className="text-lg font-bold text-blue">Customer Details</h2>
+      <Button
+        onClick={onBack}
+        variant="outline"
+        className="flex items-center gap-2"
+      >
+        <ArrowLeft size={16} />
+        Back to List
+      </Button>
+    </div>
+
+    <div className="flex items-center space-x-4 mb-6">
+      <Avatar className="w-16 h-16">
+        <AvatarImage src={user?.avatarSrc} alt={user?.firstname} />
+        <AvatarFallback>{user?.firstname.charAt(0)}</AvatarFallback>
+      </Avatar>
+      <div>
+        <h3 className="font-semibold text-md">
+          {user?.firstname} {user?.lastname}
+        </h3>
+        <p className="text-gray-500">{user?.email}</p>
+      </div>
+    </div>
+    <Separator className="mb-6" />
+
+    <div className="grid grid-cols-2 gap-6">
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold text-blue mb-4">User Info</h3>
+
+        <InfoItem
+          label="Passport Number"
+          value={user?.passportDetails?.passportNumber || "N/A"}
+        />
+        <InfoItem label="Mobile Number" value={user.mobileNumber || "N/A"} />
+        <InfoItem
+          label="DOB"
+          value={user.dob ? format(new Date(user.dob), "dd MMM, yyyy") : "N/A"}
+        />
+        <InfoItem label="Gender" value={user.gender || "N/A"} />
+        <InfoItem label="Address" value={user.address || "N/A"} />
+        <InfoItem label="Pincode" value={user.pincode || "N/A"} />
+      </div>
+      <div className="space-y-4">
+        {user?.passportDetails?.passportImg && (
+          <h3 className="text-lg font-bold text-blue mb-4">Passport Image</h3>
+        )}
+        {(user?.passportDetails?.passportImg?.length ?? 0) > 0 && (
+          <Dialog>
+            <DialogTrigger>
+              <Button className="w-60" variant="outline" type="button">
+                <Image className="size-5 mr-2" />
+                View Images (
+                {user?.passportDetails?.passportImg?.length ?? 0 > 0
+                  ? user?.passportDetails?.passportImg?.length
+                  : 1}
+                )
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl w-full flex items-center">
+              {user?.passportDetails?.passportImg?.map((img, index) => (
+                <Dialog key={index}>
+                  <DialogTrigger className="relative">
+                    <img
+                      src={img}
+                      alt={`uploaded-image-${index}`}
+                      className="w-40 h-auto aspect-square rounded-xl border border-black object-cover"
+                    />
+                  </DialogTrigger>
+                  <DialogContent className="w-full h-auto overflow-hidden">
+                    <div className="object-contain">
+                      <img
+                        src={img}
+                        alt={`uploaded-image-${index}`}
+                        className="w-full h-[60%] aspect-square rounded-xl object-cover"
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ))}
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+    </div>
+
+    <h3 className="text-lg font-bold text-blue mt-8 mb-4">
+      Additional Details (Co traveler)
+    </h3>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>No.</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>DOB</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Passport No.</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {user.coTraveler && user.coTraveler.length > 0 ? (
+          user.coTraveler.map((coTraveler, index) => (
+            <TableRow key={index}>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{coTraveler.name}</TableCell>
+              <TableCell>
+                {new Date(coTraveler.dateOfBirth).toLocaleDateString()}
+              </TableCell>
+              <TableCell>{coTraveler.email}</TableCell>
+              <TableCell>{coTraveler.passportNumber}</TableCell>
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={5} className="text-center">
+              No Co-Travellers Found
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  </div>
+);
+
 const CustomerDetailsTable = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { customers, status, error } = useSelector(
     (state: any) => state.customers
-  ); // Adjust the state structure accordingly
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [selectedUser, setSelectedUser] = useState<Customer | null>(null);
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Customer Details",
     "Are you sure you want to delete this customer details? This action cannot be undone."
@@ -242,6 +219,12 @@ const CustomerDetailsTable = () => {
 
   if (status === "failed") {
     return <div>Error: {error}</div>;
+  }
+
+  if (selectedUser) {
+    return (
+      <UserDetails user={selectedUser} onBack={() => setSelectedUser(null)} />
+    );
   }
 
   return (
@@ -300,7 +283,16 @@ const CustomerDetailsTable = () => {
                 <TableCell>{customer.lastBooking}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    <UserInfoDialog user={customer} />
+                    <Button
+                      variant="ghost"
+                      className="bg-orange-400/20 hover:bg-orange-400/40"
+                      onClick={() => {
+                        window.scrollTo(0, 0);
+                        setSelectedUser(customer);
+                      }}
+                    >
+                      <Eye size={16} className="text-orange-500" />
+                    </Button>
                     <Button
                       variant="ghost"
                       className="bg-red-200/40 hover:bg-red-200/60"
@@ -324,7 +316,7 @@ const CustomerDetailsTable = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[10, 20, 30].map((size) => (
+                {[10, 20, 30, 40, 50].map((size) => (
                   <SelectItem key={size} value={size.toString()}>
                     {size}
                   </SelectItem>
@@ -332,55 +324,34 @@ const CustomerDetailsTable = () => {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-center justify-between py-4 px-4">
-            <div>
-              <Select
-                value={pageSize.toString()}
-                onValueChange={(value) => setPageSize(Number(value))}
-              >
-                <SelectTrigger className="w-[80px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[10, 20, 30, 40, 50].map((size) => (
-                    <SelectItem key={size} value={size.toString()}>
-                      {size}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-x-2">
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
+                key={page}
+                variant={page === currentPage ? "default" : "outline"}
+                onClick={() => setCurrentPage(page)}
               >
-                Previous
+                {page}
               </Button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <Button
-                    key={page}
-                    variant={page === currentPage ? "default" : "outline"}
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </Button>
-                )
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </Button>
-            </div>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
           </div>
         </div>
       </div>

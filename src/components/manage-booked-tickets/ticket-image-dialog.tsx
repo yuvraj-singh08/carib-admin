@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area"; 
-import { X } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { X } from "lucide-react";
 
 const ImageGalleryDialog = ({
   isOpen,
@@ -25,7 +25,7 @@ const ImageGalleryDialog = ({
         <DialogHeader>
           <DialogTitle className="text-blue">Ticket Images</DialogTitle>
         </DialogHeader>
-        <ScrollArea style={{ maxHeight: '60vh' }} className="mt-4">
+        <ScrollArea style={{ maxHeight: "60vh" }} className="mt-4">
           <div className="grid grid-cols-3 gap-4">
             {ticket.images.map((img: string, index: number) => (
               <img
