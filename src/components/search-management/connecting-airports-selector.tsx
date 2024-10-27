@@ -15,11 +15,11 @@ type City = {
   label: string;
 };
 
-const CITIES: City[] = [
+const initialCities: City[] = [
   { value: "CCS", label: "Caracas" },
   { value: "SDQ", label: "Santo Domingo" },
   { value: "MIA", label: "Miami" },
-  { value: "VLN", label: "Valencia, Venezuela" },
+  { value: "VLN", label: "Valencia" },
   { value: "BOG", label: "Bogota" },
 ];
 
@@ -37,6 +37,7 @@ export function ConnectingAirportsSelector({
   const [openStates, setOpenStates] = useState<{ [key: number]: boolean }>({});
   const [inputValues, setInputValues] = useState<{ [key: number]: string }>({});
   const [localValue, setLocalValue] = useState<string[][]>([]);
+  const [cities, setCities] = useState<City[]>(initialCities);
 
   useEffect(() => {
     if (field.value && field.value.length > 0) {
@@ -85,6 +86,18 @@ export function ConnectingAirportsSelector({
     setLocalValue((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const handleEnterPress = useCallback(
+    (index: number) => {
+      const inputValue = inputValues[index]?.trim();
+      if (inputValue && !cities.some((city) => city.value === inputValue)) {
+        const newCity = { value: inputValue, label: inputValue };
+        setCities((prev) => [...prev, newCity]);
+        handleSelect(index, newCity);
+      }
+    },
+    [inputValues, cities, handleSelect]
+  );
+
   return (
     <div className="space-y-4">
       {selectors.map((index) => (
@@ -93,7 +106,7 @@ export function ConnectingAirportsSelector({
             <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
               <div className="flex flex-wrap gap-1">
                 {localValue[index]?.map((cityValue) => {
-                  const city = CITIES.find((c) => c.value === cityValue);
+                  const city = cities.find((c) => c.value === cityValue);
                   return city ? (
                     <Badge key={city.value} variant="secondary">
                       {city.label}
@@ -111,13 +124,18 @@ export function ConnectingAirportsSelector({
                   onValueChange={(value) =>
                     setInputValues((prev) => ({ ...prev, [index]: value }))
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleEnterPress(index);
+                    }
+                  }}
                   onBlur={() =>
                     setOpenStates((prev) => ({ ...prev, [index]: false }))
                   }
                   onFocus={() =>
                     setOpenStates((prev) => ({ ...prev, [index]: true }))
                   }
-                  placeholder="Select cities..."
+                  placeholder="Select cities or add new..."
                   className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
                 />
               </div>
@@ -127,20 +145,22 @@ export function ConnectingAirportsSelector({
                 <CommandList>
                   <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
                     <CommandGroup className="h-full overflow-auto">
-                      {CITIES.filter(
-                        (city) => !localValue[index]?.includes(city.value)
-                      ).map((city) => (
-                        <CommandItem
-                          key={city.value}
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            handleSelect(index, city);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          {city.label}
-                        </CommandItem>
-                      ))}
+                      {cities
+                        .filter(
+                          (city) => !localValue[index]?.includes(city.value)
+                        )
+                        .map((city) => (
+                          <CommandItem
+                            key={city.value}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelect(index, city);
+                            }}
+                            className="cursor-pointer"
+                          >
+                            {city.label} ({city.value})
+                          </CommandItem>
+                        ))}
                     </CommandGroup>
                   </div>
                 </CommandList>

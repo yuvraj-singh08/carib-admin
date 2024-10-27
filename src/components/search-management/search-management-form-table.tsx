@@ -72,15 +72,11 @@ const formSchema = z.object({
   connectingAirports: z
     .array(z.array(z.string()))
     .nonempty("Connecting airports is required"),
-  airlinesIncluded: z
-    .array(z.string())
-    .nonempty("Airlines included is required"),
-  airlinesExcluded: z
-    .array(z.string())
-    .nonempty("Airlines excluded is required"),
+  airlinesIncluded: z.array(z.string()),
+  airlinesExcluded: z.array(z.string()),
   flightExcluded: z.string(),
-  minConnectionTime: z.string().min(1, "Min. connection time is required"),
-  maxConnectionTime: z.string().min(1, "Max. connection time is required"),
+  minConnectionTime: z.string(),
+  maxConnectionTime: z.string(),
   status: z.enum(["ACTIVE", "INACTIVE"]),
   noteDescription: z.string(),
   priority: z.number().min(1, "Priority is required"),
@@ -537,7 +533,7 @@ export default function SearchManagementTable() {
                 <FormItem>
                   <FormLabel>Airlines Excluded (code)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Airlines Excluded" {...field} />
+                    <AirlinesMultiSelect field={field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
