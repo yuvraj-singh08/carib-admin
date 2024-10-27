@@ -20,8 +20,7 @@ const CITIES: City[] = [
   { value: "SDQ", label: "Santo Domingo" },
   { value: "MIA", label: "Miami" },
   { value: "VLN", label: "Valencia, Venezuela" },
-  { value: "JFK", label: "New York (JFK)" },
-  { value: "LAX", label: "Los Angeles" },
+  { value: "BOG", label: "Bogota" },
 ];
 
 type ConnectingAirportsField = {
