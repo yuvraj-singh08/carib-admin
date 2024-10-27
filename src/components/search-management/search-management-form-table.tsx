@@ -253,18 +253,45 @@ export default function SearchManagementTable() {
     setLoading(true);
     try {
       if (editingRuleId) {
-        await dispatch(
-          updateSearchManagement({
-            id: editingRuleId,
-            ...values,
-            lastUpdate: new Date(),
-          })
-        );
-        toast.success("Rule updated successfully");
-        setEditingRuleId(null);
+        try {
+          const result = await dispatch(
+            updateSearchManagement({
+              id: editingRuleId,
+              ...values,
+              lastUpdate: new Date(),
+            })
+          );
+
+          if (updateSearchManagement.fulfilled.match(result)) {
+            toast.success("Rule updated successfully");
+          } else {
+            toast.error(
+              typeof result.payload === "string"
+                ? result.payload
+                : "Failed to update rule. Please try again."
+            );
+          }
+        } catch (error) {
+          toast.error("An unexpected error occurred");
+        } finally {
+          setEditingRuleId(null);
+        }
       } else {
-        await dispatch(createSearchManagement(values));
-        toast.success("Rule created successfully");
+        try {
+          const result = await dispatch(createSearchManagement(values));
+
+          if (createSearchManagement.fulfilled.match(result)) {
+            toast.success("Rule created successfully");
+          } else {
+            toast.error(
+              typeof result.payload === "string"
+                ? result.payload
+                : "Failed to create rule. Please try again."
+            );
+          }
+        } catch (error) {
+          toast.error("An unexpected error occurred");
+        }
       }
 
       resetForm();

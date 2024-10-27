@@ -42,7 +42,7 @@ export const createSearchManagement = createAsyncThunk(
   "searchManagement/create",
   async (data: Omit<SearchManagement, "id" | "lastUpdate">) => {
     const response = await axios.post<SearchManagement>(
-      `${API_BASE_URL}/admin/add-search`,
+      `${API_BASE_URL}/admin/create-search`,
       data
     );
     return response.data;
@@ -61,12 +61,19 @@ export const getSearchManagement = createAsyncThunk(
 
 export const updateSearchManagement = createAsyncThunk(
   "searchManagement/update",
-  async (data: SearchManagement) => {
-    const response = await axios.post<SearchManagement>(
-      `${API_BASE_URL}/admin/update-search`,
-      data
-    );
-    return response.data;
+  async (data: SearchManagement, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<SearchManagement>(
+        `${API_BASE_URL}/admin/update-search`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data || "An error occurred");
+      }
+      return rejectWithValue("An unexpected error occurred");
+    }
   }
 );
 
