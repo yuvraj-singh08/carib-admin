@@ -10,7 +10,7 @@ export interface SearchManagement {
   fromOriginAirport: string;
   toDestinationsAirport: string;
   connectingAirports: string[][];
-  airlinesIncluded: string;
+  airlinesIncluded: string[];
   airlinesExcluded: string;
   flightExcluded: string;
   minConnectionTime: string;

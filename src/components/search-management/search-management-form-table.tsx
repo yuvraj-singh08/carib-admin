@@ -52,6 +52,7 @@ import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ConnectingAirportsSelector } from "./connecting-airports-selector";
+import { AirlinesMultiSelect } from "./airlines-multiselector";
 
 const formSchema = z.object({
   ruleTitle: z.string().min(1, "Rule title is required"),
@@ -65,11 +66,15 @@ const formSchema = z.object({
     required_error: "Journey type is required",
   }),
   fromOriginAirport: z.string().nonempty("From origin airport is required"),
-  toDestinationsAirport: z.string().nonempty("To destinations airport is required"),
+  toDestinationsAirport: z
+    .string()
+    .nonempty("To destinations airport is required"),
   connectingAirports: z
     .array(z.array(z.string()))
     .nonempty("Connecting airports is required"),
-  airlinesIncluded: z.string().min(1, "Airlines included is required"),
+  airlinesIncluded: z
+    .array(z.string())
+    .nonempty("Airlines included is required"),
   airlinesExcluded: z.string(),
   flightExcluded: z.string(),
   minConnectionTime: z.string().min(1, "Min. connection time is required"),
@@ -136,7 +141,7 @@ export default function SearchManagementTable() {
       fromOriginAirport: "",
       toDestinationsAirport: "",
       connectingAirports: [[]],
-      airlinesIncluded: "",
+      airlinesIncluded: [],
       airlinesExcluded: "",
       flightExcluded: "",
       minConnectionTime: "",
@@ -348,7 +353,7 @@ export default function SearchManagementTable() {
       fromOriginAirport: "",
       toDestinationsAirport: "",
       connectingAirports: [[]],
-      airlinesIncluded: "",
+      airlinesIncluded: [],
       airlinesExcluded: "",
       flightExcluded: "",
       minConnectionTime: "",
@@ -478,7 +483,7 @@ export default function SearchManagementTable() {
                 <FormItem>
                   <FormLabel>To Destinations Airport</FormLabel>
                   <FormControl>
-                   <Input placeholder="To Destinations Airport" {...field} />
+                    <Input placeholder="To Destinations Airport" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -517,7 +522,7 @@ export default function SearchManagementTable() {
                 <FormItem>
                   <FormLabel>Airlines Included (code)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Airlines Included" {...field} />
+                    <AirlinesMultiSelect field={field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

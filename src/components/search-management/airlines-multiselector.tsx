@@ -9,20 +9,22 @@ import {
 } from "@/components/ui/command";
 import { Command as CommandPrimitive } from "cmdk";
 
-type City = {
+type Airline = {
   value: string;
   label: string;
 };
 
-const CITIES: City[] = [
-  { value: "CCS", label: "Caracas" },
-  { value: "SDQ", label: "Santo Domingo" },
-  { value: "MIA", label: "Miami" },
-  { value: "VLN", label: "Valencia, Venezuela" },
-  { value: "BOG", label: "BOGOTA" },
+const AIRLINES: Airline[] = [
+  { value: "DO", label: "Sky High Airlines" },
+  { value: "9V", label: "Avior Airlines" },
+  { value: "CM", label: "Copa Airlines" },
+  { value: "IB", label: "Iberia" },
+  { value: "UX", label: "Air Europa" },
+  { value: "QL", label: "Laser Airlines" },
+  { value: "L5", label: "Aerosur Airlines" }
 ];
 
-export function CityAirportsMultiSelect({ field }: { field: any }) {
+export function AirlinesMultiSelect({ field }: { field: any }) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
 
@@ -39,13 +41,13 @@ export function CityAirportsMultiSelect({ field }: { field: any }) {
   }, [field.value]);
 
   const selected = React.useMemo(() => {
-    return CITIES.filter((city) => field.value.includes(city.value));
+    return AIRLINES.filter((airline) => field.value.includes(airline.value));
   }, [field.value]);
 
   const handleUnselect = React.useCallback(
-    (city: City) => {
+    (airline: Airline) => {
       const newValue = field.value.filter(
-        (value: string) => value !== city.value
+        (value: string) => value !== airline.value
       );
       field.onChange(newValue);
     },
@@ -53,8 +55,8 @@ export function CityAirportsMultiSelect({ field }: { field: any }) {
   );
 
   const handleSelect = React.useCallback(
-    (city: City) => {
-      const newValue = [...field.value, city.value];
+    (airline: Airline) => {
+      const newValue = [...field.value, airline.value];
       field.onChange(newValue);
       setInputValue("");
     },
@@ -62,19 +64,24 @@ export function CityAirportsMultiSelect({ field }: { field: any }) {
   );
 
   const selectables = React.useMemo(() => {
-    return CITIES.filter((city) => !field.value.includes(city.value));
-  }, [field.value]);
+    const filtered = AIRLINES.filter((airline) => !field.value.includes(airline.value));
+    if (!inputValue) return filtered;
+    return filtered.filter(
+      airline => airline.label.toLowerCase().includes(inputValue.toLowerCase()) ||
+                airline.value.toLowerCase().includes(inputValue.toLowerCase())
+    );
+  }, [field.value, inputValue]);
 
   return (
     <Command className="overflow-visible bg-transparent">
       <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
         <div className="flex flex-wrap gap-1">
-          {selected.map((city) => (
-            <Badge key={city.value} variant="secondary">
-              {city.label}
+          {selected.map((airline) => (
+            <Badge key={airline.value} variant="secondary">
+              {airline.label}
               <button
                 className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                onClick={() => handleUnselect(city)}
+                onClick={() => handleUnselect(airline)}
               >
                 <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
               </button>
@@ -85,7 +92,7 @@ export function CityAirportsMultiSelect({ field }: { field: any }) {
             onValueChange={setInputValue}
             onBlur={() => setOpen(false)}
             onFocus={() => setOpen(true)}
-            placeholder="Select cities..."
+            placeholder="Select airlines..."
             className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
           />
         </div>
@@ -95,16 +102,16 @@ export function CityAirportsMultiSelect({ field }: { field: any }) {
           <CommandList>
             <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
               <CommandGroup className="h-full overflow-auto">
-                {selectables.map((city) => (
+                {selectables.map((airline) => (
                   <CommandItem
-                    key={city.value}
+                    key={airline.value}
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      handleSelect(city);
+                      handleSelect(airline);
                     }}
                     className="cursor-pointer"
                   >
-                    {city.label}
+                    {airline.label} ({airline.value})
                   </CommandItem>
                 ))}
               </CommandGroup>
