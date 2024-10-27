@@ -75,7 +75,9 @@ const formSchema = z.object({
   airlinesIncluded: z
     .array(z.string())
     .nonempty("Airlines included is required"),
-  airlinesExcluded: z.string(),
+  airlinesExcluded: z
+    .array(z.string())
+    .nonempty("Airlines excluded is required"),
   flightExcluded: z.string(),
   minConnectionTime: z.string().min(1, "Min. connection time is required"),
   maxConnectionTime: z.string().min(1, "Max. connection time is required"),
@@ -142,7 +144,7 @@ export default function SearchManagementTable() {
       toDestinationsAirport: "",
       connectingAirports: [[]],
       airlinesIncluded: [],
-      airlinesExcluded: "",
+      airlinesExcluded: [],
       flightExcluded: "",
       minConnectionTime: "",
       maxConnectionTime: "",
@@ -354,7 +356,7 @@ export default function SearchManagementTable() {
       toDestinationsAirport: "",
       connectingAirports: [[]],
       airlinesIncluded: [],
-      airlinesExcluded: "",
+      airlinesExcluded: [],
       flightExcluded: "",
       minConnectionTime: "",
       maxConnectionTime: "",
