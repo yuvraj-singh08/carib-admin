@@ -1,5 +1,6 @@
 import EMailSettingsForm from "@/components/landing-settings/email-settings-form";
 import CouponManagementSystemTable from "@/components/settings/manage-deals-table";
+import ManagepaymentCms from "@/components/settings/manage-payment-cms";
 import ManagePaymentGateway from "@/components/settings/manage-payment-gateway";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
@@ -27,6 +28,10 @@ const SettingsPage = () => {
               </TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="email">Email SMTP setting</TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="paymentCms">
+                Payment CMS
+              </TabsTrigger>
               {activeTab === "deals" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
@@ -35,6 +40,9 @@ const SettingsPage = () => {
               )}
               {activeTab === "email" && (
                 <div className="w-48 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[380px]" />
+              )}
+              {activeTab === "paymentCms" && (
+                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[210px]" />
               )}
             </TabsList>
             <TabsContent value="deals">
@@ -45,6 +53,9 @@ const SettingsPage = () => {
             </TabsContent>
             <TabsContent value="email">
               <EMailSettingsForm />
+            </TabsContent>
+            <TabsContent value="paymentCms">
+              <ManagepaymentCms />
             </TabsContent>
           </Tabs>
         </div>
