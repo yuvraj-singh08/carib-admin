@@ -15,7 +15,7 @@ const DashboardPage = () => {
     <ContentLayout>
       <main className="w-full min-h-screen flex flex-col gap-4 ">
         <FlightSearchSection />
-        <div className="w-full h-full grid grid-cols-8 gap-2 md:gap-4">
+        <div className="w-full h-full grid grid-cols-10 gap-2 md:gap-4">
           {bookingStatusCountsOptions.map((option, index) => (
             <div
               key={index}
@@ -24,13 +24,13 @@ const DashboardPage = () => {
               <img
                 src={option.icon}
                 alt="icon"
-                className="object-cover size-8 md:size-14 pointer-events-none select-none"
+                className="object-cover size-8 md:size-10 pointer-events-none select-none"
               />
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 items-center">
                 <h1 className="text-xl md:text-2xl font-medium">
                   {option.count}
                 </h1>
-                <span className="text-sm font-medium text-black/70">
+                <span className="text-xs font-medium text-black/70">
                   {option.label}
                 </span>
               </div>

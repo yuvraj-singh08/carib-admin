@@ -37,8 +37,16 @@ export function ConnectingAirportsSelector({
   const [openStates, setOpenStates] = useState<{ [key: number]: boolean }>({});
   const [inputValues, setInputValues] = useState<{ [key: number]: string }>({});
   const [localValue, setLocalValue] = useState<string[][]>([]);
-  const [cities, setCities] = useState<City[]>(initialCities);
+  const [cities, setCities] = useState<City[]>(() => {
+    // Initialize cities with both initial cities and any existing custom cities from field value
+    const customCities = field.value?.flat().filter(cityValue => 
+      !initialCities.some(city => city.value === cityValue)
+    ).map(value => ({ value, label: value })) || [];
+    
+    return [...initialCities, ...customCities];
+  });
 
+  // Initialize state from field value
   useEffect(() => {
     if (field.value && field.value.length > 0) {
       setLocalValue(field.value);
@@ -47,8 +55,9 @@ export function ConnectingAirportsSelector({
       setLocalValue([[]]);
       setSelectors([0]);
     }
-  }, [field.value]);
+  }, []); // Only run on mount
 
+  // Sync local state to form
   useEffect(() => {
     field.onChange(localValue);
   }, [localValue, field]);
@@ -91,7 +100,9 @@ export function ConnectingAirportsSelector({
       const inputValue = inputValues[index]?.trim();
       if (inputValue && !cities.some((city) => city.value === inputValue)) {
         const newCity = { value: inputValue, label: inputValue };
+        // Add the new city to our cities state
         setCities((prev) => [...prev, newCity]);
+        // Select the new city
         handleSelect(index, newCity);
       }
     },
@@ -126,6 +137,7 @@ export function ConnectingAirportsSelector({
                   }
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
+                      e.preventDefault();
                       handleEnterPress(index);
                     }
                   }}

@@ -62,9 +62,7 @@ const formSchema = z.object({
   ruleType: z.enum(["CREATE_COMBINATION", "COMING_SOON"], {
     required_error: "Rule type is required",
   }),
-  journeyType: z.enum(["ONEWAY", "ROUNDTRIP", "MULTIWAY"], {
-    required_error: "Journey type is required",
-  }),
+  journeyType: z.enum(["ONEWAY", "ROUNDTRIP", "MULTIWAY"]).optional(),
   fromOriginAirport: z.string().nonempty("From origin airport is required"),
   toDestinationsAirport: z
     .string()
@@ -79,7 +77,7 @@ const formSchema = z.object({
   maxConnectionTime: z.string(),
   status: z.enum(["ACTIVE", "INACTIVE"]),
   noteDescription: z.string(),
-  priority: z.number().min(1, "Priority is required"),
+  priority: z.number().optional(),
   fareCodesExcluded: z.string(),
 });
 
@@ -336,7 +334,7 @@ export default function SearchManagementTable() {
         | "ALL"
         | "NONE",
       ruleType: rule.ruleType as "CREATE_COMBINATION" | "COMING_SOON",
-      journeyType: rule.journeyType as "ONEWAY" | "ROUNDTRIP" | "MULTIWAY",
+      // journeyType: rule.journeyType as "ONEWAY" | "ROUNDTRIP" | "MULTIWAY",
       fromOriginAirport: rule.fromOriginAirport,
       toDestinationsAirport: rule.toDestinationsAirport,
       connectingAirports: rule.connectingAirports || [[]],
@@ -347,7 +345,7 @@ export default function SearchManagementTable() {
       maxConnectionTime: rule.maxConnectionTime,
       status: rule.status as "ACTIVE" | "INACTIVE", // Ensure this line is present
       noteDescription: rule.noteDescription,
-      priority: rule.priority,
+      // priority: rule.priority,
       fareCodesExcluded: rule.fareCodesExcluded,
     });
     setLoading(false);
@@ -462,7 +460,7 @@ export default function SearchManagementTable() {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="journeyType"
               render={({ field }) => (
@@ -481,13 +479,12 @@ export default function SearchManagementTable() {
                       <SelectItem value="ONEWAY">One Way</SelectItem>
                       <SelectItem value="ROUNDTRIP">Round Trip</SelectItem>
                       <SelectItem value="MULTIWAY">Multi City</SelectItem>
-                      {/* Add more options as needed */}
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <FormField
               control={form.control}
               name="fromOriginAirport"
@@ -644,7 +641,7 @@ export default function SearchManagementTable() {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="priority"
               render={({ field }) => (
@@ -656,7 +653,7 @@ export default function SearchManagementTable() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <FormField
               control={form.control}
               name="fareCodesExcluded"

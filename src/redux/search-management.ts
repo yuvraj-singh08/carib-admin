@@ -6,7 +6,7 @@ export interface SearchManagement {
   ruleTitle: string;
   gdsNdcSupplier: "AMADEUS" | "KIUSYS" | "DUFFEL" | "ALL" | "NONE";
   ruleType: "CREATE_COMBINATION" | "COMING_SOON";
-  journeyType: "ONEWAY" | "ROUNDTRIP" | "MULTIWAY";
+  journeyType?: "ONEWAY" | "ROUNDTRIP" | "MULTIWAY";
   fromOriginAirport: string;
   toDestinationsAirport: string;
   connectingAirports: string[][];
@@ -17,7 +17,7 @@ export interface SearchManagement {
   maxConnectionTime: string;
   status: string;
   noteDescription: string;
-  priority: number;
+  priority?: number;
   fareCodesExcluded: string;
   lastUpdate: Date;
 }
