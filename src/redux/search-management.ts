@@ -42,7 +42,7 @@ export const createSearchManagement = createAsyncThunk(
   "searchManagement/create",
   async (data: Omit<SearchManagement, "id" | "lastUpdate">) => {
     const response = await axios.post<SearchManagement>(
-      `${API_BASE_URL}/admin/create-search`,
+      `${API_BASE_URL}/admin/add-search`,
       data
     );
     return response.data;
