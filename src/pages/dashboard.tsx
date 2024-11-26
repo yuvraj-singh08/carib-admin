@@ -1,5 +1,4 @@
 import FilterFlighTable from "@/components/dashboard/filter-flights-table";
-import { FlightSearchSection } from "@/components/dashboard/flight-search-form";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { BookingStatusCountsOptions } from "@/constants/booking-status-count";
 
@@ -14,7 +13,6 @@ const DashboardPage = () => {
   return (
     <ContentLayout>
       <main className="w-full min-h-screen flex flex-col gap-4 ">
-        <FlightSearchSection />
         <div className="w-full h-full grid grid-cols-10 gap-2 md:gap-4">
           {bookingStatusCountsOptions.map((option, index) => (
             <div
