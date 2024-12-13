@@ -6,9 +6,11 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import TermsConditionsForm from "@/components/landing-settings/terms-text-editor";
+import BlogTable from "@/components/landing-settings/blog-settings";
 
 const LandingPageSettings = () => {
   const [activeTab, setActiveTab] = useState("cookie");
+
   return (
     <ContentLayout>
       <main className="w-full min-h-screen flex flex-col gap-4">
@@ -23,6 +25,7 @@ const LandingPageSettings = () => {
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="socials">Social Media</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="blogs">Blogs</TabsTrigger>
               {activeTab === "cookie" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
@@ -35,7 +38,11 @@ const LandingPageSettings = () => {
               {activeTab === "socials" && (
                 <div className="w-32 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-[550px]" />
               )}
+              {activeTab === "blogs" && (
+                <div className="w-32 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-[700px]" />
+              )}
             </TabsList>
+
             <TabsContent value="cookie">
               <CookieSettingsForm />
             </TabsContent>
@@ -47,6 +54,9 @@ const LandingPageSettings = () => {
             </TabsContent>
             <TabsContent value="socials">
               <SocialProvidersForm />
+            </TabsContent>
+            <TabsContent value="blogs">
+              <BlogTable />
             </TabsContent>
           </Tabs>
         </div>

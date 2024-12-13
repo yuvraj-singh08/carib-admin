@@ -12,6 +12,7 @@ import SearchManagementPage from "./pages/search-management";
 import { LoginPage } from "./pages/login";
 import { SignUpPage } from "./pages/signup";
 import { useAuthMiddleware } from "./authMiddleware";
+import AddBlogPage from "./components/landing-settings/add-blog";
 
 function App() {
   useAuthMiddleware();
@@ -30,6 +31,7 @@ function App() {
         <Route path="/manage-user" element={<UserManagementPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/landing-settings" element={<LandingPageSettings />} />
+        <Route path="/add-blog" element={<AddBlogPage />} />
         <Route path="/customer-details" element={<CustomerDetailsPage />} />
         <Route path="/tickets" element={<TicketsPage />} />
         <Route path="/search-management" element={<SearchManagementPage />} />
