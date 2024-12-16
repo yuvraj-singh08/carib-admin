@@ -37,13 +37,20 @@ const AddBlogPage = () => {
     <div className="p-6 m-4">
       <h1 className="text-2xl font-bold mb-6">Add Blog</h1>
 
+      {/* Main Image */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Main Image</label>
+        <label
+          htmlFor="mainImage"
+          className="block text-sm font-medium border p-3 rounded-lg text-gray-700 mb-2 cursor-pointer hover:text-blue-600"
+        >
+          Upload Main Image
+        </label>
         <input
+          id="mainImage"
           type="file"
           accept="image/*"
           onChange={handleMainImageChange}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-gray-300 file:text-sm file:font-medium file:bg-gray-50"
+          className="hidden"
         />
         {mainImage && (
           <img
@@ -54,6 +61,7 @@ const AddBlogPage = () => {
         )}
       </div>
 
+      {/* Main Description */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Main Description</label>
         <Editor
@@ -63,14 +71,21 @@ const AddBlogPage = () => {
         />
       </div>
 
+      {/* Secondary Images */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Secondary Images</label>
+        <label
+          htmlFor="secondaryImages"
+          className="block text-sm font-medium border p-3 rounded-lg text-gray-700 mb-2 cursor-pointer hover:text-blue-600"
+        >
+          Upload Secondary Images (Max 3)
+        </label>
         <input
+          id="secondaryImages"
           type="file"
           accept="image/*"
           multiple
           onChange={handleSecondaryImagesChange}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-gray-300 file:text-sm file:font-medium file:bg-gray-50"
+          className="hidden"
         />
         <div className="mt-4 flex gap-4 flex-wrap">
           {secondaryImages.map((image, index) => (
@@ -91,6 +106,7 @@ const AddBlogPage = () => {
         </div>
       </div>
 
+      {/* Secondary Description */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Secondary Description</label>
         <Editor
@@ -100,9 +116,10 @@ const AddBlogPage = () => {
         />
       </div>
 
+      {/* Submit Button */}
       <button
         onClick={handleSubmit}
-        className="px-6 py-2 bg-blue-600 text-white bg-green-500 rounded-md hover:bg-green-600"
+        className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
       >
         Save
       </button>
