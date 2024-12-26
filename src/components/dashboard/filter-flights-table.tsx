@@ -57,17 +57,17 @@ const getStatusColor = (status: AdminStatus) => {
     case AdminStatus.PENDING_PAYMENT:
       return "bg-orange-200 text-orange-600";
     case AdminStatus.EXPIRED:
-      return "bg-gray/50 text-black";
+      return "bg-gray-200 text-gray-600";
     case AdminStatus.FAILED_BOOKING:
       return "bg-red-100 text-red-600";
     default:
-      return "bg-gray text-gray";
+      return "bg-gray-100 text-gray-600";
   }
 };
 
 export default function FlightBookingsTable() {
   const dispatch = useDispatch<AppDispatch>();
-  const bookings = useSelector((state: RootState) => state.bookings.bookings);
+  const { bookings, loading, error } = useSelector((state: RootState) => state.bookings);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -76,12 +76,18 @@ export default function FlightBookingsTable() {
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
+
+  
   useEffect(() => {
     dispatch(fetchBookings());
   }, [dispatch]);
 
-  const handleStatusChange = (id: string, newStatus: AdminStatus) => {
-    dispatch(updateBooking({ id, adminStatus: newStatus }));
+  const handleStatusChange = async (id: string, newStatus: AdminStatus) => {
+    try {
+      await dispatch(updateBooking({ id, adminStatus: newStatus })).unwrap();
+    } catch (error) {
+      console.error('Failed to update booking status:', error);
+    }
   };
 
   const columns: ColumnDef<Booking>[] = [
@@ -178,7 +184,7 @@ export default function FlightBookingsTable() {
   ];
 
   const table = useReactTable({
-    data: bookings,
+    data: bookings || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -208,43 +214,20 @@ export default function FlightBookingsTable() {
   });
 
   const handleApplyFilters = () => {
-    // Apply the filters
-    // table
-    //   .getColumn("pnrNumber")
-    //   ?.setFilterValue(
-    //     (columnFilters.find((f) => f.id === "pnrNumber")?.value as string) || ""
-    //   );
-    table
-      .getColumn("id")
-      ?.setFilterValue(
-        (columnFilters.find((f) => f.id === "id")?.value as string) || ""
-      );
-    table;
-    // .getColumn("contactDetail.email")
-    // ?.setFilterValue(
-    //   (columnFilters.find((f) => f.id === "contactDetail.email")?.value as string) || ""
-    // );
-    table
-      .getColumn("adminStatus")
-      ?.setFilterValue(
-        (columnFilters.find((f) => f.id === "adminStatus")?.value as string) ||
-          ""
-      );
-    table
-      .getColumn("supplier")
-      ?.setFilterValue(
-        (columnFilters.find((f) => f.id === "supplier")?.value as string) || ""
-      );
-    // table
-    //   .getColumn("bookingStatus")
-    //   ?.setFilterValue(
-    //     (columnFilters.find((f) => f.id === "bookingStatus")
-    //       ?.value as string) || ""
-    //   );
+    table.getColumn("id")?.setFilterValue(
+      (columnFilters.find((f) => f.id === "id")?.value as string) || ""
+    );
+    
+    table.getColumn("adminStatus")?.setFilterValue(
+      (columnFilters.find((f) => f.id === "adminStatus")?.value as string) || ""
+    );
+    
+    table.getColumn("supplier")?.setFilterValue(
+      (columnFilters.find((f) => f.id === "supplier")?.value as string) || ""
+    );
+
     if (date) {
-      table
-        .getColumn("bookingDate")
-        ?.setFilterValue(format(date, "dd-MM-yyyy"));
+      table.getColumn("bookingDate")?.setFilterValue(format(date, "dd-MM-yyyy"));
     }
   };
 
@@ -255,28 +238,28 @@ export default function FlightBookingsTable() {
     table.resetColumnFilters();
   };
 
+  if (loading) {
+    return (
+      <div className="w-full h-96 flex items-center justify-center bg-white rounded-xl">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full p-4 bg-white rounded-xl text-red-600">
+        Error loading bookings: {error}
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-white px-3 rounded-xl">
       <div className="flex items-center gap-2 py-4">
-        {/* <Input
-          placeholder="PNR"
-          value={
-            (columnFilters.find((f) => f.id === "pnrNumber")
-              ?.value as string) || ""
-          }
-          onChange={(event) =>
-            setColumnFilters((prev) => [
-              ...prev.filter((f) => f.id !== "pnrNumber"),
-              { id: "pnrNumber", value: event.target.value },
-            ])
-          }
-          className="w-[120px] rounded-xl"
-        /> */}
         <Input
           placeholder="Booking ID"
-          value={
-            (columnFilters.find((f) => f.id === "id")?.value as string) || ""
-          }
+          value={(columnFilters.find((f) => f.id === "id")?.value as string) || ""}
           onChange={(event) =>
             setColumnFilters((prev) => [
               ...prev.filter((f) => f.id !== "id"),
@@ -292,10 +275,7 @@ export default function FlightBookingsTable() {
               { id: "adminStatus", value },
             ])
           }
-          value={
-            (columnFilters.find((f) => f.id === "adminStatus")
-              ?.value as string) || ""
-          }
+          value={(columnFilters.find((f) => f.id === "adminStatus")?.value as string) || ""}
         >
           <SelectTrigger className="w-[150px] rounded-xl">
             <SelectValue placeholder="Booking Status" />
@@ -315,10 +295,7 @@ export default function FlightBookingsTable() {
               { id: "supplier", value },
             ])
           }
-          value={
-            (columnFilters.find((f) => f.id === "supplier")?.value as string) ||
-            ""
-          }
+          value={(columnFilters.find((f) => f.id === "supplier")?.value as string) || ""}
         >
           <SelectTrigger className="w-[110px] rounded-xl">
             <SelectValue placeholder="Supplier" />
@@ -349,7 +326,7 @@ export default function FlightBookingsTable() {
           </PopoverContent>
         </Popover>
 
-        <Button className="bg-blue rounded-lg" onClick={handleApplyFilters}>
+        <Button className="bg-blue-500 rounded-lg" onClick={handleApplyFilters}>
           Apply
         </Button>
         <Button
@@ -371,14 +348,15 @@ export default function FlightBookingsTable() {
           className="max-w-sm ml-auto rounded-xl"
         />
       </div>
-      <div className="rounded-md border overflow-x-auto ">
-        <Table className="min-w-max scroll-visible">
-          <ScrollArea className="max-w-full overflow-x-auto">
+
+      <div className="rounded-md border">
+        <ScrollArea className="max-h-[600px]">
+          <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="px-3 text-[#1D1F2C]">
+                    <TableHead key={header.id} className="px-3 text-[#1D1F2C] sticky top-0 bg-white">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -398,10 +376,7 @@ export default function FlightBookingsTable() {
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className="px-3 text-[#777980] py-3"
-                      >
+                      <TableCell key={cell.id} className="px-3 text-[#777980] py-3">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -412,18 +387,16 @@ export default function FlightBookingsTable() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
                     No results.
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
-          </ScrollArea>
-        </Table>
+          </Table>
+        </ScrollArea>
       </div>
+
       <div className="flex items-center justify-between py-4">
         <Select
           value={pageSize.toString()}
@@ -442,6 +415,7 @@ export default function FlightBookingsTable() {
             ))}
           </SelectContent>
         </Select>
+        
         <div className="space-x-2">
           <Button
             variant="outline"
