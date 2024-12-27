@@ -1,11 +1,19 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { postBlog, resetState } from "@/redux/blogSlice";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { Editor } from "primereact/editor";
+import { AppDispatch, RootState } from "@/provider/redux-provider";
 
 const AddBlogPage = () => {
+
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [mainDescription, setMainDescription] = useState("");
   const [secondaryImages, setSecondaryImages] = useState<File[]>([]);
   const [secondaryDescription, setSecondaryDescription] = useState("");
+
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, success, error } = useSelector((state: RootState) => state.blogs);
 
   const handleMainImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -29,9 +37,29 @@ const AddBlogPage = () => {
   };
 
   const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log({ mainImage, mainDescription, secondaryImages, secondaryDescription });
+    if (mainImage && secondaryImages.length > 0) {
+      const blogPayload = {
+        mainImg: mainImage,
+        description: mainDescription,
+        secondaryImg: secondaryImages,
+        secondaryDesc: secondaryDescription,
+      };
+
+      dispatch(postBlog(blogPayload));
+    } else {
+      alert("Please fill all fields!");
+    }
   };
+
+  React.useEffect(() => {
+    if (success) {
+      toast.success("Blog posted successfully!");
+      dispatch(resetState());
+    }
+    if (error) {
+      toast.error(error);
+    }
+  }, [success, error, dispatch])
 
   return (
     <div className="p-6 m-4">
@@ -121,7 +149,7 @@ const AddBlogPage = () => {
         onClick={handleSubmit}
         className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
       >
-        Save
+        {loading ? "Saving..." : "Save"}
       </button>
     </div>
   );

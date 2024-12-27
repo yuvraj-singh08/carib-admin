@@ -14,7 +14,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   Select,
@@ -23,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ArrowLeft, Eye, Image, Trash2 } from "lucide-react";
+import { ArrowLeft, Eye, Trash2 } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { useConfirm } from "@/hooks/use-confirm";
 import { AppDispatch } from "@/provider/redux-provider";
@@ -78,7 +77,7 @@ const UserDetails = ({
     </div>
     <Separator className="mb-6" />
 
-    <div className="grid grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-blue mb-4">User Info</h3>
 
@@ -96,83 +95,53 @@ const UserDetails = ({
         <InfoItem label="Pincode" value={user.pincode || "N/A"} />
       </div>
       <div className="space-y-4">
-        {user?.passportDetails?.passportImg && (
+        {user?.passportDetails?.passportImg ? (
           <h3 className="text-lg font-bold text-blue mb-4">Passport Image</h3>
+        ) : (
+          <h3 className="text-lg font-bold text-blue mb-4"> No Passport Found</h3>
+        
         )}
-        {(user?.passportDetails?.passportImg?.length ?? 0) > 0 && (
-          <Dialog>
-            <DialogTrigger>
-              <Button className="w-60" variant="outline" type="button">
-                <Image className="size-5 mr-2" />
-                View Images (
-                {user?.passportDetails?.passportImg?.length ?? 0 > 0
-                  ? user?.passportDetails?.passportImg?.length
-                  : 1}
-                )
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl w-full flex items-center">
+          
               {user?.passportDetails?.passportImg?.map((img, index) => (
-                <Dialog key={index}>
-                  <DialogTrigger className="relative">
+                <>
+                
                     <img
                       src={img}
                       alt={`uploaded-image-${index}`}
-                      className="w-40 h-auto aspect-square rounded-xl border border-black object-cover"
+                      className="w-40 h-auto aspect-square rounded-xl object-cover"
                     />
-                  </DialogTrigger>
-                  <DialogContent className="w-full h-auto overflow-hidden">
-                    <div className="object-contain">
-                      <img
-                        src={img}
-                        alt={`uploaded-image-${index}`}
-                        className="w-full h-[60%] aspect-square rounded-xl object-cover"
-                      />
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                    </>
               ))}
-            </DialogContent>
-          </Dialog>
-        )}
       </div>
     </div>
 
     <h3 className="text-lg font-bold text-blue mt-8 mb-4">
       Additional Details (Co traveler)
     </h3>
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>No.</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>DOB</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Passport No.</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {user.coTraveler && user.coTraveler.length > 0 ? (
-          user.coTraveler.map((coTraveler, index) => (
-            <TableRow key={index}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{coTraveler.name}</TableCell>
-              <TableCell>
-                {new Date(coTraveler.dateOfBirth).toLocaleDateString()}
-              </TableCell>
-              <TableCell>{coTraveler.email}</TableCell>
-              <TableCell>{coTraveler.passportNumber}</TableCell>
-            </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <TableCell colSpan={5} className="text-center">
-              No Co-Travellers Found
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    {user.coTraveler && user.coTraveler.length > 0 ? (
+          user.coTraveler.map((coTraveler) => (
+            <div className="space-y-4">
+        <InfoItem
+          label="Name"
+          value={coTraveler.name || "N/A"}
+        />
+        <InfoItem
+          label="DOB"
+          value={new Date(coTraveler.dateOfBirth).toLocaleDateString() || "N/A"}
+        />
+        <InfoItem
+          label="Email"
+          value={coTraveler.email || "N/A"}
+        />
+        <InfoItem
+          label="Passport No"
+          value={coTraveler.passportNumber || "N/A"}
+        />
+        </div>
+          ))):(
+            <p>No Co-Travellers Found</p>
+          )
+    }
   </div>
 );
 
