@@ -23,9 +23,8 @@ const PaymentOption: React.FC<PaymentOptionProps> = ({
   children,
 }) => (
   <div
-    className={`p-4 border-b cursor-pointer flex items-center justify-between ${
-      isSelected ? "bg-gray-50" : ""
-    }`}
+    className={`p-4 border-b cursor-pointer flex items-center justify-between ${isSelected ? "bg-gray-50" : ""
+      }`}
     onClick={onSelect}
   >
     <div className="flex items-center gap-4">
@@ -41,7 +40,12 @@ const PaymentOption: React.FC<PaymentOptionProps> = ({
 const ManagePaymentCms = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValues, setInputValues] = useState<Record<string, string>>({
+    sepa: "",
+    pago: "",
+    zelle: "",
+    bitcoin: "",
+  });
 
   const paymentOptions = [
     { id: "sepa", name: "SEPA", img: "/payment-cms/sepa.svg" },
@@ -50,11 +54,18 @@ const ManagePaymentCms = () => {
     { id: "bitcoin", name: "Bitcoin", img: "/payment-cms/bitcoin.svg" },
   ];
 
-  const handleSubmit = () => {
+  const handleSubmit = (optionId: string) => {
     console.log({
-      selectedPayment: selectedOption,
-      value: inputValue,
+      selectedPayment: optionId,
+      value: inputValues[optionId],
     });
+  };
+
+  const handleInputChange = (optionId: string, value: string) => {
+    setInputValues((prev) => ({
+      ...prev,
+      [optionId]: value,
+    }));
   };
 
   const handleOptionSelect = (optionId: string) => {
@@ -92,12 +103,15 @@ const ManagePaymentCms = () => {
               <div className="p-4 bg-gray-50 space-y-4">
                 <Textarea
                   placeholder={`Enter ${option.name} details`}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  value={inputValues[option.id]}
+                  onChange={(e) => handleInputChange(option.id, e.target.value)}
                   className="w-full resize-none h-[140px]"
                   required
                 />
-                <Button className="w-full" onClick={handleSubmit}>
+                <Button
+                  className="w-full"
+                  onClick={() => handleSubmit(option.id)}
+                >
                   Submit
                 </Button>
               </div>

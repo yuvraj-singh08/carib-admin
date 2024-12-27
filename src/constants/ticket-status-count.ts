@@ -13,17 +13,17 @@ export const TicketStatusCountsOptions = (ticketCounts: {
   {
     icon: "/icons/ticked.png",
     count: ticketCounts[TicketStatus.RESOLVE]?.toString() || "0", // Ticketed
-    label: "Resolved Tickets",
+    label: "Resolved Ticket",
   },
   {
     icon: "/icons/pending.png",
     count: ticketCounts[TicketStatus.OPEN]?.toString() || "0", // Pending Ticketing
-    label: "Open Tickets",
+    label: "Open Ticket",
   },
   {
     icon: "/icons/pending-payment.png",
     count: ticketCounts[TicketStatus.PENDING]?.toString() || "0", // Pending Ticketing
-    label: "Pending Tickets",
+    label: "Pending Ticket",
   },
 ];
 
