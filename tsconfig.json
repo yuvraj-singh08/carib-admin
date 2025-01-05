@@ -1,17 +1,19 @@
 {
   "files": [],
   "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
-    }
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": ".", // Sets the base directory for resolving non-relative module names
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["src/*"] // Alias @/ to point to the src directory
+    },
+    "strict": true, // Enables all strict type-checking options
+    "esModuleInterop": true, // Allows default imports from CommonJS modules
+    "moduleResolution": "node", // Node-style module resolution
+    "resolveJsonModule": true, // Allows importing .json files
+    "isolatedModules": true, // Ensures each file is treated as a module
+    "skipLibCheck": true // Skips type-checking .d.ts files in node_modules
   }
 }
