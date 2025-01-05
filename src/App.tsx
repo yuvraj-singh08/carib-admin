@@ -13,6 +13,7 @@ import { LoginPage } from "./pages/login";
 import { SignUpPage } from "./pages/signup";
 import { useAuthMiddleware } from "./authMiddleware";
 import AddBlogPage from "./components/landing-settings/add-blog";
+import EditBlogPage from "./components/landing-settings/edit-blog";
 
 function App() {
   useAuthMiddleware();
@@ -32,6 +33,7 @@ function App() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/landing-settings" element={<LandingPageSettings />} />
         <Route path="/add-blog" element={<AddBlogPage />} />
+        <Route path="/edit-blog/:id" element={<EditBlogPage />} />
         <Route path="/customer-details" element={<CustomerDetailsPage />} />
         <Route path="/tickets" element={<TicketsPage />} />
         <Route path="/search-management" element={<SearchManagementPage />} />
