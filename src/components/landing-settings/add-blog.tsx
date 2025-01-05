@@ -60,7 +60,7 @@ const AddBlogPage = () => {
   React.useEffect(() => {
     if (success) {
       toast.success("Blog posted successfully!");
-      navigate("/blogs"); // Redirect to blogs list or another page
+      navigate("/landing-settings"); // Redirect to blogs list or another page
       dispatch(resetState());
     }
     if (error) {
