@@ -4,15 +4,18 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Editor } from "primereact/editor";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
+import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
+import { ArrowLeft } from "lucide-react";
+import { Button } from "../ui/button";
 
 const AddBlogPage = () => {
-
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [mainDescription, setMainDescription] = useState("");
   const [secondaryImages, setSecondaryImages] = useState<File[]>([]);
   const [secondaryDescription, setSecondaryDescription] = useState("");
 
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate(); // Initialize the navigate function
   const { loading, success, error } = useSelector((state: RootState) => state.blogs);
 
   const handleMainImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,33 +40,49 @@ const AddBlogPage = () => {
   };
 
   const handleSubmit = () => {
-    if (mainImage && secondaryImages.length > 0) {
+    if (mainDescription && secondaryDescription) {
       const blogPayload = {
-        mainImg: mainImage,
+        mainImg: "https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75", // Example static URL
         description: mainDescription,
-        secondaryImg: secondaryImages,
+        secondaryImg: [
+          "https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75", // Example static URL
+        ],
         secondaryDesc: secondaryDescription,
       };
-
+  
       dispatch(postBlog(blogPayload));
     } else {
-      alert("Please fill all fields!");
+      toast.error("Please fill all required fields!");
     }
   };
-
+  
+  
   React.useEffect(() => {
     if (success) {
       toast.success("Blog posted successfully!");
+      navigate("/blogs"); // Redirect to blogs list or another page
       dispatch(resetState());
     }
     if (error) {
-      toast.error(error);
+      toast.error(`Error: ${error}`);
     }
-  }, [success, error, dispatch])
+  }, [success, error, dispatch, navigate]);
 
   return (
     <div className="p-6 m-4">
-      <h1 className="text-2xl font-bold mb-6">Add Blog</h1>
+      {/* Back Button */}
+      <div className=" flex justify-between">
+      <h1 className="text-2xl text-blue font-bold mb-6">Add Blog</h1>
+
+      <Button
+        onClick={() => navigate(-1)}
+        variant="outline"
+        className="flex items-center gap-2"
+      >
+        <ArrowLeft size={16} />
+        Back to List
+      </Button>
+      </div>
 
       {/* Main Image */}
       <div className="mb-6">
@@ -147,7 +166,7 @@ const AddBlogPage = () => {
       {/* Submit Button */}
       <button
         onClick={handleSubmit}
-        className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+        className="px-6 py-2 bg-blue text-white rounded-md"
       >
         {loading ? "Saving..." : "Save"}
       </button>

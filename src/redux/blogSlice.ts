@@ -1,19 +1,30 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { axiosInstance } from "@/provider/axios"; // Adjust path based on your project structure
+import axios from "axios";
 
-// Define the API endpoint
-const API_URL = "/admin/add-blog";
+// Define the API endpoints
+const POST_API_URL = "https://travelcarib.tekniche.xyz/admin/add-blog";
+const GET_API_URL = "https://travelcarib.tekniche.xyz/admin/blogs";
 
 // Define the type for the blog payload
 interface BlogPayload {
-  mainImg: File;
+  mainImg: string;
   description: string;
-  secondaryImg: File[];
+  secondaryImg: string[];
+  secondaryDesc: string;
+}
+
+// Define the type for the blog state
+interface Blog {
+  id: string;
+  mainImg: string;
+  description: string;
+  secondaryImg: string[];
   secondaryDesc: string;
 }
 
 // Define the state type
 interface BlogState {
+  blogs: Blog[];
   loading: boolean;
   success: boolean;
   error: string | null;
@@ -21,6 +32,7 @@ interface BlogState {
 
 // Initial state
 const initialState: BlogState = {
+  blogs: [],
   loading: false,
   success: false,
   error: null,
@@ -31,24 +43,30 @@ export const postBlog = createAsyncThunk(
   "blog/postBlog",
   async (blogData: BlogPayload, { rejectWithValue }) => {
     try {
-      const formData = new FormData();
-      formData.append("mainImg", blogData.mainImg);
-      formData.append("description", blogData.description);
-      blogData.secondaryImg.forEach((file, index) => {
-        formData.append(`secondaryImg[${index}]`, file);
-      });
-      formData.append("secondaryDesc", blogData.secondaryDesc);
-
-      const response = await axiosInstance.post(API_URL, formData, {
+      const response = await axios.post(POST_API_URL, blogData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       });
-
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || "Something went wrong"
+      );
+    }
+  }
+);
+
+// Thunk for fetching blogs
+export const getBlogs = createAsyncThunk(
+  "blog/getBlogs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(GET_API_URL);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch blogs"
       );
     }
   }
@@ -67,6 +85,7 @@ const blogSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // POST Blog
       .addCase(postBlog.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -80,6 +99,20 @@ const blogSlice = createSlice({
       .addCase(postBlog.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
+        state.error = action.payload as string;
+      })
+
+      // GET Blogs
+      .addCase(getBlogs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getBlogs.fulfilled, (state, action) => {
+        state.loading = false;
+        state.blogs = action.payload;
+      })
+      .addCase(getBlogs.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload as string;
       });
   },

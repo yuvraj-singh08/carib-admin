@@ -1,89 +1,87 @@
-import React from "react";
-import { MdEdit } from "react-icons/md";
-import { MdDelete } from "react-icons/md";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getBlogs } from "@/redux/blogSlice"; // Import the thunk
+import { AppDispatch, RootState } from "@/provider/redux-provider"; // Adjust based on your store structure
+import { MdEdit, MdDelete } from "react-icons/md";
 import { FaEye } from "react-icons/fa6";
-import { Link } from "react-router-dom";
-
-interface Blog {
-  id: number;
-  image: string;
-  title: string;
-  date: string;
-}
 
 const BlogTable: React.FC = () => {
-  const blogs: Blog[] = [
-    {
-      id: 1,
-      image: "https://pixlr.com/images/generator/image-editor.webp",
-      title: "First Blog",
-      date: "2024-12-13",
-    },
-    {
-      id: 2,
-      image: "https://pixlr.com/images/generator/image-editor.webp",
-      title: "Second Blog",
-      date: "2024-12-12",
-    },
-    // Add more blog data here...
-  ];
+  const dispatch = useDispatch<AppDispatch>(); // Use a typed dispatch hook
 
-  const handleEdit = (id: number) => {
+  // Access blogs state
+  const { blogs, loading, error } = useSelector((state: RootState) => state.blogs);
+
+  useEffect(() => {
+    dispatch(getBlogs());
+  }, [dispatch]);
+
+  const handleEdit = (id: string) => {
     console.log(`Edit blog with id: ${id}`);
   };
 
-  const handleView = (id: number) => {
+  const handleView = (id: string) => {
     console.log(`View blog with id: ${id}`);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     console.log(`Delete blog with id: ${id}`);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="w-full bg-white rounded-xl p-10">
-      <div className="flex justify-end mb-4">
-        <Link to="/add-blog" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-          + Blogs
-        </Link>
+      <div className="flex justify-between mb-4">
+        <h1 className="font-semibold text-xl text-blue">Blogs</h1>
+        <button className="bg-blue text-white px-4 py-2 rounded">+ Blogs</button>
       </div>
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead className="bg-gray-100">
           <tr>
             <th className="border border-gray-300 px-4 py-2">S.No</th>
             <th className="border border-gray-300 px-4 py-2">Image</th>
-            <th className="border border-gray-300 px-4 py-2">Title</th>
-            <th className="border border-gray-300 px-4 py-2">Date</th>
+            <th className="border border-gray-300 px-4 py-2">Description</th>
+            <th className="border border-gray-300 px-4 py-2">Secondary Description</th>
             <th className="border border-gray-300 px-4 py-2">Action</th>
           </tr>
         </thead>
         <tbody>
           {blogs.map((blog, index) => (
             <tr key={blog.id} className="odd:bg-white even:bg-gray-50">
-              <td className="border border-gray-300 px-4 py-2 text-center text-sm">{index + 1}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
               <td className="border border-gray-300 px-4 py-2 text-center">
-                <img src={blog.image} alt={blog.title} className="w-16 h-16 object-cover rounded-md mx-auto" />
+                <img
+                  src={blog.mainImg}
+                  alt="Blog"
+                  className="w-16 h-16 object-cover rounded-md mx-auto"
+                />
               </td>
-              <td className="border border-gray-300 px-4 py-2 text-sm text-center">{blog.title}</td>
-              <td className="border border-gray-300 px-4 py-2 text-sm text-center">{blog.date}</td>
+              <td className="border border-gray-300 px-4 py-2">{blog.description}</td>
+              <td className="border border-gray-300 px-4 py-2">{blog.secondaryDesc}</td>
               <td className="border border-gray-300 px-4 py-2 text-center">
                 <button
                   onClick={() => handleEdit(blog.id)}
-                  className="bg-blue-500 text-white bg-green-500 hover:bg-green-600 p-2 rounded mr-2 hover:bg-blue-600"
+                  className="bg-green-500 text-white p-2 rounded mr-2 hover:bg-green-600"
                 >
-                  <MdEdit/>
+                  <MdEdit />
                 </button>
                 <button
                   onClick={() => handleView(blog.id)}
-                  className="bg-gray-500 text-white bg-yellow-500 hover:bg-yellow-600 p-2 rounded mr-2 hover:bg-gray-600"
+                  className="bg-yellow-500 text-white p-2 rounded mr-2 hover:bg-yellow-600"
                 >
-                  <FaEye/>
+                  <FaEye />
                 </button>
                 <button
                   onClick={() => handleDelete(blog.id)}
                   className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
                 >
-                  <MdDelete/>
+                  <MdDelete />
                 </button>
               </td>
             </tr>
@@ -95,3 +93,4 @@ const BlogTable: React.FC = () => {
 };
 
 export default BlogTable;
+
