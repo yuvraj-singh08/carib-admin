@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
@@ -23,11 +23,11 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        blue:"#223A60",
-        gray:"#93A3AB",
-        customGreen:'#1CB205',
-        customBlue:'#0561fc',
-        lightGray:'#C9CFD2',
+        blue: "#223A60",
+        gray: "#93A3AB",
+        customGreen: '#1CB205',
+        customBlue: '#0561fc',
+        lightGray: '#C9CFD2',
         primary: {
           DEFAULT: "#223A60",
           foreground: "hsl(var(--primary-foreground))",
@@ -72,16 +72,16 @@ module.exports = {
           to: { height: "0" },
         },
         'logo-cloud': {
-       from: { transform: 'translateX(0)' },
-       to: { transform: 'translateX(calc(-100% - 4rem))' },
-     },
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(calc(-100% - 4rem))' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        'logo-cloud': 'logo-cloud 30s linear infinite', 
+        'logo-cloud': 'logo-cloud 30s linear infinite',
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
