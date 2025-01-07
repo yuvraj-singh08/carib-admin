@@ -65,9 +65,20 @@ const getStatusColor = (status: AdminStatus) => {
   }
 };
 
+const BookingStatusArray = [
+  { value: "TICKETED", label: "Ticketed" },
+  { value: "PENDING_TICKET", label: "Pending Ticketing" },
+  { value: "PENDING_PAYMENT", label: "Pending Payment" },
+  { value: "EXPIRED", label: "Expired" },
+  { value: "FAILED_BOOKING", label: "Failed Booking" },
+]
+
 export default function FlightBookingsTable() {
   const dispatch = useDispatch<AppDispatch>();
-  const { bookings, loading, error } = useSelector((state: RootState) => state.bookings);
+  const bookings = useSelector((state: RootState) => state.bookings.bookings);
+  const loading = useSelector((state: RootState) => state.bookings.loading);
+  const error = useSelector((state: RootState) => state.bookings.error);
+  console.log("Bookings", bookings);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -77,7 +88,7 @@ export default function FlightBookingsTable() {
   const [pageSize, setPageSize] = useState(10);
 
 
-  
+
   useEffect(() => {
     dispatch(fetchBookings());
   }, [dispatch]);
@@ -217,11 +228,11 @@ export default function FlightBookingsTable() {
     table.getColumn("id")?.setFilterValue(
       (columnFilters.find((f) => f.id === "id")?.value as string) || ""
     );
-    
+
     table.getColumn("adminStatus")?.setFilterValue(
       (columnFilters.find((f) => f.id === "adminStatus")?.value as string) || ""
     );
-    
+
     table.getColumn("supplier")?.setFilterValue(
       (columnFilters.find((f) => f.id === "supplier")?.value as string) || ""
     );
@@ -360,9 +371,9 @@ export default function FlightBookingsTable() {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -415,7 +426,7 @@ export default function FlightBookingsTable() {
             ))}
           </SelectContent>
         </Select>
-        
+
         <div className="space-x-2">
           <Button
             variant="outline"
