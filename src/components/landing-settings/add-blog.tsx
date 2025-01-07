@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Editor } from "primereact/editor";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
-import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../ui/button";
 
@@ -15,7 +15,7 @@ const AddBlogPage = () => {
   const [secondaryDescription, setSecondaryDescription] = useState("");
 
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
   const { loading, success, error } = useSelector((state: RootState) => state.blogs);
 
   const handleMainImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,28 +39,30 @@ const AddBlogPage = () => {
     setSecondaryImages(secondaryImages.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    if (mainDescription && secondaryDescription) {
+  const handleSubmit = async () => {
+    if (!mainImage || !mainDescription || !secondaryDescription) {
+      toast.error("Please fill all required fields!");
+      return;
+    }
+  
+    try {
       const blogPayload = {
-        mainImg: "https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75", // Example static URL
+        mainImg: mainImage, // Pass File here
         description: mainDescription,
-        secondaryImg: [
-          "https://next-images.123rf.com/index/_next/image/?url=https://assets-cdn.123rf.com/index/static/assets/top-section-bg.jpeg&w=3840&q=75", // Example static URL
-        ],
+        secondaryImg: secondaryImages, // Pass array of Files here
         secondaryDesc: secondaryDescription,
       };
   
       dispatch(postBlog(blogPayload));
-    } else {
-      toast.error("Please fill all required fields!");
+    } catch (uploadError) {
+      toast.error("Image upload failed. Please try again.");
     }
   };
-  
-  
+
   React.useEffect(() => {
     if (success) {
       toast.success("Blog posted successfully!");
-      navigate("/landing-settings"); // Redirect to blogs list or another page
+      navigate("/landing-settings");
       dispatch(resetState());
     }
     if (error) {
@@ -71,17 +73,17 @@ const AddBlogPage = () => {
   return (
     <div className="p-6 m-4">
       {/* Back Button */}
-      <div className=" flex justify-between">
-      <h1 className="text-2xl text-blue font-bold mb-6">Add Blog</h1>
+      <div className="flex justify-between">
+        <h1 className="text-2xl text-blue font-bold mb-6">Add Blog</h1>
 
-      <Button
-        onClick={() => navigate(-1)}
-        variant="outline"
-        className="flex items-center gap-2"
-      >
-        <ArrowLeft size={16} />
-        Back to List
-      </Button>
+        <Button
+          onClick={() => navigate(-1)}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft size={16} />
+          Back to List
+        </Button>
       </div>
 
       {/* Main Image */}

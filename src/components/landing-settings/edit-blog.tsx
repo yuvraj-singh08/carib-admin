@@ -11,12 +11,11 @@ const EditBlogPage = () => {
   const navigate = useNavigate();
 
   const [mainImage, setMainImage] = useState<string>("");
-  const [mainDescription, setMainDescription] = useState<string>("");  // Ensure it's a string
+  const [mainDescription, setMainDescription] = useState<string>("");
   const [secondaryImages, setSecondaryImages] = useState<string[]>([]);
   const [secondaryDescription, setSecondaryDescription] = useState<string>("");
 
   useEffect(() => {
-    // Fetch blog data
     const fetchBlog = async () => {
       try {
         const response = await axios.get(
@@ -24,12 +23,10 @@ const EditBlogPage = () => {
         );
         const { mainImg, description, secondaryImg, secondaryDesc } = response.data;
 
-        // Ensure the descriptions are set as strings
-        setMainImage(mainImg || ""); // Fallback to empty string if undefined
-        setMainDescription(description || ""); // Set the description safely
-        setSecondaryImages(secondaryImg || []); // Ensure secondary images is an array
-        setSecondaryDescription(secondaryDesc || ""); // Fallback to empty string
-        console.log(mainDescription);
+        setMainImage(mainImg || ""); // Set main image URL
+        setMainDescription(description || "");
+        setSecondaryImages(secondaryImg || []); // Set secondary images as URLs
+        setSecondaryDescription(secondaryDesc || "");
       } catch (error) {
         toast.error("Failed to fetch blog details.");
       }
@@ -54,6 +51,27 @@ const EditBlogPage = () => {
     } catch (error) {
       toast.error("Failed to update blog.");
     }
+  };
+
+  const handleMainImageUpload = (file: File) => {
+    const fileUrl = URL.createObjectURL(file);
+    setMainImage(fileUrl);
+
+    // Cleanup the object URL after use
+    return () => URL.revokeObjectURL(fileUrl);
+  };
+
+  const handleSecondaryImageUpload = (file: File, index: number) => {
+    const fileUrl = URL.createObjectURL(file);
+
+    setSecondaryImages((prevImages) => {
+      const updatedImages = [...prevImages];
+      updatedImages[index] = fileUrl; // Replace the specific image
+      return updatedImages;
+    });
+
+    // Cleanup the object URL after use
+    return () => URL.revokeObjectURL(fileUrl);
   };
 
   return (
@@ -83,8 +101,7 @@ const EditBlogPage = () => {
           accept="image/*"
           onChange={(e) => {
             if (e.target.files && e.target.files[0]) {
-              const fileUrl = URL.createObjectURL(e.target.files[0]);
-              setMainImage(fileUrl);
+              handleMainImageUpload(e.target.files[0]);
             }
           }}
           className="hidden"
@@ -101,42 +118,47 @@ const EditBlogPage = () => {
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Main Description</label>
         <Editor
-          value={mainDescription}  // Bind the state to the editor
-          onTextChange={(e) => setMainDescription(e.htmlValue || "")}  // Update the state on text change
+          value={mainDescription}
+          onTextChange={(e) => setMainDescription(e.htmlValue || "")}
           style={{ height: "200px" }}
         />
       </div>
 
       <div className="mb-6">
-        <label
-          htmlFor="secondaryImages"
-          className="block text-sm font-medium border p-3 rounded-lg text-gray-700 mb-2 cursor-pointer hover:text-blue-600"
-        >
-          Upload Secondary Images (Max 3)
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Secondary Images (Max 3)
         </label>
-        <input
-          id="secondaryImages"
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => {
-            if (e.target.files) {
-              const filesArray = Array.from(e.target.files).map((file) =>
-                URL.createObjectURL(file)
-              );
-              setSecondaryImages(filesArray);
-            }
-          }}
-          className="hidden"
-        />
-        <div className="mt-4 flex gap-2">
-          {secondaryImages.map((img, idx) => (
-            <img
-              key={idx}
-              src={img}
-              alt={`Secondary ${idx}`}
-              className="w-20 h-20 object-cover border rounded-md"
-            />
+        <div className="grid grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="relative">
+              <label
+                htmlFor={`secondaryImage-${index}`}
+                className="block text-sm font-medium text-gray-700 cursor-pointer"
+              >
+                {secondaryImages[index] ? (
+                  <img
+                    src={secondaryImages[index]}
+                    alt={`Secondary ${index + 1}`}
+                    className="w-32 h-32 object-cover border rounded-md"
+                  />
+                ) : (
+                  <div className="w-32 h-32 border rounded-md flex items-center justify-center text-gray-500">
+                    Upload
+                  </div>
+                )}
+              </label>
+              <input
+                id={`secondaryImage-${index}`}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    handleSecondaryImageUpload(e.target.files[0], index);
+                  }
+                }}
+                className="hidden"
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -146,8 +168,8 @@ const EditBlogPage = () => {
           Secondary Description
         </label>
         <Editor
-          value={secondaryDescription}  // Bind the state to the editor
-          onTextChange={(e) => setSecondaryDescription(e.htmlValue || "")}  // Update the state on text change
+          value={secondaryDescription}
+          onTextChange={(e) => setSecondaryDescription(e.htmlValue || "")}
           style={{ height: "200px" }}
         />
       </div>
