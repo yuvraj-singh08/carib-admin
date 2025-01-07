@@ -65,13 +65,13 @@ const getStatusColor = (status: AdminStatus) => {
   }
 };
 
-const BookingStatusArray = [
-  { value: "TICKETED", label: "Ticketed" },
-  { value: "PENDING_TICKET", label: "Pending Ticketing" },
-  { value: "PENDING_PAYMENT", label: "Pending Payment" },
-  { value: "EXPIRED", label: "Expired" },
-  { value: "FAILED_BOOKING", label: "Failed Booking" },
-]
+// const BookingStatusArray = [
+//   { value: "TICKETED", label: "Ticketed" },
+//   { value: "PENDING_TICKET", label: "Pending Ticketing" },
+//   { value: "PENDING_PAYMENT", label: "Pending Payment" },
+//   { value: "EXPIRED", label: "Expired" },
+//   { value: "FAILED_BOOKING", label: "Failed Booking" },
+// ]
 
 export default function FlightBookingsTable() {
   const dispatch = useDispatch<AppDispatch>();
