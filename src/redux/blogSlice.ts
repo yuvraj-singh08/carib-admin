@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { uploadImage } from "@/hooks/aws";
 import axios from "axios";
 
 // Define the API endpoints
@@ -7,20 +8,21 @@ const GET_API_URL = "https://travelcarib.tekniche.xyz/admin/blogs";
 
 // Define the type for the blog payload
 interface BlogPayload {
-  mainImg: string;
+  mainImg: File | string;
   description: string;
-  secondaryImg: string[];
+  secondaryImg: (File | string)[];
   secondaryDesc: string;
 }
 
 // Define the type for the blog state
 interface Blog {
   id: string;
-  mainImg: string;
+  mainImg: string; // Updated to string for URL
   description: string;
-  secondaryImg: string[];
+  secondaryImg: string[]; // URLs for secondary images
   secondaryDesc: string;
 }
+
 
 // Define the state type
 interface BlogState {
@@ -43,15 +45,29 @@ export const postBlog = createAsyncThunk(
   "blog/postBlog",
   async (blogData: BlogPayload, { rejectWithValue }) => {
     try {
-      const response = await axios.post(POST_API_URL, blogData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const mainImgUrl =
+        typeof blogData.mainImg === "string"
+          ? blogData.mainImg
+          : await uploadImage(blogData.mainImg);
+
+      const secondaryImgUrls = await Promise.all(
+        blogData.secondaryImg.map((img) =>
+          typeof img === "string" ? img : uploadImage(img)
+        )
+      );
+
+      const newData = {
+        mainImg: mainImgUrl,
+        description: blogData.description,
+        secondaryImg: secondaryImgUrls,
+        secondaryDesc: blogData.secondaryDesc,
+      };
+
+      const response = await axios.post(POST_API_URL, newData);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Something went wrong"
+        error.response?.data?.message || "Failed to create blog"
       );
     }
   }

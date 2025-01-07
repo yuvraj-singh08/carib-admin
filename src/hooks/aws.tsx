@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const uploadImage = async (img: File) => {
-  let imgUrl = null;
+  let imgUrl: string = "";
 
   await axios
     .get(import.meta.env.VITE_BACKEND_URL + "/bucket/get-url")
@@ -16,7 +16,5 @@ export const uploadImage = async (img: File) => {
       });
     });
 
-  return imgUrl;
+  return imgUrl;
 };
-
-
