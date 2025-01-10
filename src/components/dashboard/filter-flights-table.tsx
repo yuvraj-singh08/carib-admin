@@ -299,7 +299,7 @@ export default function FlightBookingsTable() {
             ))}
           </SelectContent>
         </Select>
-        <Select
+        {/* <Select
           onValueChange={(value) =>
             setColumnFilters((prev) => [
               ...prev.filter((f) => f.id !== "supplier"),
@@ -316,7 +316,7 @@ export default function FlightBookingsTable() {
             <SelectItem value="kiusys">Kiusys</SelectItem>
             <SelectItem value="Duffel">Duffel</SelectItem>
           </SelectContent>
-        </Select>
+        </Select> */}
         <Popover>
           <PopoverTrigger asChild>
             <Button

@@ -2,27 +2,23 @@ import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { getBlogs } from "@/redux/blogSlice"; // Import the thunk
-import { AppDispatch, RootState } from "@/provider/redux-provider"; // Adjust based on your store structure
+import { getBlogs } from "@/redux/blogSlice";
+import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { FaEye } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-
-// Utility function to strip HTML tags
-const stripHtmlTags = (html: string): string => {
-  const tempElement = document.createElement("div");
-  tempElement.innerHTML = html;
-  return tempElement.textContent || tempElement.innerText || "";
-};
 
 const BlogTable: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const [deletePopup, setDeletePopup] = useState<null | string>(null); // To track the blog to be deleted
+  const [deletePopup, setDeletePopup] = useState<null | string>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
 
-  const { blogs, loading, error } = useSelector((state: RootState) => state.blogs);
+  const { blogs } = useSelector((state: RootState) => state.blogs);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     dispatch(getBlogs());
@@ -33,8 +29,9 @@ const BlogTable: React.FC = () => {
   };
 
   const handleView = (id: string) => {
-    console.log(`View blog with id: ${id}`);
+    navigate(`/blog/${id}`);
   };
+
 
   const confirmDelete = async (id: string) => {
     try {
@@ -44,7 +41,7 @@ const BlogTable: React.FC = () => {
     } catch (error) {
       toast.error("Failed to delete blog. Please try again.");
     } finally {
-      setDeletePopup(null); // Close the popup after deletion
+      setDeletePopup(null);
     }
   };
 
@@ -54,7 +51,7 @@ const BlogTable: React.FC = () => {
 
   const handleOutsideClick = (e: MouseEvent) => {
     if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
-      setDeletePopup(null); // Close the popup when clicking outside
+      setDeletePopup(null);
     }
   };
 
@@ -69,13 +66,26 @@ const BlogTable: React.FC = () => {
     };
   }, [deletePopup]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const totalPages = Math.ceil(blogs.length / rowsPerPage);
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  const paginatedBlogs = blogs.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setRowsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when rows per page changes
+  };
+
+  const truncateWords = (text: string, wordLimit: number): string => {
+    const words = text.split(" ");
+    return words.slice(0, wordLimit).join(" ") + (words.length > wordLimit ? "..." : "");
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="w-full bg-white rounded-xl p-10">
@@ -96,9 +106,11 @@ const BlogTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {blogs.map((blog, index) => (
+          {paginatedBlogs.map((blog, index) => (
             <tr key={blog.id} className="odd:bg-white even:bg-gray-50">
-              <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                {(currentPage - 1) * rowsPerPage + index + 1}
+              </td>
               <td className="border border-gray-300 px-4 py-2 text-center">
                 <img
                   src={blog.mainImg}
@@ -107,10 +119,20 @@ const BlogTable: React.FC = () => {
                 />
               </td>
               <td className="border border-gray-300 px-4 py-2">
-                {stripHtmlTags(blog.description)}
+                <p
+                  className="text-[0.85rem] font-medium text-[#667085]"
+                  dangerouslySetInnerHTML={{
+                    __html: truncateWords(blog.description, 10),
+                  }}
+                />
               </td>
               <td className="border border-gray-300 px-4 py-2">
-                {stripHtmlTags(blog.secondaryDesc)}
+                <p
+                  className="text-[0.85rem] font-medium text-[#667085]"
+                  dangerouslySetInnerHTML={{
+                    __html: truncateWords(blog.secondaryDesc || "", 15),
+                  }}
+                />
               </td>
               <td className="border border-gray-300 px-4 py-2 text-center">
                 <button
@@ -136,6 +158,48 @@ const BlogTable: React.FC = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-between mt-4">
+        <select
+          value={rowsPerPage}
+          onChange={handleRowsPerPageChange}
+          className="border border-gray px-2 py-1 rounded"
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+        </select>
+        <div className="flex items-center">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 border cursor-pointer text-gray ${currentPage === 1 ? "text-gray-400" : "text-blue"}`}
+          >
+            Previous
+          </button>
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => handlePageChange(i + 1)}
+              className={`px-4 py-2 border ${
+                currentPage === i + 1 ? "bg-blue text-white" : "text-blue"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 border cursor-pointer ${
+              currentPage === totalPages ? "text-gray-400" : "text-blue"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      </div>
 
       {/* Delete confirmation popup */}
       {deletePopup && (
