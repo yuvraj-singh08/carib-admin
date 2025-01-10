@@ -29,8 +29,9 @@ const BlogTable: React.FC = () => {
   };
 
   const handleView = (id: string) => {
-    console.log(`View blog with id: ${id}`);
+    navigate(`/blog/${id}`);
   };
+
 
   const confirmDelete = async (id: string) => {
     try {
