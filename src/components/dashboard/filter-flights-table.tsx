@@ -268,7 +268,7 @@ export default function FlightBookingsTable() {
   return (
     <div className="w-full bg-white px-3 rounded-xl">
       <div className="flex items-center gap-2 py-4">
-        <Input
+        {/* <Input
           placeholder="Booking ID"
           value={(columnFilters.find((f) => f.id === "id")?.value as string) || ""}
           onChange={(event) =>
@@ -278,7 +278,7 @@ export default function FlightBookingsTable() {
             ])
           }
           className="w-[130px] rounded-xl"
-        />
+        /> */}
         <Select
           onValueChange={(value) =>
             setColumnFilters((prev) => [
@@ -337,7 +337,7 @@ export default function FlightBookingsTable() {
           </PopoverContent>
         </Popover>
 
-        <Button className="bg-blue-500 rounded-lg" onClick={handleApplyFilters}>
+        <Button className="bg-blue rounded-lg" onClick={handleApplyFilters}>
           Apply
         </Button>
         <Button
