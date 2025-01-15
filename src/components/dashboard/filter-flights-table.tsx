@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -65,19 +66,13 @@ const getStatusColor = (status: AdminStatus) => {
   }
 };
 
-// const BookingStatusArray = [
-//   { value: "TICKETED", label: "Ticketed" },
-//   { value: "PENDING_TICKET", label: "Pending Ticketing" },
-//   { value: "PENDING_PAYMENT", label: "Pending Payment" },
-//   { value: "EXPIRED", label: "Expired" },
-//   { value: "FAILED_BOOKING", label: "Failed Booking" },
-// ]
 
 export default function FlightBookingsTable() {
   const dispatch = useDispatch<AppDispatch>();
   const bookings = useSelector((state: RootState) => state.bookings.bookings);
   const loading = useSelector((state: RootState) => state.bookings.loading);
   const error = useSelector((state: RootState) => state.bookings.error);
+  const navigate = useNavigate();
   console.log("Bookings", bookings);
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -129,7 +124,9 @@ export default function FlightBookingsTable() {
       accessorKey: "id",
       header: "Internal Booking ID",
       cell: ({ row }) => (
-        <div className="text-[#0561FC]">{row.getValue("id")}</div>
+        <div className="text-[#0561FC] cursor-pointer"
+        onClick={() => navigate(`/flightdetails`)}
+        >{row.getValue("id")}</div>
       ),
     },
     {
@@ -459,6 +456,7 @@ export default function FlightBookingsTable() {
           </Button>
         </div>
       </div>
+
     </div>
   );
 }
