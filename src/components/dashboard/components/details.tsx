@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface Passenger {
   eTicketNumber: number;
@@ -9,7 +9,7 @@ interface Passenger {
   gender: "Male" | "Female" | "Other";
 }
 
-const passengers: Passenger[] = [
+const initialPassengers: Passenger[] = [
   {
     eTicketNumber: 1,
     pnrNumber: "A1GEZX",
@@ -28,16 +28,19 @@ const passengers: Passenger[] = [
   },
 ];
 
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const statusStyles = {
-    Pending: "text-orange-500",
-    Confirm: "text-green-500",
+const PassengerTable: React.FC = () => {
+  const [passengers, setPassengers] = useState<Passenger[]>(initialPassengers);
+
+  const handleStatusChange = (eTicketNumber: number, newStatus: "Pending" | "Confirm") => {
+    setPassengers((prevPassengers) =>
+      prevPassengers.map((passenger) =>
+        passenger.eTicketNumber === eTicketNumber
+          ? { ...passenger, status: newStatus }
+          : passenger
+      )
+    );
   };
 
-  return <span className={statusStyles[status as keyof typeof statusStyles]}>{status}</span>;
-};
-
-const PassengerTable: React.FC = () => {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full border border-gray-300 bg-white">
@@ -60,7 +63,14 @@ const PassengerTable: React.FC = () => {
               <td className="px-4 py-2 text-sm text-gray-900 font-medium">{passenger.lastName}</td>
               <td className="px-4 py-2 text-sm text-gray-900">{passenger.gender}</td>
               <td className="px-4 py-2 text-sm">
-                <StatusBadge status={passenger.status} />
+                <select
+                  value={passenger.status}
+                  onChange={(e) => handleStatusChange(passenger.eTicketNumber, e.target.value as "Pending" | "Confirm")}
+                  className="border border-gray-300 rounded px-2 py-1"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Confirm">Confirm</option>
+                </select>
               </td>
             </tr>
           ))}
