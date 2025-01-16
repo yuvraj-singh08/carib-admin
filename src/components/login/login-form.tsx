@@ -88,6 +88,7 @@ export function LogInForm() {
           type="button"
           variant="ghost"
           className="w-full text-sm underline flex items-center justify-end hover:bg-transparent"
+          onClick={() => navigate("/forgot-password")}
         >
           Forgot Password
         </Button>

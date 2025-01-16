@@ -10,12 +10,13 @@ import CustomerDetailsPage from "./pages/customers-details";
 import TicketsPage from "./pages/tickets";
 import SearchManagementPage from "./pages/search-management";
 import { LoginPage } from "./pages/login";
-import { SignUpPage } from "./pages/signup";
 import { useAuthMiddleware } from "./authMiddleware";
 import AddBlogPage from "./components/landing-settings/add-blog";
 import EditBlogPage from "./components/landing-settings/edit-blog";
 import BlogPage from "./pages/blog/blog-page";
 import FlightBooking from "./components/dashboard/components/FlightBooking";
+import ForgotPasswordComponent from "./components/forgot-password/forgot-password";
+import ResetPasswordPage from "./components/reset-password/reset-password";
 
 function App() {
   useAuthMiddleware();
@@ -24,7 +25,8 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordComponent />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* Private Routes */}
         <Route path="/" element={<HomePage />} />

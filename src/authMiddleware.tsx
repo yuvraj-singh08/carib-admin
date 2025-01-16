@@ -8,7 +8,7 @@ export const useAuthMiddleware = () => {
 
   useEffect(() => {
     const isLoggedIn = checkIfUserIsLoggedIn();
-    const publicRoutes = ["/login", "/signup"]; // Only login and signup routes are public
+    const publicRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"]; // Only login and signup routes are public
 
     // Redirect to login page if user is not logged in and trying to access a private route
     if (!isLoggedIn && !publicRoutes.includes(location.pathname)) {
