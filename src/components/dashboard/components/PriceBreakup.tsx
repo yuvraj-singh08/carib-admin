@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 
 const PriceBreakup: React.FC = () => {
@@ -33,34 +34,45 @@ const PriceBreakup: React.FC = () => {
 
             <div className="bg-white p-4 rounded-md shadow-md mt-4">
                 <p>Booking Status</p>
-                <div className="relative inline-block w-64 mt-1">
-                    <div
-                        className={`w-full px-4 py-2 text-black border rounded cursor-pointer ${getSelectedOptionColor()}`}
-                        onClick={toggleDropdown}
-                    >
-                        {selectedOption}
+
+                <div className=" flex justify-between items-center gap-1">
+                    <div className="relative inline-block w-64 mt-1">
+                        <div
+                            className={`w-full px-4 py-2 text-black border rounded cursor-pointer ${getSelectedOptionColor()}`}
+                            onClick={toggleDropdown}
+                        >
+                            {selectedOption}
+                        </div>
+
+                        {isDropdownOpen && (
+                            <div className="absolute w-full mt-2 bg-white border rounded shadow-lg z-10">
+                                {options.map((option) => (
+                                    <div
+                                        key={option.label}
+                                        className={`flex items-center px-4 py-2 cursor-pointer hover:bg-gray`}
+                                        onClick={() => handleOptionClick(option.label)}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="status"
+                                            checked={selectedOption === option.label}
+                                            readOnly
+                                            className="mr-2"
+                                        />
+                                        {option.label}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    {isDropdownOpen && (
-                        <div className="absolute w-full mt-2 bg-white border rounded shadow-lg z-10">
-                            {options.map((option) => (
-                                <div
-                                    key={option.label}
-                                    className={`flex items-center px-4 py-2 cursor-pointer hover:bg-gray`}
-                                    onClick={() => handleOptionClick(option.label)}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="status"
-                                        checked={selectedOption === option.label}
-                                        readOnly
-                                        className="mr-2"
-                                    />
-                                    {option.label}
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <Button size="icon" variant="secondary">
+                        <img
+                            src="/icons/plane.png"
+                            alt="icon"
+                            className="size-4 shrink-0"
+                        />
+                    </Button>
                 </div>
 
             </div>
@@ -86,7 +98,7 @@ const PriceBreakup: React.FC = () => {
                     <li className="flex justify-between">
                         <div className=" flex flex-col">
                             <span>Ancillary Charges</span>
-                            <span>(Seat/Baggage/Meal Charges)</span>
+                            <span>(Baggage)</span>
                         </div>
                         <span>₹ 350</span>
                     </li>
