@@ -1,6 +1,7 @@
 import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { DateRange } from "react-day-picker";
 
 const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 
@@ -34,6 +35,7 @@ export interface Booking {
 
 interface BookingState {
   bookings: Booking[];
+  total:number
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   loading: boolean;
@@ -41,6 +43,7 @@ interface BookingState {
 
 const initialState: BookingState = {
   bookings: [],
+  total:0,
   status: "idle",
   error: null,
   loading: false,
@@ -48,10 +51,22 @@ const initialState: BookingState = {
 
 export const fetchBookings = createAsyncThunk(
   "bookings/fetchBookings",
-  async (_, { rejectWithValue }) => {
+  async (
+    params: {
+      date?: DateRange | undefined;
+      pageIndex: number;
+      pageSize: number;
+      globalFilter?: string;
+      searchKey?:string;
+      status?:string
+    },
+
+     { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`${apiUrl}/book/bookings`);
-      return response.data.data;
+      const response = await axiosInstance.post(`${apiUrl}/book/bookings`,
+       params
+      );
+      return response.data;
     } catch (error) {
       if (error instanceof Error) {
         return rejectWithValue(error.message);
@@ -112,10 +127,11 @@ const bookingsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchBookings.fulfilled, (state, action: PayloadAction<Booking[]>) => {
+      .addCase(fetchBookings.fulfilled, (state, action: PayloadAction<any>) => {
         state.status = "succeeded";
         state.loading = false;
-        state.bookings = action.payload;
+        state.bookings = action.payload.data;
+        state.total=action.payload.total;
         state.error = null;
       })
       .addCase(fetchBookings.rejected, (state, action) => {
