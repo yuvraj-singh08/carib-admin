@@ -91,7 +91,7 @@ export default function FlightBookingsTable() {
     from: new Date(new Date().getFullYear(), 0, 1),
     to: new Date(),
   });
-  const [pageIndex, setPageIndex] = useState(2);
+  const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [searchKey, setSearchKey] = useState("");
   const [status, setStatus] = useState<string | undefined>();
@@ -235,7 +235,7 @@ export default function FlightBookingsTable() {
       columnFilters,
       globalFilter,
       pagination: {
-        pageIndex,
+        pageIndex:0,
         pageSize,
       },
     },
@@ -485,6 +485,7 @@ export default function FlightBookingsTable() {
           onValueChange={(value:any) => {
             // table.setPageSize(Number(value));
             setPageSize(Number(value));
+            setPageIndex(0);
           }}
         >
           <SelectTrigger className="w-[80px]">
