@@ -164,7 +164,7 @@ const BookingTicketsTableWithDateFilter = () => {
       <div className="w-full bg-white px-3 rounded-xl">
         <div className="flex items-center justify-between py-4">
           <div className="flex space-x-2">
-            <DatePickerWithRange onDateChange={handleDateRangeChange} />
+            <DatePickerWithRange date={dateRange} onDateChange={handleDateRangeChange} />
             <Select value={statusFilter} onValueChange={handleStatusChange}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Filter by status" />

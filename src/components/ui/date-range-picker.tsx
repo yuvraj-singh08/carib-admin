@@ -18,7 +18,7 @@ const years = Array.from({ length: currentYear - 1899 }, (_, i) => currentYear -
 
 interface DatePickerWithRangeProps {
   onDateChange: (range: DateRange | undefined) => void;
-  date:any
+  date?:any
 }
 
 const DatePickerWithRange: React.FC<DatePickerWithRangeProps> = ({ onDateChange,date }) => {
