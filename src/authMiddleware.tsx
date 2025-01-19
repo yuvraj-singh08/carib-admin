@@ -28,6 +28,7 @@ const checkIfUserIsLoggedIn = (): boolean => {
   return !!token; // Returns true if the token exists
 };
 
+
 // Logout function to clear the token and redirect
 export const handleLogout = (navigate: any) => {
   localStorage.removeItem("authToken"); // Remove the auth token from localStorage

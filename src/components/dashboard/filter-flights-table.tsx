@@ -11,9 +11,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Calendar as CalendarIcon } from "lucide-react";
+// import { Calendar as CalendarIcon } from "lucide-react";
 import { FaCheckCircle } from "react-icons/fa";
-import { format } from "date-fns";
+// import { format } from "date-fns";
 import { BiReset } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
@@ -34,12 +34,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+// import {
+//   Popover,
+//   PopoverContent,
+//   PopoverTrigger,
+// } from "@/components/ui/popover";
+// import { Calendar } from "@/components/ui/calendar";
 import {
   Select,
   SelectContent,
@@ -48,6 +48,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "../ui/scroll-area";
+import useThrottle from "@/hooks/use-throttle";
+import { DateRange } from "react-day-picker";
+// import { DatePickerWithRange } from "../ui/date-range-picker";
+import DatePickerWithRange from "../ui/date-range-picker";
 
 const getStatusColor = (status: AdminStatus) => {
   switch (status) {
@@ -66,9 +70,10 @@ const getStatusColor = (status: AdminStatus) => {
   }
 };
 
-
 export default function FlightBookingsTable() {
   const dispatch = useDispatch<AppDispatch>();
+  const total = useSelector((state: RootState) => state.bookings.total);
+
   const bookings = useSelector((state: RootState) => state.bookings.bookings);
   const loading = useSelector((state: RootState) => state.bookings.loading);
   const error = useSelector((state: RootState) => state.bookings.error);
@@ -78,21 +83,39 @@ export default function FlightBookingsTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  // const [date, setDate] = useState<DateRange | undefined>({
+  //   to:Date:'',
+  //   from:''
+  // });
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(new Date().getFullYear(), 0, 1),
+    to: new Date(),
+  });
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-
-
+  const [searchKey, setSearchKey] = useState("");
+  const [status, setStatus] = useState<string | undefined>();
+  // const setSearchKeyRef = useRef(setSearchKey);
+  const throttledValue = useThrottle(globalFilter, 500);
+ 
+  console.log("sattus...", status);
+  console.log("bookings",bookings)
 
   useEffect(() => {
-    dispatch(fetchBookings());
-  }, [dispatch]);
+    dispatch(fetchBookings({ date, pageIndex, pageSize, searchKey, status }));
+  }, [dispatch, date, pageIndex, pageSize, searchKey, status]);
+
+  useEffect(() => {
+    // if (setSearchKeyRef.current) {
+    setSearchKey(throttledValue);
+    // }
+  }, [throttledValue, setSearchKey]);
 
   const handleStatusChange = async (id: string, newStatus: AdminStatus) => {
     try {
       await dispatch(updateBooking({ id, adminStatus: newStatus })).unwrap();
     } catch (error) {
-      console.error('Failed to update booking status:', error);
+      console.error("Failed to update booking status:", error);
     }
   };
 
@@ -124,9 +147,12 @@ export default function FlightBookingsTable() {
       accessorKey: "id",
       header: "Internal Booking ID",
       cell: ({ row }) => (
-        <div className="text-[#0561FC] cursor-pointer"
-        onClick={() => navigate(`/flightdetails`)}
-        >{row.getValue("id")}</div>
+        <div
+          className="text-[#0561FC] cursor-pointer"
+          onClick={() => navigate(`/flightdetails`)}
+        >
+          {row.getValue("id")}
+        </div>
       ),
     },
     // {
@@ -196,7 +222,7 @@ export default function FlightBookingsTable() {
   ];
 
   const table = useReactTable({
-    data: bookings || [],
+    data: bookings,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -209,38 +235,47 @@ export default function FlightBookingsTable() {
       columnFilters,
       globalFilter,
       pagination: {
-        pageIndex,
+        pageIndex:0,
         pageSize,
       },
     },
-    onPaginationChange: (updater) => {
-      if (typeof updater === "function") {
-        const newState = updater({ pageIndex, pageSize });
-        setPageIndex(newState.pageIndex);
-        setPageSize(newState.pageSize);
-      } else {
-        setPageIndex(updater.pageIndex);
-        setPageSize(updater.pageSize);
-      }
-    },
+    // onPaginationChange: (updater) => {
+    //   if (typeof updater === "function") {
+    //     const newState = updater({ pageIndex, pageSize });
+    //     setPageIndex(newState.pageIndex);
+    //     setPageSize(newState.pageSize);
+    //   } else {
+    //     setPageIndex(updater.pageIndex);
+    //     setPageSize(updater.pageSize);
+    //   }
+    // },
+
+    
   });
 
   const handleApplyFilters = () => {
-    table.getColumn("id")?.setFilterValue(
-      (columnFilters.find((f) => f.id === "id")?.value as string) || ""
-    );
+    table
+      .getColumn("id")
+      ?.setFilterValue(
+        (columnFilters.find((f) => f.id === "id")?.value as string) || ""
+      );
 
-    table.getColumn("adminStatus")?.setFilterValue(
-      (columnFilters.find((f) => f.id === "adminStatus")?.value as string) || ""
-    );
+    table
+      .getColumn("adminStatus")
+      ?.setFilterValue(
+        (columnFilters.find((f) => f.id === "adminStatus")?.value as string) ||
+          ""
+      );
 
-    table.getColumn("supplier")?.setFilterValue(
-      (columnFilters.find((f) => f.id === "supplier")?.value as string) || ""
-    );
+    table
+      .getColumn("supplier")
+      ?.setFilterValue(
+        (columnFilters.find((f) => f.id === "supplier")?.value as string) || ""
+      );
 
-    if (date) {
-      table.getColumn("bookingDate")?.setFilterValue(format(date, "dd-MM-yyyy"));
-    }
+    // if (date) {
+    //   table.getColumn("bookingDate")?.setFilterValue(format(date, "dd-MM-yyyy"));
+    // }
   };
 
   const handleResetFilters = () => {
@@ -265,7 +300,7 @@ export default function FlightBookingsTable() {
       </div>
     );
   }
-
+  console.log("date", date);
   return (
     <div className="w-full bg-white px-3 rounded-xl">
       <div className="flex items-center gap-2 py-4">
@@ -281,13 +316,17 @@ export default function FlightBookingsTable() {
           className="w-[130px] rounded-xl"
         /> */}
         <Select
-          onValueChange={(value) =>
+          onValueChange={(value) => {
             setColumnFilters((prev) => [
               ...prev.filter((f) => f.id !== "adminStatus"),
               { id: "adminStatus", value },
-            ])
+            ]);
+            setStatus(value);
+          }}
+          value={
+            (columnFilters.find((f) => f.id === "adminStatus")
+              ?.value as string) || ""
           }
-          value={(columnFilters.find((f) => f.id === "adminStatus")?.value as string) || ""}
         >
           <SelectTrigger className="w-[150px] rounded-xl">
             <SelectValue placeholder="Booking Status" />
@@ -318,25 +357,47 @@ export default function FlightBookingsTable() {
             <SelectItem value="Duffel">Duffel</SelectItem>
           </SelectContent>
         </Select> */}
-        <Popover>
+        {/* <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-[110px] rounded-xl justify-start text-left font-normal"
+              className="w-[210px] rounded-xl justify-start text-left font-normal"
             >
               {!date && <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />}
-              {date ? format(date, "dd/MM/yyyy") : <span>Month</span>}
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "LLL dd, y")} -{" "}
+                    {format(date.to, "LLL dd, y")}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd, y")
+                )
+              ) : (
+                <span>Pick a date</span>
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
             <Calendar
-              mode="single"
+              mode="range"
               selected={date}
               onSelect={setDate}
               initialFocus
+             
             />
           </PopoverContent>
-        </Popover>
+        </Popover> */}
+        <DatePickerWithRange
+          date={date}
+          onDateChange={setDate}
+          // className="w-full"
+        />
+        {/* <DatePickerWithRange
+                value={date}
+                onChange={setDate}
+                className="w-full"
+              /> */}
 
         <Button className="bg-blue rounded-lg" onClick={handleApplyFilters}>
           Apply
@@ -362,19 +423,22 @@ export default function FlightBookingsTable() {
       </div>
 
       <div className="rounded-md border">
-        <ScrollArea className="max-h-[600px]">
+        <ScrollArea className="">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="px-3 text-[#1D1F2C] sticky top-0 bg-white">
+                    <TableHead
+                      key={header.id}
+                      className="px-3 text-[#1D1F2C] sticky top-0 bg-white"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -388,7 +452,10 @@ export default function FlightBookingsTable() {
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-3 text-[#777980] py-3">
+                      <TableCell
+                        key={cell.id}
+                        className="px-3 text-[#777980] py-3"
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -399,7 +466,10 @@ export default function FlightBookingsTable() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     No results.
                   </TableCell>
                 </TableRow>
@@ -412,8 +482,10 @@ export default function FlightBookingsTable() {
       <div className="flex items-center justify-between py-4">
         <Select
           value={pageSize.toString()}
-          onValueChange={(value) => {
-            table.setPageSize(Number(value));
+          onValueChange={(value:any) => {
+            // table.setPageSize(Number(value));
+            setPageSize(Number(value));
+            setPageIndex(0);
           }}
         >
           <SelectTrigger className="w-[80px]">
@@ -432,18 +504,21 @@ export default function FlightBookingsTable() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            // onClick={() => table.previousPage()}
+            onClick={() => setPageIndex(pageIndex-1)}
+            disabled={pageIndex<=0}
           >
             Previous
           </Button>
-          {Array.from({ length: table.getPageCount() }, (_, i) => i + 1).map(
+          {Array.from({ length: Math.ceil(total/pageSize) }, (_, i) => i + 1).map(
             (page) => (
               <Button
                 key={page}
                 variant={page === pageIndex + 1 ? "default" : "outline"}
                 size="sm"
-                onClick={() => table.setPageIndex(page - 1)}
+                // onClick={() => table.setPageIndex(page - 1)}
+                onClick={() => {setPageIndex(page-1);table.setPageIndex(page - 1)}}
+
                 className="px-3"
               >
                 {page}
@@ -453,14 +528,14 @@ export default function FlightBookingsTable() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            // onClick={() => table.nextPage()}
+            onClick={() =>{ setPageIndex(pageIndex+1)}}
+            disabled={pageIndex>=Math.ceil(total/pageSize)-1}
           >
             Next
           </Button>
         </div>
       </div>
-
     </div>
   );
 }

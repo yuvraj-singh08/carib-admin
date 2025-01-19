@@ -18,12 +18,13 @@ const years = Array.from({ length: currentYear - 1899 }, (_, i) => currentYear -
 
 interface DatePickerWithRangeProps {
   onDateChange: (range: DateRange | undefined) => void;
+  date:any
 }
 
-const DatePickerWithRange: React.FC<DatePickerWithRangeProps> = ({ onDateChange }) => {
+const DatePickerWithRange: React.FC<DatePickerWithRangeProps> = ({ onDateChange,date }) => {
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-  const [date, setDate] = useState<DateRange | undefined>(undefined);
+  // const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleMonthChange = (value: string) => {
@@ -35,7 +36,14 @@ const DatePickerWithRange: React.FC<DatePickerWithRangeProps> = ({ onDateChange 
   };
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
-    setDate(range);
+    // setDate(range);
+    if (range && range.from && range.to) {
+      const normalizedFrom = new Date(range.from.setHours(0, 0, 0, 0));
+      const normalizedTo = new Date(range.to.setHours(23, 59, 59, 999));
+      onDateChange({ from: normalizedFrom, to: normalizedTo });
+    } else {
+      onDateChange(range);
+    }
     onDateChange(range);
   };
 
@@ -71,7 +79,7 @@ const DatePickerWithRange: React.FC<DatePickerWithRangeProps> = ({ onDateChange 
         break;
     }
 
-    setDate({ from, to });
+    // setDate({ from, to });
     onDateChange({ from, to });
     setIsOpen(false);
   };
