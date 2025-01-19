@@ -129,10 +129,14 @@ export default function FlightBookingsTable() {
         >{row.getValue("id")}</div>
       ),
     },
-    // {
-    //   header: "Name",
-    //   accessorKey: "passenger[0].firstName"
-    // },
+    {
+      accessorKey: "passenger",
+      header: "Name",
+      cell: ({ row }) => {
+        const passenger = (row.getValue("passenger") as { firstName: string; surname: string }[])[0];
+        return `${passenger.firstName} ${passenger.surname}`;
+      }
+    },
     {
       accessorKey: "contactDetail.email",
       header: "Email",
