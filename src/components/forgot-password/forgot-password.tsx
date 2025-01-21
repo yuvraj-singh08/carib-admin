@@ -19,7 +19,7 @@ const ForgotPasswordComponent: React.FC = () => {
         setLoading(true);
         try {
             const response = await axiosInstance.post(
-                "https://travelcarib.tekniche.xyz/user/forgot-password",
+                "https://travelcarib.tekniche.xyz/admin/forgot-password",
                 { email }
             );
 
@@ -42,7 +42,7 @@ const ForgotPasswordComponent: React.FC = () => {
         setLoading(true);
         try {
             const response = await axiosInstance.post(
-                "https://travelcarib.tekniche.xyz/user/verify",
+                "https://travelcarib.tekniche.xyz/admin/verify",
                 { email, otp }
             );
 

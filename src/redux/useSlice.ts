@@ -97,7 +97,7 @@ export const login = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axiosInstance.post("/user/login", credentials);
+      const response = await axiosInstance.post("/admin/login", credentials);
       const jwtToken = response?.data?.token;
       const userId = response?.data?.data?.userId;
       if (jwtToken) {
@@ -123,7 +123,7 @@ export const signup = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axiosInstance.post("/user/register", credentials);
+      const response = await axiosInstance.post("/admin/register", credentials);
       const jwtToken = response?.data?.data?.token;
       if (jwtToken) {
         window.localStorage.setItem("token", jwtToken);
@@ -139,7 +139,7 @@ export const fetchUserById = createAsyncThunk(
   "user/fetchUserById",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/user/profile");
+      const response = await axiosInstance.get("/admin/profile");
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || "Fetch user failed";
@@ -154,14 +154,14 @@ export const updateUserProfile = createAsyncThunk(
   async (updatedProfileData: UserProfileProps, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        "/user/profile",
+        "/admin/profile",
         updatedProfileData
       );
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Profile update failed");
-    }
-  }
+    }
+  }
 );
 
 export const updateUserPassword = createAsyncThunk(
