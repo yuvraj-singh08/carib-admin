@@ -5,14 +5,19 @@ import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../ui/button";
 import axios from "axios";
+import { uploadImage } from "@/hooks/aws";
+
 
 const EditBlogPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [mainImage, setMainImage] = useState<string>("");
+  const [mainImage, setMainImage] = useState<File | null>(null); // Store File for main image
+  const [mainImageUrl, setMainImageUrl] = useState<string>(""); // URL for main image
   const [mainDescription, setMainDescription] = useState<string>("");
-  const [secondaryImages, setSecondaryImages] = useState<string[]>([]);
+
+  const [secondaryImages, setSecondaryImages] = useState<(File | null)[]>([null, null, null]); // Store Files for secondary images
+  const [secondaryImageUrls, setSecondaryImageUrls] = useState<string[]>([]); // URLs for secondary images
   const [secondaryDescription, setSecondaryDescription] = useState<string>("");
 
   useEffect(() => {
@@ -23,9 +28,9 @@ const EditBlogPage = () => {
         );
         const { mainImg, description, secondaryImg, secondaryDesc } = response.data;
 
-        setMainImage(mainImg || ""); // Set main image URL
+        setMainImageUrl(mainImg || ""); // Set main image URL
         setMainDescription(description || "");
-        setSecondaryImages(secondaryImg || []); // Set secondary images as URLs
+        setSecondaryImageUrls(secondaryImg || []); // Set secondary images as URLs
         setSecondaryDescription(secondaryDesc || "");
       } catch (error) {
         toast.error("Failed to fetch blog details.");
@@ -37,11 +42,25 @@ const EditBlogPage = () => {
 
   const handleUpdate = async () => {
     try {
+      // Upload all images
+      let uploadedMainImageUrl = mainImageUrl;
+      const uploadedSecondaryImageUrls = [...secondaryImageUrls];
+
+      if (mainImage) {
+        uploadedMainImageUrl = await uploadImage(mainImage);
+      }
+
+      for (let i = 0; i < secondaryImages.length; i++) {
+        if (secondaryImages[i]) {
+          uploadedSecondaryImageUrls[i] = await uploadImage(secondaryImages[i]!);
+        }
+      }
+
       const payload = {
         id,
-        mainImg: mainImage,
+        mainImg: uploadedMainImageUrl,
         description: mainDescription,
-        secondaryImg: secondaryImages,
+        secondaryImg: uploadedSecondaryImageUrls,
         secondaryDesc: secondaryDescription,
       };
 
@@ -54,23 +73,27 @@ const EditBlogPage = () => {
   };
 
   const handleMainImageUpload = (file: File) => {
+    setMainImage(file);
     const fileUrl = URL.createObjectURL(file);
-    setMainImage(fileUrl);
+    setMainImageUrl(fileUrl);
 
-    // Cleanup the object URL after use
     return () => URL.revokeObjectURL(fileUrl);
   };
 
   const handleSecondaryImageUpload = (file: File, index: number) => {
     const fileUrl = URL.createObjectURL(file);
-
-    setSecondaryImages((prevImages) => {
-      const updatedImages = [...prevImages];
-      updatedImages[index] = fileUrl; // Replace the specific image
-      return updatedImages;
+    setSecondaryImages((prev) => {
+      const updated = [...prev];
+      updated[index] = file;
+      return updated;
     });
 
-    // Cleanup the object URL after use
+    setSecondaryImageUrls((prev) => {
+      const updated = [...prev];
+      updated[index] = fileUrl;
+      return updated;
+    });
+
     return () => URL.revokeObjectURL(fileUrl);
   };
 
@@ -106,9 +129,9 @@ const EditBlogPage = () => {
           }}
           className="hidden"
         />
-        {mainImage && (
+        {mainImageUrl && (
           <img
-            src={mainImage}
+            src={mainImageUrl}
             alt="Main Preview"
             className="mt-4 w-32 h-32 object-cover border rounded-md"
           />
@@ -135,9 +158,9 @@ const EditBlogPage = () => {
                 htmlFor={`secondaryImage-${index}`}
                 className="block text-sm font-medium text-gray-700 cursor-pointer"
               >
-                {secondaryImages[index] ? (
+                {secondaryImageUrls[index] ? (
                   <img
-                    src={secondaryImages[index]}
+                    src={secondaryImageUrls[index]}
                     alt={`Secondary ${index + 1}`}
                     className="w-32 h-32 object-cover border rounded-md"
                   />
