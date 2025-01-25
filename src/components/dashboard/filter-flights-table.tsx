@@ -102,7 +102,7 @@ export default function FlightBookingsTable() {
   console.log("bookings",bookings)
 
   useEffect(() => {
-    dispatch(fetchBookings({ date, pageIndex, pageSize, searchKey, status }));
+    dispatch(fetchBookings({ to :date?.to,from :date?.from, pageIndex, pageSize, searchKey, status }));
   }, [dispatch, date, pageIndex, pageSize, searchKey, status]);
 
   useEffect(() => {

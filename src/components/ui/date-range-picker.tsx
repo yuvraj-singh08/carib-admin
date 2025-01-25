@@ -59,10 +59,10 @@ const DatePickerWithRange: React.FC<DatePickerWithRangeProps> = ({ onDateChange,
       case 'yesterday':
         from = to = subDays(today, 1);
         break;
-      case 'thisWeek':
-        from = startOfWeek(today);
-        to = endOfWeek(today);
-        break;
+      // case 'thisWeek':
+      //   from = startOfWeek(today);
+      //   to = endOfWeek(today);
+      //   break;
       case 'lastWeek':
         from = startOfWeek(subDays(today, 7));
         to = endOfWeek(subDays(today, 7));
@@ -165,7 +165,7 @@ const DatePickerWithRange: React.FC<DatePickerWithRangeProps> = ({ onDateChange,
               <div className="space-y-2">
                 <Button variant="ghost" className="w-full justify-start" onClick={() => handleShortcutSelect('today')}>Today</Button>
                 <Button variant="ghost" className="w-full justify-start" onClick={() => handleShortcutSelect('yesterday')}>Yesterday</Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => handleShortcutSelect('thisWeek')}>This Week</Button>
+                {/* <Button variant="ghost" className="w-full justify-start" onClick={() => handleShortcutSelect('thisWeek')}>This Week</Button> */}
                 <Button variant="ghost" className="w-full justify-start" onClick={() => handleShortcutSelect('lastWeek')}>Last Week</Button>
                 <Button variant="ghost" className="w-full justify-start" onClick={() => handleShortcutSelect('1dayUpToToday')}>1 day up to today</Button>
                 <Button variant="ghost" className="w-full justify-start" onClick={() => handleShortcutSelect('1dayStartingToday')}>1 day starting today</Button>
