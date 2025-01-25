@@ -56,7 +56,7 @@ const ResetPasswordComponent = () => {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post("/reset/reset-password", {
+      const response = await axiosInstance.post("/reset/admin/reset-password", {
         email,
         password,
       });
