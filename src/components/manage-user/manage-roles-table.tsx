@@ -172,7 +172,7 @@ export default function CompleteRoleManagementComponent() {
   const handlePermissionChange = (
     group: string,
     permission: string,
-    type: "view" | "update",
+    type: "view",
     value: boolean
   ) => {
     if (selectedRole && permissionStates[group]) {
@@ -368,8 +368,8 @@ export default function CompleteRoleManagementComponent() {
                       <CardContent className="p-0">
                         <div className="grid grid-cols-4 gap-2">
                           <div className="col-span-2">Name</div>
-                          <div className="col-span-1 pl-4">View</div>
-                          <div className="col-span-1 pl-3">Update</div>
+                          <div className="col-span-1 pl-4">Permissions</div>
+                          {/* <div className="col-span-1 pl-3">Update</div> */}
                           <Separator orientation="horizontal" className="col-span-4" />
                           {permissions.map((permission) => (
                             <React.Fragment key={permission}>
@@ -392,7 +392,7 @@ export default function CompleteRoleManagementComponent() {
                                   disabled={!permissionStates[group]}
                                 />
                               </div>
-                              <div className="col-span-1 flex items-center justify-center">
+                              {/* <div className="col-span-1 flex items-center justify-center">
                                 <Checkbox
                                   checked={
                                     selectedRole?.permissionGroups.find(
@@ -409,7 +409,7 @@ export default function CompleteRoleManagementComponent() {
                                   }
                                   disabled={!permissionStates[group]}
                                 />
-                              </div>
+                              </div> */}
                             </React.Fragment>
                           ))}
                         </div>
