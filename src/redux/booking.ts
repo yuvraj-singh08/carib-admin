@@ -53,7 +53,9 @@ export const fetchBookings = createAsyncThunk(
   "bookings/fetchBookings",
   async (
     params: {
-      date?: DateRange | undefined;
+      // date?: DateRange | undefined;
+      from:Date | undefined ,
+      to:Date | undefined,
       pageIndex: number;
       pageSize: number;
       globalFilter?: string;
