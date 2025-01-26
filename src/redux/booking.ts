@@ -1,7 +1,7 @@
 import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { DateRange } from "react-day-picker";
+// import { DateRange } from "react-day-picker";
 
 const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 
