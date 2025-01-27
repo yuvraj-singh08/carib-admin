@@ -14,6 +14,7 @@ import customerSlice from "../redux/registered-customers";
 import userReducer from "../redux/useSlice";
 import bookingsSlice from "../redux/booking";
 import blogSlice from '../redux/blogSlice';
+import flightSlice from '../redux/flightSlice';
 
 export const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ export const store = configureStore({
     socials: socialSettingsSlice,
     manageUser: manageUsersSlice,
     tickets: ticketsSlice,
+    flight: flightSlice,
     emailSmtp: emailSMTPSlice,
     privacy: privacyPolicySlice,
     deals: dealsSlice,

@@ -149,7 +149,7 @@ export default function FlightBookingsTable() {
       cell: ({ row }) => (
         <div
           className="text-[#0561FC] cursor-pointer"
-          onClick={() => navigate(`/flightdetails`)}
+          onClick={() => navigate(`/flightdetails/${row.getValue("id")}`)}
         >
           {row.getValue("id")}
         </div>
