@@ -874,14 +874,14 @@ import { BsCash } from "react-icons/bs";
 import { LuBaggageClaim } from "react-icons/lu";
 import { MdOutlineFastfood } from "react-icons/md";
 
-interface Passenger {
-  eTicketNumber: number;
-  pnrNumber: string;
-  status: "pending" | "confirmed";
-  firstName: string;
-  lastName: string;
-  gender: string;
-}
+// interface Passenger {
+//   eTicketNumber: number;
+//   pnrNumber: string;
+//   status: "pending" | "confirmed";
+//   firstName: string;
+//   lastName: string;
+//   gender: string;
+// }
 
 const FlightBooking: React.FC = () => {
   const navigate = useNavigate();
@@ -935,7 +935,7 @@ const FlightBooking: React.FC = () => {
     ticketNumber: number,
     newStatus: "pending" | "confirmed"
   ) => {
-    // Implement status update logic here
+   console.log('ticketNumber,newStatus',ticketNumber,newStatus)
   };
 
   const handleSave = () => {
