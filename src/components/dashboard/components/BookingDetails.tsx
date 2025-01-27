@@ -17,16 +17,7 @@ const BookingDetails: React.FC = () => {
         <h2 className="text-lg font-bold text-primary">Chennai ⇆ Jabalpur</h2>
         <p className="text-sm text-gray-500">Thu 22 Aug '24 • 1 Traveller(s)</p>
       </div>
-      {/* <div className="mt-4 flex justify-between">
-        <button className="flex items-center gap-2 text-primary">
-          <AiOutlineDownload size={18} />
-          <span>Download E-ticket(s)</span>
-        </button>
-        <button className="flex items-center gap-2 text-primary">
-          <AiOutlineMail size={18} />
-          <span>Email/SMS E-Ticket(s)</span>
-        </button>
-      </div> */}
+      
     </div>
   );
 };

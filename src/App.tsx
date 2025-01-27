@@ -30,7 +30,7 @@ function App() {
 
         {/* Private Routes */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/flightdetails" element={<FlightBooking />} />
+        <Route path="/flightdetails/:bookingId" element={<FlightBooking />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/supplier" element={<SupplierFirewallPage />} />
         <Route path="/manage-commission" element={<ManageCommisionPage />} />
