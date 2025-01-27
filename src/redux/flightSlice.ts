@@ -12,7 +12,7 @@ interface FlightDetails {
 
 interface FlightState {
   flight: any;
-  flightDetails: FlightDetails | null;
+  flightDetails: any | null ;
   loading: boolean;
   error: string | null;
 }
@@ -38,7 +38,8 @@ export const fetchFlightDetails = createAsyncThunk<FlightDetails, string, { reje
   async (bookingId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/book/${bookingId}`);
-      return response.data;
+      console.log("response...",response.data.data)
+      return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || error.message);
     }
