@@ -29,9 +29,7 @@ const SettingsPage = () => {
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="email">Email SMTP setting</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
-              <TabsTrigger value="paymentCms">
-                Payment CMS
-              </TabsTrigger>
+              <TabsTrigger value="paymentCms">Payment CMS</TabsTrigger>
               {activeTab === "deals" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
@@ -46,10 +44,10 @@ const SettingsPage = () => {
               )}
             </TabsList>
             <TabsContent value="deals">
-                <CouponManagementSystemTable/>
+              <CouponManagementSystemTable />
             </TabsContent>
             <TabsContent value="payment">
-            <ManagePaymentGateway/>
+              <ManagePaymentGateway />
             </TabsContent>
             <TabsContent value="email">
               <EMailSettingsForm />

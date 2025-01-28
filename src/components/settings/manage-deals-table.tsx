@@ -58,6 +58,7 @@ import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { uploadImage } from "@/hooks/aws";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
+import PermissionButtonGroup from "../permission-button/PermissionButton";
 // import { selectMultipleUsers } from "@/redux/useSlice";
 
 const dealFormSchema = z.object({
@@ -281,27 +282,33 @@ const CouponManagementSystemTable = () => {
                 </TableCell>
                 <TableCell className="flex items-center justify-center">
                   <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      className="bg-orange-400/20 hover:bg-orange-400/40"
-                      onClick={() => handleView(deal)}
-                    >
-                      <Eye size={16} className="text-orange-500" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="bg-green-400/20 hover:bg-green-400/40"
-                      onClick={() => handleEdit(deal)}
-                    >
-                      <Pencil size={16} className="text-green-500" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleDelete(deal.id)}
-                      className="bg-red-400/20 hover:bg-red-400/40"
-                    >
-                      <Trash2 size={16} className="text-red-500" />
-                    </Button>
+                    <PermissionButtonGroup resource="discounts" action="view">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleView(deal)}
+                        className="bg-blue/20 hover:bg-blue/40"
+                      >
+                        <Eye size={16} className="text-blue" />
+                      </Button>
+                    </PermissionButtonGroup>
+                    <PermissionButtonGroup resource="discounts" action="update">
+                      <Button
+                        variant="ghost"
+                        className="bg-green-400/20 hover:bg-green-400/40"
+                        onClick={() => handleEdit(deal)}
+                      >
+                        <Pencil size={16} className="text-green-500" />
+                      </Button>
+                    </PermissionButtonGroup>
+                    <PermissionButtonGroup resource="discounts" action="delete">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleDelete(deal.id)}
+                        className="bg-red-400/20 hover:bg-red-400/40"
+                      >
+                        <Trash2 size={16} className="text-red-500" />
+                      </Button>
+                    </PermissionButtonGroup>
                   </div>
                 </TableCell>
               </TableRow>

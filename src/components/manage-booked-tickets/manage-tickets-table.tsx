@@ -35,6 +35,7 @@ import { Ticket } from "@/redux/tickets";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 import TicketDetails from "./tieket-dialog";
+import PermissionButtonGroup from "../permission-button/PermissionButton";
 
 const statusOptions = [
   { value: "OPEN", label: "Open Tickets", color: "bg-blue" },
@@ -164,7 +165,10 @@ const BookingTicketsTableWithDateFilter = () => {
       <div className="w-full bg-white px-3 rounded-xl">
         <div className="flex items-center justify-between py-4">
           <div className="flex space-x-2">
-            <DatePickerWithRange date={dateRange} onDateChange={handleDateRangeChange} />
+            <DatePickerWithRange
+              date={dateRange}
+              onDateChange={handleDateRangeChange}
+            />
             <Select value={statusFilter} onValueChange={handleStatusChange}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Filter by status" />
@@ -273,20 +277,24 @@ const BookingTicketsTableWithDateFilter = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button
-                        variant="ghost"
-                        className="bg-orange-400/20 hover:bg-orange-400/40"
-                        onClick={() => handleViewTicket(item)}
-                      >
-                        <Eye size={16} className="text-orange-500" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="bg-red-400/20 hover:bg-red-400/40"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <Trash2 size={16} className="text-red-500" />
-                      </Button>
+                      <PermissionButtonGroup resource="support" action="view">
+                        <Button
+                          variant="ghost"
+                          className="bg-orange-400/20 hover:bg-orange-400/40"
+                          onClick={() => handleViewTicket(item)}
+                        >
+                          <Eye size={16} className="text-orange-500" />
+                        </Button>
+                      </PermissionButtonGroup>
+                      <PermissionButtonGroup resource="support" action="delete">
+                        <Button
+                          variant="ghost"
+                          className="bg-red-400/20 hover:bg-red-400/40"
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          <Trash2 size={16} className="text-red-500" />
+                        </Button>
+                      </PermissionButtonGroup>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -294,7 +302,7 @@ const BookingTicketsTableWithDateFilter = () => {
             </TableBody>
           </Table>
         </ScrollArea>
-
+        
         <div className="flex items-center justify-between space-x-2 py-4">
           <div>
             <Select
