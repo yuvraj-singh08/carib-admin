@@ -8,6 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Textarea } from "../ui/textarea";
+import PermissionButtonGroup from "../permission-button/PermissionButton";
 
 interface PaymentOptionProps {
   name: string;
@@ -23,8 +24,9 @@ const PaymentOption: React.FC<PaymentOptionProps> = ({
   children,
 }) => (
   <div
-    className={`p-4 border-b cursor-pointer flex items-center justify-between ${isSelected ? "bg-gray-50" : ""
-      }`}
+    className={`p-4 border-b cursor-pointer flex items-center justify-between ${
+      isSelected ? "bg-gray-50" : ""
+    }`}
     onClick={onSelect}
   >
     <div className="flex items-center gap-4">
@@ -108,12 +110,14 @@ const ManagePaymentCms = () => {
                   className="w-full resize-none h-[140px]"
                   required
                 />
-                <Button
-                  className="w-full"
-                  onClick={() => handleSubmit(option.id)}
-                >
-                  Submit
-                </Button>
+                <PermissionButtonGroup resource="settings" action="create">
+                  <Button
+                    className="w-full"
+                    onClick={() => handleSubmit(option.id)}
+                  >
+                    Submit
+                  </Button>
+                </PermissionButtonGroup>
               </div>
             </CollapsibleContent>
           </Collapsible>

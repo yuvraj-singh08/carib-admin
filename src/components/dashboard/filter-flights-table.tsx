@@ -52,6 +52,7 @@ import useThrottle from "@/hooks/use-throttle";
 import { DateRange } from "react-day-picker";
 // import { DatePickerWithRange } from "../ui/date-range-picker";
 import DatePickerWithRange from "../ui/date-range-picker";
+import PermissionButtonGroup from "../permission-button/PermissionButton";
 
 const getStatusColor = (status: AdminStatus) => {
   switch (status) {
@@ -97,12 +98,21 @@ export default function FlightBookingsTable() {
   const [status, setStatus] = useState<string | undefined>();
   // const setSearchKeyRef = useRef(setSearchKey);
   const throttledValue = useThrottle(globalFilter, 500);
- 
+
   console.log("sattus...", status);
-  console.log("bookings",bookings)
+  console.log("bookings", bookings);
 
   useEffect(() => {
-    dispatch(fetchBookings({ to :date?.to,from :date?.from, pageIndex, pageSize, searchKey, status }));
+    dispatch(
+      fetchBookings({
+        to: date?.to,
+        from: date?.from,
+        pageIndex,
+        pageSize,
+        searchKey,
+        status,
+      })
+    );
   }, [dispatch, date, pageIndex, pageSize, searchKey, status]);
 
   useEffect(() => {
@@ -159,9 +169,11 @@ export default function FlightBookingsTable() {
       accessorKey: "passenger",
       header: "Name",
       cell: ({ row }) => {
-        const passenger = (row.getValue("passenger") as { firstName: string; surname: string }[])[0];
+        const passenger = (
+          row.getValue("passenger") as { firstName: string; surname: string }[]
+        )[0];
         return `${passenger.firstName} ${passenger.surname}`;
-      }
+      },
     },
     {
       accessorKey: "contactDetail.email",
@@ -239,7 +251,7 @@ export default function FlightBookingsTable() {
       columnFilters,
       globalFilter,
       pagination: {
-        pageIndex:0,
+        pageIndex: 0,
         pageSize,
       },
     },
@@ -253,8 +265,6 @@ export default function FlightBookingsTable() {
     //     setPageSize(updater.pageSize);
     //   }
     // },
-
-    
   });
 
   const handleApplyFilters = () => {
@@ -486,7 +496,7 @@ export default function FlightBookingsTable() {
       <div className="flex items-center justify-between py-4">
         <Select
           value={pageSize.toString()}
-          onValueChange={(value:any) => {
+          onValueChange={(value: any) => {
             // table.setPageSize(Number(value));
             setPageSize(Number(value));
             setPageIndex(0);
@@ -509,32 +519,37 @@ export default function FlightBookingsTable() {
             variant="outline"
             size="sm"
             // onClick={() => table.previousPage()}
-            onClick={() => setPageIndex(pageIndex-1)}
-            disabled={pageIndex<=0}
+            onClick={() => setPageIndex(pageIndex - 1)}
+            disabled={pageIndex <= 0}
           >
             Previous
           </Button>
-          {Array.from({ length: Math.ceil(total/pageSize) }, (_, i) => i + 1).map(
-            (page) => (
-              <Button
-                key={page}
-                variant={page === pageIndex + 1 ? "default" : "outline"}
-                size="sm"
-                // onClick={() => table.setPageIndex(page - 1)}
-                onClick={() => {setPageIndex(page-1);table.setPageIndex(page - 1)}}
-
-                className="px-3"
-              >
-                {page}
-              </Button>
-            )
-          )}
+          {Array.from(
+            { length: Math.ceil(total / pageSize) },
+            (_, i) => i + 1
+          ).map((page) => (
+            <Button
+              key={page}
+              variant={page === pageIndex + 1 ? "default" : "outline"}
+              size="sm"
+              // onClick={() => table.setPageIndex(page - 1)}
+              onClick={() => {
+                setPageIndex(page - 1);
+                table.setPageIndex(page - 1);
+              }}
+              className="px-3"
+            >
+              {page}
+            </Button>
+          ))}
           <Button
             variant="outline"
             size="sm"
             // onClick={() => table.nextPage()}
-            onClick={() =>{ setPageIndex(pageIndex+1)}}
-            disabled={pageIndex>=Math.ceil(total/pageSize)-1}
+            onClick={() => {
+              setPageIndex(pageIndex + 1);
+            }}
+            disabled={pageIndex >= Math.ceil(total / pageSize) - 1}
           >
             Next
           </Button>

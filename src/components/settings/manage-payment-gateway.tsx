@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import PermissionButtonGroup from "../permission-button/PermissionButton";
 
 // Define the Zod schema for validation
 const schema = z.object({
@@ -168,9 +169,11 @@ export default function ManagePaymentGateway() {
                 />
 
                 <div className="flex items-center w-full justify-end">
-                  <Button type="submit" className="w-[120px]">
-                    Save Changes
-                  </Button>
+                  <PermissionButtonGroup resource="settings" action="create">
+                    <Button type="submit" className="w-[120px]">
+                      Save Changes
+                    </Button>
+                  </PermissionButtonGroup>
                 </div>
               </form>
             </Form>

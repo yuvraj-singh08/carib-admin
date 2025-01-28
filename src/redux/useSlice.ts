@@ -1,38 +1,16 @@
+import { userPermission } from "@/components/permission-button/PermissionButton";
 import { axiosInstance } from "@/provider/axios";
 import { RootState } from "@/provider/redux-provider";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 export interface User {
-  mobileNumber: string;
-  gender: string;
-  dob: Date;
-  pincode: string;
-  address: string;
+  id: string;
   firstname: string;
   lastname: string;
-  name: string;
   email: string;
-  role?: string;
+  role: string;
   password: string;
-  avatarSrc: string;
-  provider?: string;
-  passportDetails?: {
-    passportNumber: string;
-    issuingCountry: string;
-    expiryDate: string;
-    passportImg: string;
-  };
-  coTraveler?: {
-    name: string;
-    email: string;
-    dateOfBirth: string;
-    passportNumber: string;
-    phoneNumber: string;
-  }[];
-  frequentlyFlyer?: {
-    flyerNumber: string;
-    airlines: string[];
-  };
+  permissions: userPermission[];
 }
 
 interface UserProfileProps {
@@ -40,32 +18,9 @@ interface UserProfileProps {
   firstName?: string;
   lastName?: string;
   email?: string;
-  mobileNumber?: string;
-  gender?: string;
-  dob?: string;
-  pincode?: string;
-  address?: string;
-  avatarSrc?: string;
   role?: string;
   password?: string;
-  provider?: string;
-  passportDetails?: {
-    passportNumber: string;
-    issuingCountry: string;
-    expiryDate: string;
-    passportImg: string;
-  };
-  coTraveler?: {
-    name: string;
-    email: string;
-    dateOfBirth: string;
-    passportNumber: string;
-    phoneNumber: string;
-  }[];
-  frequentlyFlyer?: {
-    flyerNumber: string;
-    airlines: string[];
-  };
+  permissions?: userPermission[];
 }
 
 export interface UserState {
@@ -160,8 +115,8 @@ export const updateUserProfile = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Profile update failed");
-    }
-  }
+    }
+  }
 );
 
 export const updateUserPassword = createAsyncThunk(
