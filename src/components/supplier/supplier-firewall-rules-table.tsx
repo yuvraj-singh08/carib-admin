@@ -51,7 +51,6 @@ import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
 import { useConfirm } from "@/hooks/use-confirm";
 import { Trash2 } from "lucide-react";
-import PermissionButtonGroup from "../permission-button/PermissionButton";
 
 const formSchema = z.object({
   rulesTitle: z.string().optional(),
