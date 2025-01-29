@@ -228,7 +228,6 @@ export default function FlightRulesManager() {
     return <TableLoader />;
   }
 
-
   return (
     <>
       <ConfirmDialogue />

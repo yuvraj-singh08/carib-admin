@@ -20,6 +20,7 @@ import { AppDispatch, RootState } from "@/provider/redux-provider";
 import {
   fetchBookings,
   updateBooking,
+  sendBookingEmail,
   AdminStatus,
   Booking,
 } from "@/redux/booking";
@@ -34,12 +35,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// import {
-//   Popover,
-//   PopoverContent,
-//   PopoverTrigger,
-// } from "@/components/ui/popover";
-// import { Calendar } from "@/components/ui/calendar";
 import {
   Select,
   SelectContent,
@@ -50,8 +45,11 @@ import {
 import { ScrollArea } from "../ui/scroll-area";
 import useThrottle from "@/hooks/use-throttle";
 import { DateRange } from "react-day-picker";
-// import { DatePickerWithRange } from "../ui/date-range-picker";
 import DatePickerWithRange from "../ui/date-range-picker";
+import { Popover } from "@radix-ui/react-popover";
+import { PopoverContent, PopoverTrigger } from "../ui/popover";
+import toast from "react-hot-toast";
+
 
 const getStatusColor = (status: AdminStatus) => {
   switch (status) {
@@ -77,12 +75,15 @@ export default function FlightBookingsTable() {
   const bookings = useSelector((state: RootState) => state.bookings.bookings);
   const loading = useSelector((state: RootState) => state.bookings.loading);
   const error = useSelector((state: RootState) => state.bookings.error);
+  const emailSending = useSelector((state: RootState) => state.bookings.emailSending);
+  const emailError = useSelector((state: RootState) => state.bookings.emailError);
   const navigate = useNavigate();
   console.log("Bookings", bookings);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [open, setOpen] = useState(false);
   // const [date, setDate] = useState<DateRange | undefined>({
   //   to:Date:'',
   //   from:''
@@ -97,12 +98,21 @@ export default function FlightBookingsTable() {
   const [status, setStatus] = useState<string | undefined>();
   // const setSearchKeyRef = useRef(setSearchKey);
   const throttledValue = useThrottle(globalFilter, 500);
- 
+
   console.log("sattus...", status);
-  console.log("bookings",bookings)
+  console.log("bookings", bookings);
 
   useEffect(() => {
-    dispatch(fetchBookings({ to :date?.to,from :date?.from, pageIndex, pageSize, searchKey, status }));
+    dispatch(
+      fetchBookings({
+        to: date?.to,
+        from: date?.from,
+        pageIndex,
+        pageSize,
+        searchKey,
+        status,
+      })
+    );
   }, [dispatch, date, pageIndex, pageSize, searchKey, status]);
 
   useEffect(() => {
@@ -118,6 +128,69 @@ export default function FlightBookingsTable() {
       console.error("Failed to update booking status:", error);
     }
   };
+
+  // const handleSendEmail = async (bookingId: string) => {
+  //   setOpen(false);
+    
+  //   setLoadingStates(prev => ({ ...prev, [bookingId]: true }));
+  //   try {
+  //     // Make a POST request to the backend API
+  //     //${apiUrl}/email/send
+  //     const response = await axiosInstance.post(
+  //       "http://localhost:8000/email/send",
+  //       {bookingId}, // If the API requires a request body, replace this empty object with your data
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json", // Specify headers if needed
+  //         },
+  //       }
+  //     );
+  //     console.log("Email sent successfully:", response.data);
+  //     //alert("Email sent successfully!");
+      
+  //     toast.success("Email sent successfully!");
+      
+  //   } catch (error) {
+  //     console.error("Error sending email:", error);
+  //     toast.error("Failed to send email. Check the console for details.");
+  //   }
+  //   finally{
+  //     setLoadingStates(prev => ({ ...prev, [bookingId]: false }));
+  //   }
+  // };
+
+
+  const handleSendEmail = async (bookingId: string) => {
+    setOpen(false);
+    try {
+      await dispatch(sendBookingEmail(bookingId)).unwrap();
+      toast.success("Email sent successfully");
+    } catch (error) {
+      // Now we're using the error from Redux state to show in toast
+      console.log(error);
+      const errorMessage = emailError[bookingId] || "Failed to send email";
+      toast.error(errorMessage);
+    }
+  };
+
+  const LoadingSpinner = () => (
+    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+  );
 
   const columns: ColumnDef<Booking>[] = [
     {
@@ -175,6 +248,7 @@ export default function FlightBookingsTable() {
         }
         return "N/A"; // Fallback in case of missing data
       }
+
     },
     {
       accessorKey: "contactDetail.email",
@@ -225,13 +299,50 @@ export default function FlightBookingsTable() {
           {row.getValue("sendEmail") ? (
             <FaCheckCircle className="size-4 shrink-0 fill-customGreen" />
           ) : (
-            <Button size="icon" variant="secondary">
-              <img
-                src="/icons/plane.png"
-                alt="icon"
-                className="size-4 shrink-0"
-              />
-            </Button>
+            <Popover onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="secondary"
+                  type="button"
+                  disabled={emailSending[row.original.id]}
+                >
+                  {emailSending[row.original.id] ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <img
+                      src="/icons/plane.png"
+                      alt="icon"
+                      className="w-4 h-4 shrink-0"
+                    />
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 shadow-lg rounded-lg border border-gray-200 p-6 bg-white mr-7">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">Confirm Action</h4>
+                    <p className="text-sm text-gray-500">
+                      Do you want to send the email?
+                    </p>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setOpen(false)}
+                    >
+                      No
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => handleSendEmail(row.original.id)}
+                    >
+                      Yes
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       ),
@@ -252,7 +363,7 @@ export default function FlightBookingsTable() {
       columnFilters,
       globalFilter,
       pagination: {
-        pageIndex:0,
+        pageIndex: 0,
         pageSize,
       },
     },
@@ -266,8 +377,6 @@ export default function FlightBookingsTable() {
     //     setPageSize(updater.pageSize);
     //   }
     // },
-
-    
   });
 
   const handleApplyFilters = () => {
@@ -499,7 +608,7 @@ export default function FlightBookingsTable() {
       <div className="flex items-center justify-between py-4">
         <Select
           value={pageSize.toString()}
-          onValueChange={(value:any) => {
+          onValueChange={(value: any) => {
             // table.setPageSize(Number(value));
             setPageSize(Number(value));
             setPageIndex(0);
@@ -522,32 +631,37 @@ export default function FlightBookingsTable() {
             variant="outline"
             size="sm"
             // onClick={() => table.previousPage()}
-            onClick={() => setPageIndex(pageIndex-1)}
-            disabled={pageIndex<=0}
+            onClick={() => setPageIndex(pageIndex - 1)}
+            disabled={pageIndex <= 0}
           >
             Previous
           </Button>
-          {Array.from({ length: Math.ceil(total/pageSize) }, (_, i) => i + 1).map(
-            (page) => (
-              <Button
-                key={page}
-                variant={page === pageIndex + 1 ? "default" : "outline"}
-                size="sm"
-                // onClick={() => table.setPageIndex(page - 1)}
-                onClick={() => {setPageIndex(page-1);table.setPageIndex(page - 1)}}
-
-                className="px-3"
-              >
-                {page}
-              </Button>
-            )
-          )}
+          {Array.from(
+            { length: Math.ceil(total / pageSize) },
+            (_, i) => i + 1
+          ).map((page) => (
+            <Button
+              key={page}
+              variant={page === pageIndex + 1 ? "default" : "outline"}
+              size="sm"
+              // onClick={() => table.setPageIndex(page - 1)}
+              onClick={() => {
+                setPageIndex(page - 1);
+                table.setPageIndex(page - 1);
+              }}
+              className="px-3"
+            >
+              {page}
+            </Button>
+          ))}
           <Button
             variant="outline"
             size="sm"
             // onClick={() => table.nextPage()}
-            onClick={() =>{ setPageIndex(pageIndex+1)}}
-            disabled={pageIndex>=Math.ceil(total/pageSize)-1}
+            onClick={() => {
+              setPageIndex(pageIndex + 1);
+            }}
+            disabled={pageIndex >= Math.ceil(total / pageSize) - 1}
           >
             Next
           </Button>

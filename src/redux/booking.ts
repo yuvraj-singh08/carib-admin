@@ -31,6 +31,8 @@ export interface Booking {
   currency: string;
   adminStatus: AdminStatus;
   userId: string;
+  sendEmail?: boolean;
+  
 }
 
 interface BookingState {
@@ -39,6 +41,9 @@ interface BookingState {
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   loading: boolean;
+  emailSending: { [key: string]: boolean };
+  emailError: { [key: string]: string | null };
+  
 }
 
 const initialState: BookingState = {
@@ -47,7 +52,32 @@ const initialState: BookingState = {
   status: "idle",
   error: null,
   loading: false,
+  emailSending: {},
+  emailError: {},
 };
+
+export const sendBookingEmail = createAsyncThunk(
+  "bookings/sendEmail",
+  async (bookingId: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        "http://localhost:8000/email/send",
+        { bookingId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return { bookingId, data: response.data };
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue({ bookingId, error: error.message });
+      }
+      return rejectWithValue({ bookingId, error: "Failed to send email" });
+    }
+  }
+);
 
 export const fetchBookings = createAsyncThunk(
   "bookings/fetchBookings",
@@ -77,6 +107,7 @@ export const fetchBookings = createAsyncThunk(
     }
   }
 );
+
 
 export const deleteBooking = createAsyncThunk(
   "bookings/deleteBooking",
@@ -120,10 +151,35 @@ const bookingsSlice = createSlice({
       state.status = "idle";
       state.error = null;
       state.loading = false;
+      state.emailSending = {};
+      state.emailError = {};
+    },
+    clearEmailError: (state, action: PayloadAction<string>) => {
+      state.emailError[action.payload] = null;
     },
   },
   extraReducers: (builder) => {
     builder
+    .addCase(sendBookingEmail.pending, (state, action) => {
+      const bookingId = action.meta.arg;
+      state.emailSending[bookingId] = true;
+      state.emailError[bookingId] = null;
+    })
+    .addCase(sendBookingEmail.fulfilled, (state, action) => {
+      const { bookingId } = action.payload;
+      state.emailSending[bookingId] = false;
+      state.emailError[bookingId] = null;
+      // Update the booking to mark email as sent
+      const booking = state.bookings.find(b => b.id === bookingId);
+      if (booking) {
+        booking.sendEmail = true;
+      }
+    })
+    .addCase(sendBookingEmail.rejected, (state, action) => {
+      const payload = action.payload as { bookingId: string; error: string };
+      state.emailSending[payload.bookingId] = false;
+      state.emailError[payload.bookingId] = payload.error;
+    })
       .addCase(fetchBookings.pending, (state) => {
         state.status = "loading";
         state.loading = true;
@@ -132,7 +188,11 @@ const bookingsSlice = createSlice({
       .addCase(fetchBookings.fulfilled, (state, action: PayloadAction<any>) => {
         state.status = "succeeded";
         state.loading = false;
-        state.bookings = action.payload.data;
+        //state.bookings = action.payload.data;
+        state.bookings = action.payload.data.map((booking: Booking) => ({
+          ...booking,
+          sendEmail: booking.sendEmail ?? false
+        }));
         state.total=action.payload.total;
         state.error = null;
       })
@@ -157,7 +217,7 @@ const bookingsSlice = createSlice({
   },
 });
 
-export const { resetState } = bookingsSlice.actions;
+export const { resetState, clearEmailError } = bookingsSlice.actions;
 
 export default bookingsSlice.reducer;
 

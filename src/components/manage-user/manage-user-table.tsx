@@ -46,6 +46,7 @@ import {
   ManageUser,
 } from "@/redux/manage-user";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
+import PermissionButtonGroup from "../permission-button/PermissionButton";
 
 const userFormSchema = z
   .object({
@@ -74,7 +75,9 @@ export default function UserManagementPage() {
   );
   const rolesStatus = useSelector((state: RootState) => state.roles.status);
   const users = useSelector((state: RootState) => state.manageUser.users);
-  const usersStatus = useSelector((state: RootState) => state.manageUser.status);
+  const usersStatus = useSelector(
+    (state: RootState) => state.manageUser.status
+  );
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<ManageUser | null>(null);
@@ -480,20 +483,24 @@ export default function UserManagementPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleEdit(user)}
-                        className="bg-green-400/20 hover:bg-green-400/40"
-                      >
-                        <Pencil size={16} className="text-green-500" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="bg-red-400/20 hover:bg-red-400/40"
-                        onClick={() => handleDelete(user.id)}
-                      >
-                        <Trash2 size={16} className="text-red-500" />
-                      </Button>
+                      <PermissionButtonGroup resource="user" action="update">
+                        <Button
+                          variant="ghost"
+                          onClick={() => handleEdit(user)}
+                          className="bg-green-400/20 hover:bg-green-400/40"
+                        >
+                          <Pencil size={16} className="text-green-500" />
+                        </Button>
+                      </PermissionButtonGroup>
+                      <PermissionButtonGroup resource="user" action="delete">
+                        <Button
+                          variant="ghost"
+                          className="bg-red-400/20 hover:bg-red-400/40"
+                          onClick={() => handleDelete(user.id)}
+                        >
+                          <Trash2 size={16} className="text-red-500" />
+                        </Button>
+                      </PermissionButtonGroup>
                     </div>
                   </TableCell>
                 </TableRow>
