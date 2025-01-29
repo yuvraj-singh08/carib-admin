@@ -873,6 +873,9 @@ import flightIcon from "../../../../public/icons/flight.png";
 import { BsCash } from "react-icons/bs";
 import { LuBaggageClaim } from "react-icons/lu";
 import { MdOutlineFastfood } from "react-icons/md";
+import { sendBookingEmail } from '@/redux/booking';
+import toast from "react-hot-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 // interface Passenger {
 //   eTicketNumber: number;
@@ -883,6 +886,10 @@ import { MdOutlineFastfood } from "react-icons/md";
 //   gender: string;
 // }
 
+
+
+
+
 const FlightBooking: React.FC = () => {
   const navigate = useNavigate();
   const { bookingId } = useParams<{ bookingId: string }>();
@@ -892,9 +899,13 @@ const FlightBooking: React.FC = () => {
   );
   const [selectedOption, setSelectedOption] = useState("FAILED_BOOKING");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   // const [selectedOption, setSelectedOption] = useState("FAILED_BOOKING");
   // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   // const [passengers, setPassengers] = useState<Passenger[]>(initialPassengers);
+
+  const emailSending = useSelector((state: RootState) => state.bookings.emailSending);
+  const emailError = useSelector((state: RootState) => state.bookings.emailError);
 
   const options = [
     { label: "TICKETED", color: "bg-green-500" },
@@ -903,6 +914,22 @@ const FlightBooking: React.FC = () => {
     { label: "EXPIRED", color: "bg-white" },
     { label: "FAILED_BOOKING", color: "bg-red-500" },
   ];
+
+
+  const handleSendEmail = async (bookingId: string) => {
+    setOpen(false);
+    try {
+      await dispatch(sendBookingEmail(bookingId)).unwrap();
+      toast.success("Email sent successfully");
+    } catch (error) {
+      // Now we're using the error from Redux state to show in toast
+      console.log(error);
+      const errorMessage = emailError[bookingId] || "Failed to send email";
+      toast.error(errorMessage);
+    }
+  };
+
+  
 
   const getSelectedOptionColor = () =>
     options.find((option) => option.label === selectedOption)?.color || "";
@@ -946,6 +973,25 @@ const FlightBooking: React.FC = () => {
           dispatch(updateFlightDetails({ bookingId, updatedData })); // Dispatch with bookingId and updated data
         }
       };
+
+      const LoadingSpinner = () => (
+        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
+        </svg>
+      );
 
   return (
     <div className="p-4 rounded-md shadow-md flex flex-col gap-4 mt-8">
@@ -1165,13 +1211,50 @@ const FlightBooking: React.FC = () => {
                 )}
               </div>
 
-              <Button size="icon" variant="secondary">
-                <img
-                  src="/icons/plane.png"
-                  alt="icon"
-                  className="size-4 shrink-0"
-                />
-              </Button>
+              <Popover onOpenChange={setOpen} open={open}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="secondary"
+                  type="button"
+                  disabled={emailSending[bookingId as string]}
+                >
+                  {emailSending[bookingId as string] ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <img
+                      src="/icons/plane.png"
+                      alt="icon"
+                      className="w-4 h-4 shrink-0"
+                    />
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 shadow-lg rounded-lg border border-gray-200 p-6 bg-white mr-7">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">Confirm Action</h4>
+                    <p className="text-sm text-gray-500">
+                      Do you want to send the email?
+                    </p>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setOpen(false)}
+                    >
+                      No
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => handleSendEmail(bookingId as string)}
+                    >
+                      Yes
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
             </div>
           </div>
 
