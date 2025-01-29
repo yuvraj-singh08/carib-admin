@@ -57,8 +57,8 @@ const userFormSchema = z
     roleName: z.string().min(1, "Role is required"),
     address: z.string().min(1, "Address is required"),
     contact: z.string().min(1, "Contact is required"),
-    password: z.string().optional(),
-    confirmPassword: z.string().optional(),
+    password: z.string(),
+    confirmPassword: z.string(),
     status: z.enum(["ACTIVE", "INACTIVE"]),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -127,7 +127,7 @@ export default function UserManagementPage() {
       address: values.address,
       contact: values.contact,
       email: values.email,
-      password: password || "", // Use the stored password or empty string
+      password: values.password,
       roleId: values.roleId,
       roleName: values.roleName,
       status: values.status,
@@ -164,8 +164,8 @@ export default function UserManagementPage() {
       roleName: user.roleName,
       address: user.address,
       contact: user.contact,
-      password: "",
-      confirmPassword: "",
+      password: password!,
+      confirmPassword: password!,
       status: user.status,
     });
     setIsDialogOpen(true);
