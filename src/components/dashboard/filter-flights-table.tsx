@@ -155,12 +155,25 @@ export default function FlightBookingsTable() {
         </div>
       ),
     },
+    // {
+    //   accessorKey: "passenger",
+    //   header: "Name",
+    //   cell: ({ row }) => {
+    //     const passenger = (row.getValue("passenger") as { firstName: string; surname: string }[])[0];
+    //     return `${passenger.firstName} ${passenger.surname}`;
+    //   }
+    // },
+
     {
       accessorKey: "passenger",
       header: "Name",
       cell: ({ row }) => {
-        const passenger = (row.getValue("passenger") as { firstName: string; surname: string }[])[0];
-        return `${passenger.firstName} ${passenger.surname}`;
+        const passengers = row.getValue("passenger") as string[]; // Get the JSON string array
+        if (passengers.length > 0) {
+          const passengerData = JSON.parse(passengers[0]); // Parse the first passenger object
+          return `${passengerData.firstName} ${passengerData.lastName}`;
+        }
+        return "N/A"; // Fallback in case of missing data
       }
     },
     {
