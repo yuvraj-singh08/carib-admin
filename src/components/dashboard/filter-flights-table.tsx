@@ -83,7 +83,7 @@ export default function FlightBookingsTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [open, setOpen] = useState(false);
+  const [, setOpen] = useState(false);
   // const [date, setDate] = useState<DateRange | undefined>({
   //   to:Date:'',
   //   from:''
@@ -237,19 +237,19 @@ export default function FlightBookingsTable() {
     //   }
     // },
 
-    {
-      accessorKey: "passenger",
-      header: "Name",
-      cell: ({ row }) => {
-        const passengers = row.getValue("passenger") as string[]; // Get the JSON string array
-        if (passengers.length > 0) {
-          const passengerData = JSON.parse(passengers[0]); // Parse the first passenger object
-          return `${passengerData.firstName} ${passengerData.lastName}`;
-        }
-        return "N/A"; // Fallback in case of missing data
-      }
+    // {
+    //   accessorKey: "passenger",
+    //   header: "Name",
+    //   cell: ({ row }) => {
+    //     const passengers = row.getValue("passenger") as string[]; // Get the JSON string array
+    //     if (passengers.length > 0) {
+    //       const passengerData = JSON.parse(passengers[0]); // Parse the first passenger object
+    //       return `${passengerData.firstName} ${passengerData.lastName}`;
+    //     }
+    //     return "N/A"; // Fallback in case of missing data
+    //   }
 
-    },
+    // },
     {
       accessorKey: "contactDetail.email",
       header: "Email",
