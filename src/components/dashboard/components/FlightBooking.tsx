@@ -10,7 +10,7 @@ import { AppDispatch, RootState } from "@/provider/redux-provider";
 import flightIcon from "../../../../public/icons/flight.png";
 // import { BsCash } from "react-icons/bs";
 import { LuBaggageClaim } from "react-icons/lu";
-import { MdOutlineFastfood } from "react-icons/md";
+// import { MdOutlineFastfood } from "react-icons/md";
 import { sendBookingEmail } from '@/redux/booking';
 import toast from "react-hot-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -69,15 +69,15 @@ const FlightBooking: React.FC = () => {
 
   
 
-  const getSelectedOptionColor = () =>
-    options.find((option) => option.label === selectedOption)?.color || "";
+  // const getSelectedOptionColor = () =>
+  //   options.find((option) => option.label === selectedOption)?.color || "";
 
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  // const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  const handleOptionClick = (optionLabel: string) => {
-    setSelectedOption(optionLabel);
-    setIsDropdownOpen(false); // Close the dropdown after selecting an option
-  };
+  // const handleOptionClick = (optionLabel: string) => {
+  //   setSelectedOption(optionLabel);
+  //   setIsDropdownOpen(false); // Close the dropdown after selecting an option
+  // };
   useEffect(() => {
     if (bookingId) {
       dispatch(fetchFlightDetails(bookingId));
