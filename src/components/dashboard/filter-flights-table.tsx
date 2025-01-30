@@ -248,8 +248,26 @@ export default function FlightBookingsTable() {
     //     }
     //     return "N/A"; // Fallback in case of missing data
     //   }
-
     // },
+
+    {
+      accessorKey: "passenger",
+      header: "Name",
+      cell: ({ row }) => {
+        const passengers = row.getValue("passenger") as string; // Get the JSON string
+        if (passengers) {
+          try {
+            const passengerData = JSON.parse(passengers)[0]; // Parse the first passenger object
+            return `${passengerData.firstName} ${passengerData.lastName}`;
+          } catch (error) {
+            console.error("Error parsing passenger data:", error);
+            return "Invalid Data";
+          }
+        }
+        return "N/A"; // Fallback in case of missing data
+      }
+    },
+    
     {
       accessorKey: "contactDetail.email",
       header: "Email",
