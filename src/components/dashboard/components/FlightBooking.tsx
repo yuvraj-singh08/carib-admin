@@ -565,7 +565,7 @@ const FlightBooking: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 font-medium">
-                      {subBooking.pnr || "Not Found"}
+                      {subBooking.PNR || "Not Found"}
                     </td>
                     <td className="px-4 py-3">
                       {subBooking.ticketNumber?.toString() || "N/A"}
