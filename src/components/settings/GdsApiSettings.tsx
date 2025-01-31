@@ -54,8 +54,8 @@ const GdsApiSettings = () => {
               type="text"
               placeholder={
                 serverType.Duffel === "Test Server"
-                  ? "Duffel Test API Key"
-                  : "Duffel Production API Key"
+                  ? "API Key"
+                  : "API Key"
               }
               className="w-full p-2 border rounded-lg"
             />
