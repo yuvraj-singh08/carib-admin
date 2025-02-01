@@ -15,19 +15,6 @@ import { sendBookingEmail } from '@/redux/booking';
 import toast from "react-hot-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-// interface Passenger {
-//   eTicketNumber: number;
-//   pnrNumber: string;
-//   status: "pending" | "confirmed";
-//   firstName: string;
-//   lastName: string;
-//   gender: string;
-// }
-
-
-
-
-
 const FlightBooking: React.FC = () => {
   const navigate = useNavigate();
   const { bookingId } = useParams<{ bookingId: string }>();
@@ -39,10 +26,7 @@ const FlightBooking: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState("FAILED_BOOKING");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  // const [selectedOption, setSelectedOption] = useState("FAILED_BOOKING");
-  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // const [passengers, setPassengers] = useState<Passenger[]>(initialPassengers);
-
+ 
   const emailSending = useSelector((state: RootState) => state.bookings.emailSending);
   const emailError = useSelector((state: RootState) => state.bookings.emailError);
 
@@ -299,7 +283,7 @@ const FlightBooking: React.FC = () => {
                               alt="Airline"
                               className="h-10 w-10 object-contain"
                             />
-                            <div>
+                            <div> 
                               <p className="text-sm font-medium">
                                 {segment.operating_carrier?.name ||
                                   "Unknown Airline"}
@@ -565,7 +549,8 @@ const FlightBooking: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 font-medium">
-                      {subBooking.PNR || "Not Found"}
+                      {subBooking.pnr || flightDetails?.flightDetails?.slices[0]?.PNR || "Not Found"}
+
                     </td>
                     <td className="px-4 py-3">
                       {subBooking.ticketNumber?.toString() || "N/A"}
