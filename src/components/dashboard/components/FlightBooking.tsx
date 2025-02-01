@@ -550,6 +550,7 @@ const FlightBooking: React.FC = () => {
                     </td>
                     <td className="px-4 py-3 font-medium">
                       {subBooking.pnr || flightDetails?.flightDetails?.slices[0]?.PNR || "Not Found"}
+
                     </td>
                     <td className="px-4 py-3">
                       {subBooking.ticketNumber?.toString() || "N/A"}

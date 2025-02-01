@@ -1,4 +1,5 @@
 import EMailSettingsForm from "@/components/landing-settings/email-settings-form";
+import GdsApiSettings from "@/components/settings/GdsApiSettings";
 import CouponManagementSystemTable from "@/components/settings/manage-deals-table";
 import ManagepaymentCms from "@/components/settings/manage-payment-cms";
 import ManagePaymentGateway from "@/components/settings/manage-payment-gateway";
@@ -30,6 +31,7 @@ const SettingsPage = () => {
               <TabsTrigger value="email">Email SMTP setting</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="paymentCms">Payment CMS</TabsTrigger>
+              <TabsTrigger value="GDSAPI">GDS API Settings</TabsTrigger>
               {activeTab === "deals" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
@@ -41,6 +43,9 @@ const SettingsPage = () => {
               )}
               {activeTab === "paymentCms" && (
                 <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[210px]" />
+              )}
+              {activeTab === "GDSAPI" && (
+                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[50px]" />
               )}
             </TabsList>
             <TabsContent value="deals">
@@ -54,6 +59,9 @@ const SettingsPage = () => {
             </TabsContent>
             <TabsContent value="paymentCms">
               <ManagepaymentCms />
+            </TabsContent>
+            <TabsContent value="GDSAPI">
+              <GdsApiSettings />
             </TabsContent>
           </Tabs>
         </div>
