@@ -42,13 +42,13 @@ export function Navbar({ className }: NavbarProps) {
               2
             </span>
           </div> */}
-          <div className="size-7 md:gap-8 rounded-full flex items-center justify-center object-contain cursor-pointer">
+          {/* <div className="size-7 md:gap-8 rounded-full flex items-center justify-center object-contain cursor-pointer">
             <img
               src="/language/english.png"
               alt="region"
               className="w-full h-full object-cover"
             />
-          </div>
+          </div> */}
           <Separator orientation="vertical" className="h-[34px]" />
           <UserNav user={user} loading={isLoading} logout={logout} />
         </div>

@@ -43,14 +43,15 @@ const roleFormSchema = z.object({
 });
 
 const permissionGroups = [
-  "View & Manage User Accounts",
-  "Access Booking Management",
-  "Manage Support Tickets",
-  "View Financial Reports",
-  "Process Refunds",
-  "Generate Reports & Analytics",
-  "Create & Manage Discount Codes",
-  "Configure System Settings",
+  "Dashboard",
+  "Firewall",
+  "Customer Details",
+  "Commission Details",
+  "User Management",
+  "Ticket System",
+  "Landing Page",
+  "Settings",
+  "Search Management"
 ];
 
 const permissions = ["View", "Create", "Delete", "Update", "View All Records"];
