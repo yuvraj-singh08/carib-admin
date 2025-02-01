@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import PermissionButtonGroup from "../permission-button/PermissionButton";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 // Define the Zod schema for validation
 const schema = z.object({

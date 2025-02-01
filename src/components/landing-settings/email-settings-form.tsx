@@ -22,7 +22,7 @@ import {
 import { AppDispatch, RootState } from "@/provider/redux-provider"; // Update this path
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
-import PermissionButtonGroup from "../permission-button/PermissionButton";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 const formSchema = z.object({
   mailDriver: z.string().min(1, "Mail Driver is required"),
@@ -215,7 +215,7 @@ const EMailSettingsForm = () => {
           >
             Send test mail
           </Button>
-          <PermissionButtonGroup resource="settings" action="create">
+          <PermissionButtonGroup resource="settings" action="create|update">
             <Button type="submit" className="bg-blue text-white">
               {emailSMTPs.length > 0
                 ? status === "loading"

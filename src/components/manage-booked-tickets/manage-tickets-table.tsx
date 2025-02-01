@@ -35,7 +35,8 @@ import { Ticket } from "@/redux/tickets";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 import TicketDetails from "./tieket-dialog";
-import PermissionButtonGroup from "../permission-button/PermissionButton";
+import PermissionButtonGroup from "../permissions/PermissionButton";
+import PermissionGroup from "../permissions/PermissionGroup";
 
 const statusOptions = [
   { value: "OPEN", label: "Open Tickets", color: "bg-blue" },
@@ -225,84 +226,95 @@ const BookingTicketsTableWithDateFilter = () => {
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {filteredData.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedItems.includes(item.id)}
-                      onCheckedChange={() => handleCheckboxChange(item.id)}
-                    />
-                  </TableCell>
-                  <TableCell className="text-[13px]">{item.id}</TableCell>
-                  <TableCell className="capitalize">{item.subject}</TableCell>
-                  <TableCell>{item.requesterName}</TableCell>
-                  <TableCell>
-                    {format(new Date(item.requestedOn), "dd-MM-yyyy HH:mm")}
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      value={item.status}
-                      onValueChange={(value) =>
-                        handleTicketStatusChange(item.id, value as TicketStatus)
-                      }
-                    >
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue>
-                          <div className="flex items-center gap-1">
-                            <span
-                              className={`w-3 h-3 shrink-0 rounded-full mr-1 ${
-                                statusOptions.find(
-                                  (option) => option.value === item.status
-                                )?.color
-                              }`}
-                            />
-                            {item.status}
-                          </div>
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {statusOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            <div className="flex items-center">
-                              <div
-                                className={`w-3 h-3 rounded-full mr-2 ${option.color}`}
+            <PermissionGroup resource="ticket_system" action="view">
+              <TableBody>
+                {filteredData.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedItems.includes(item.id)}
+                        onCheckedChange={() => handleCheckboxChange(item.id)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-[13px]">{item.id}</TableCell>
+                    <TableCell className="capitalize">{item.subject}</TableCell>
+                    <TableCell>{item.requesterName}</TableCell>
+                    <TableCell>
+                      {format(new Date(item.requestedOn), "dd-MM-yyyy HH:mm")}
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={item.status}
+                        onValueChange={(value) =>
+                          handleTicketStatusChange(
+                            item.id,
+                            value as TicketStatus
+                          )
+                        }
+                      >
+                        <SelectTrigger className="w-[200px]">
+                          <SelectValue>
+                            <div className="flex items-center gap-1">
+                              <span
+                                className={`w-3 h-3 shrink-0 rounded-full mr-1 ${
+                                  statusOptions.find(
+                                    (option) => option.value === item.status
+                                  )?.color
+                                }`}
                               />
-                              {option.value}
+                              {item.status}
                             </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <PermissionButtonGroup resource="support" action="view">
-                        <Button
-                          variant="ghost"
-                          className="bg-orange-400/20 hover:bg-orange-400/40"
-                          onClick={() => handleViewTicket(item)}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              <div className="flex items-center">
+                                <div
+                                  className={`w-3 h-3 rounded-full mr-2 ${option.color}`}
+                                />
+                                {option.value}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <PermissionButtonGroup
+                          resource="ticket_system"
+                          action="view"
                         >
-                          <Eye size={16} className="text-orange-500" />
-                        </Button>
-                      </PermissionButtonGroup>
-                      <PermissionButtonGroup resource="support" action="delete">
-                        <Button
-                          variant="ghost"
-                          className="bg-red-400/20 hover:bg-red-400/40"
-                          onClick={() => handleDelete(item.id)}
+                          <Button
+                            variant="ghost"
+                            className="bg-orange-400/20 hover:bg-orange-400/40"
+                            onClick={() => handleViewTicket(item)}
+                          >
+                            <Eye size={16} className="text-orange-500" />
+                          </Button>
+                        </PermissionButtonGroup>
+                        <PermissionButtonGroup
+                          resource="ticket_system"
+                          action="delete"
                         >
-                          <Trash2 size={16} className="text-red-500" />
-                        </Button>
-                      </PermissionButtonGroup>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+                          <Button
+                            variant="ghost"
+                            className="bg-red-400/20 hover:bg-red-400/40"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            <Trash2 size={16} className="text-red-500" />
+                          </Button>
+                        </PermissionButtonGroup>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </PermissionGroup>
           </Table>
         </ScrollArea>
-        
+
         <div className="flex items-center justify-between space-x-2 py-4">
           <div>
             <Select

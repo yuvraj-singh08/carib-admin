@@ -1,4 +1,5 @@
 import EMailSettingsForm from "@/components/landing-settings/email-settings-form";
+import PermissionGroup from "@/components/permissions/PermissionGroup";
 import GdsApiSettings from "@/components/settings/GdsApiSettings";
 import CouponManagementSystemTable from "@/components/settings/manage-deals-table";
 import ManagepaymentCms from "@/components/settings/manage-payment-cms";
@@ -49,19 +50,29 @@ const SettingsPage = () => {
               )}
             </TabsList>
             <TabsContent value="deals">
-              <CouponManagementSystemTable />
+              <PermissionGroup resource="settings" action="view">
+                <CouponManagementSystemTable />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="payment">
-              <ManagePaymentGateway />
+              <PermissionGroup resource="settings" action="view">
+                <ManagePaymentGateway />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="email">
-              <EMailSettingsForm />
+              <PermissionGroup resource="settings" action="view">
+                <EMailSettingsForm />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="paymentCms">
-              <ManagepaymentCms />
+              <PermissionGroup resource="settings" action="view">
+                <ManagepaymentCms />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="GDSAPI">
-              <GdsApiSettings />
+              <PermissionGroup resource="settings" action="view">
+                <GdsApiSettings />
+              </PermissionGroup>
             </TabsContent>
           </Tabs>
         </div>

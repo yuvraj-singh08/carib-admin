@@ -6,8 +6,9 @@ export const hasPermission = (
   action: string
 ): boolean => {
   if (!user || !user.role || !user.permissions) return false;
+
   return user.permissions.some(
     (permission) =>
-      permission.name === resource && permission.actions.includes(action)
+      permission.name === resource && action.split("|").map((a) => permission.actions.includes(a)).includes(true)
   );
 };

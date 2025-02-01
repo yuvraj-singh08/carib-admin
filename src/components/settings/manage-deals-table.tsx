@@ -58,7 +58,7 @@ import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { uploadImage } from "@/hooks/aws";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
-import PermissionButtonGroup from "../permission-button/PermissionButton";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 // import { selectMultipleUsers } from "@/redux/useSlice";
 
 const dealFormSchema = z.object({
@@ -282,7 +282,7 @@ const CouponManagementSystemTable = () => {
                 </TableCell>
                 <TableCell className="flex items-center justify-center">
                   <div className="flex items-center space-x-2">
-                    <PermissionButtonGroup resource="discounts" action="view">
+                    <PermissionButtonGroup resource="settings" action="view">
                       <Button
                         variant="ghost"
                         onClick={() => handleView(deal)}
@@ -291,7 +291,7 @@ const CouponManagementSystemTable = () => {
                         <Eye size={16} className="text-blue" />
                       </Button>
                     </PermissionButtonGroup>
-                    <PermissionButtonGroup resource="discounts" action="update">
+                    <PermissionButtonGroup resource="settings" action="update">
                       <Button
                         variant="ghost"
                         className="bg-green-400/20 hover:bg-green-400/40"
@@ -300,7 +300,7 @@ const CouponManagementSystemTable = () => {
                         <Pencil size={16} className="text-green-500" />
                       </Button>
                     </PermissionButtonGroup>
-                    <PermissionButtonGroup resource="discounts" action="delete">
+                    <PermissionButtonGroup resource="settings" action="delete">
                       <Button
                         variant="ghost"
                         onClick={() => handleDelete(deal.id)}

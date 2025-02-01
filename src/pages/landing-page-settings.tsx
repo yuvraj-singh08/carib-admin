@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import TermsConditionsForm from "@/components/landing-settings/terms-text-editor";
 import BlogTable from "@/components/landing-settings/blog-settings";
+import PermissionGroup from "@/components/permissions/PermissionGroup";
 
 const LandingPageSettings = () => {
   const [activeTab, setActiveTab] = useState("cookie");
@@ -44,19 +45,29 @@ const LandingPageSettings = () => {
             </TabsList>
 
             <TabsContent value="cookie">
-              <CookieSettingsForm />
+              <PermissionGroup resource="landing_page" action="view">
+                <CookieSettingsForm />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="privacy">
-              <PrivacyPolicyForm />
+              <PermissionGroup resource="landing_page" action="view">
+                <PrivacyPolicyForm />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="terms">
-              <TermsConditionsForm />
+              <PermissionGroup resource="landing_page" action="view">
+                <TermsConditionsForm />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="socials">
-              <SocialProvidersForm />
+              <PermissionGroup resource="landing_page" action="view">
+                <SocialProvidersForm />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="blogs">
-              <BlogTable />
+              <PermissionGroup resource="landing_page" action="view">
+                <BlogTable />
+              </PermissionGroup>
             </TabsContent>
           </Tabs>
         </div>

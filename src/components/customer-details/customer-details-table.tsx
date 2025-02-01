@@ -29,6 +29,8 @@ import { AppDispatch } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
 import { format } from "date-fns";
+import PermissionGroup from "../permissions/PermissionGroup";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 const InfoItem = ({
   label,
@@ -98,20 +100,21 @@ const UserDetails = ({
         {user?.passportDetails?.passportImg ? (
           <h3 className="text-lg font-bold text-blue mb-4">Passport Image</h3>
         ) : (
-          <h3 className="text-lg font-bold text-blue mb-4"> No Passport Found</h3>
-        
+          <h3 className="text-lg font-bold text-blue mb-4">
+            {" "}
+            No Passport Found
+          </h3>
         )}
-          
-              {user?.passportDetails?.passportImg?.map((img, index) => (
-                <>
-                
-                    <img
-                      src={img}
-                      alt={`uploaded-image-${index}`}
-                      className="w-40 h-auto aspect-square rounded-xl object-cover"
-                    />
-                    </>
-              ))}
+
+        {user?.passportDetails?.passportImg?.map((img, index) => (
+          <>
+            <img
+              src={img}
+              alt={`uploaded-image-${index}`}
+              className="w-40 h-auto aspect-square rounded-xl object-cover"
+            />
+          </>
+        ))}
       </div>
     </div>
 
@@ -119,29 +122,25 @@ const UserDetails = ({
       Additional Details (Co traveler)
     </h3>
     {user.coTraveler && user.coTraveler.length > 0 ? (
-          user.coTraveler.map((coTraveler) => (
-            <div className="space-y-4">
-        <InfoItem
-          label="Name"
-          value={coTraveler.name || "N/A"}
-        />
-        <InfoItem
-          label="DOB"
-          value={new Date(coTraveler.dateOfBirth).toLocaleDateString() || "N/A"}
-        />
-        <InfoItem
-          label="Email"
-          value={coTraveler.email || "N/A"}
-        />
-        <InfoItem
-          label="Passport No"
-          value={coTraveler.passportNumber || "N/A"}
-        />
+      user.coTraveler.map((coTraveler) => (
+        <div className="space-y-4">
+          <InfoItem label="Name" value={coTraveler.name || "N/A"} />
+          <InfoItem
+            label="DOB"
+            value={
+              new Date(coTraveler.dateOfBirth).toLocaleDateString() || "N/A"
+            }
+          />
+          <InfoItem label="Email" value={coTraveler.email || "N/A"} />
+          <InfoItem
+            label="Passport No"
+            value={coTraveler.passportNumber || "N/A"}
+          />
         </div>
-          ))):(
-            <p>No Co-Travellers Found</p>
-          )
-    }
+      ))
+    ) : (
+      <p>No Co-Travellers Found</p>
+    )}
   </div>
 );
 
@@ -219,61 +218,74 @@ const CustomerDetailsTable = () => {
               </TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {paginatedCustomers.map((customer: Customer) => (
-              <TableRow key={customer.id}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center space-x-2">
-                    <Avatar>
-                      <AvatarImage
-                        src={customer.avatarSrc}
-                        alt={customer.firstname}
-                      />
-                      <AvatarFallback>
-                        {customer.firstname.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="truncate">
-                      {customer.firstname} {customer.lastname}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-customBlue">
-                  {customer.mobileNumber}
-                </TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell className="truncate max-w-[100px]">
-                  {customer.address}
-                </TableCell>
-                <TableCell>{customer.dob}</TableCell>
-                <TableCell>
-                  {customer.passportDetails?.passportNumber}
-                </TableCell>
-                <TableCell>{customer.lastBooking}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      className="bg-orange-400/20 hover:bg-orange-400/40"
-                      onClick={() => {
-                        window.scrollTo(0, 0);
-                        setSelectedUser(customer);
-                      }}
-                    >
-                      <Eye size={16} className="text-orange-500" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="bg-red-200/40 hover:bg-red-200/60"
-                      onClick={() => handleDelete(customer.id)}
-                    >
-                      <Trash2 size={16} className="text-red-500" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+          <PermissionGroup resource="customer_details" action="view">
+            <TableBody>
+              {paginatedCustomers.map((customer: Customer) => (
+                <TableRow key={customer.id}>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center space-x-2">
+                      <Avatar>
+                        <AvatarImage
+                          src={customer.avatarSrc}
+                          alt={customer.firstname}
+                        />
+                        <AvatarFallback>
+                          {customer.firstname.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="truncate">
+                        {customer.firstname} {customer.lastname}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-customBlue">
+                    {customer.mobileNumber}
+                  </TableCell>
+                  <TableCell>{customer.email}</TableCell>
+                  <TableCell className="truncate max-w-[100px]">
+                    {customer.address}
+                  </TableCell>
+                  <TableCell>{customer.dob}</TableCell>
+                  <TableCell>
+                    {customer.passportDetails?.passportNumber}
+                  </TableCell>
+                  <TableCell>{customer.lastBooking}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <PermissionButtonGroup
+                        resource="customer_details"
+                        action="view"
+                      >
+                        <Button
+                          variant="ghost"
+                          className="bg-orange-400/20 hover:bg-orange-400/40"
+                          onClick={() => {
+                            window.scrollTo(0, 0);
+                            setSelectedUser(customer);
+                          }}
+                        >
+                          <Eye size={16} className="text-orange-500" />
+                        </Button>
+                      </PermissionButtonGroup>
+
+                      <PermissionButtonGroup
+                        resource="customer_details"
+                        action="delete"
+                      >
+                        <Button
+                          variant="ghost"
+                          className="bg-red-200/40 hover:bg-red-200/60"
+                          onClick={() => handleDelete(customer.id)}
+                        >
+                          <Trash2 size={16} className="text-red-500" />
+                        </Button>
+                      </PermissionButtonGroup>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </PermissionGroup>
         </Table>
         <div className="flex items-center justify-between py-4 px-4">
           <div>

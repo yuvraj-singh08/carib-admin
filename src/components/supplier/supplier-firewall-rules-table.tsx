@@ -51,6 +51,8 @@ import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
 import { useConfirm } from "@/hooks/use-confirm";
 import { Trash2 } from "lucide-react";
+import PermissionButtonGroup from "../permissions/PermissionButton";
+import PermissionGroup from "../permissions/PermissionGroup";
 
 const formSchema = z.object({
   rulesTitle: z.string().optional(),
@@ -147,13 +149,15 @@ export default function FlightRulesManager() {
       cell: ({ row }) => {
         const flightRule = row.original;
         return (
-          <Button
-            variant="ghost"
-            className="bg-red-200/40 hover:bg-red-200/60"
-            onClick={() => handleDelete(flightRule.id)}
-          >
-            <Trash2 size={16} className="text-red-500" />
-          </Button>
+          <PermissionButtonGroup resource="firewall" action="delete">
+            <Button
+              variant="ghost"
+              className="bg-red-200/40 hover:bg-red-200/60"
+              onClick={() => handleDelete(flightRule.id)}
+            >
+              <Trash2 size={16} className="text-red-500" />
+            </Button>
+          </PermissionButtonGroup>
         );
       },
     },
@@ -329,14 +333,16 @@ export default function FlightRulesManager() {
               />
             </div>
             <div className="flex justify-end gap-4 items-center">
-              <Button
-                disabled={status === "loading"}
-                type="submit"
-                className="bg-blue text-white"
-                size={"sm"}
-              >
-                Create Rules
-              </Button>
+              <PermissionButtonGroup resource="firewall" action="create">
+                <Button
+                  disabled={status === "loading"}
+                  type="submit"
+                  className="bg-blue text-white"
+                  size={"sm"}
+                >
+                  Create Rules
+                </Button>
+              </PermissionButtonGroup>
 
               <Button
                 type="button"
@@ -381,37 +387,39 @@ export default function FlightRulesManager() {
                   </TableRow>
                 ))}
               </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          className="px-3 text-[#777980] py-3"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
+              <PermissionGroup resource="firewall" action="view">
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className="px-3 text-[#777980] py-3"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
+                  )}
+                </TableBody>
+              </PermissionGroup>
             </ScrollArea>
           </Table>
         </div>

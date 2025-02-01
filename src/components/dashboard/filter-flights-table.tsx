@@ -49,7 +49,7 @@ import DatePickerWithRange from "../ui/date-range-picker";
 import { Popover } from "@radix-ui/react-popover";
 import { PopoverContent, PopoverTrigger } from "../ui/popover";
 import toast from "react-hot-toast";
-
+import PermissionGroup from "../permissions/PermissionGroup";
 
 const getStatusColor = (status: AdminStatus) => {
   switch (status) {
@@ -75,8 +75,12 @@ export default function FlightBookingsTable() {
   const bookings = useSelector((state: RootState) => state.bookings.bookings);
   const loading = useSelector((state: RootState) => state.bookings.loading);
   const error = useSelector((state: RootState) => state.bookings.error);
-  const emailSending = useSelector((state: RootState) => state.bookings.emailSending);
-  const emailError = useSelector((state: RootState) => state.bookings.emailError);
+  const emailSending = useSelector(
+    (state: RootState) => state.bookings.emailSending
+  );
+  const emailError = useSelector(
+    (state: RootState) => state.bookings.emailError
+  );
   const navigate = useNavigate();
   console.log("Bookings", bookings);
 
@@ -131,7 +135,7 @@ export default function FlightBookingsTable() {
 
   // const handleSendEmail = async (bookingId: string) => {
   //   setOpen(false);
-    
+
   //   setLoadingStates(prev => ({ ...prev, [bookingId]: true }));
   //   try {
   //     // Make a POST request to the backend API
@@ -147,9 +151,9 @@ export default function FlightBookingsTable() {
   //     );
   //     console.log("Email sent successfully:", response.data);
   //     //alert("Email sent successfully!");
-      
+
   //     toast.success("Email sent successfully!");
-      
+
   //   } catch (error) {
   //     console.error("Error sending email:", error);
   //     toast.error("Failed to send email. Check the console for details.");
@@ -158,7 +162,6 @@ export default function FlightBookingsTable() {
   //     setLoadingStates(prev => ({ ...prev, [bookingId]: false }));
   //   }
   // };
-
 
   const handleSendEmail = async (bookingId: string) => {
     setOpen(false);
@@ -265,9 +268,9 @@ export default function FlightBookingsTable() {
           }
         }
         return "N/A"; // Fallback in case of missing data
-      }
+      },
     },
-    
+
     {
       accessorKey: "contactDetail.email",
       header: "Email",
@@ -319,7 +322,7 @@ export default function FlightBookingsTable() {
           ) : (
             <Popover onOpenChange={setOpen}>
               <PopoverTrigger asChild>
-                <Button 
+                <Button
                   variant="secondary"
                   type="button"
                   disabled={emailSending[row.original.id]}
@@ -444,7 +447,7 @@ export default function FlightBookingsTable() {
       </div>
     );
   }
-  console.log("date", date);
+
   return (
     <div className="w-full bg-white px-3 rounded-xl">
       <div className="flex items-center gap-2 py-4">
@@ -588,37 +591,39 @@ export default function FlightBookingsTable() {
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className="px-3 text-[#777980] py-3"
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+            <PermissionGroup resource="dashboard" action="view">
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className="px-3 text-[#777980] py-3"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
+                )}
+              </TableBody>
+            </PermissionGroup>
           </Table>
         </ScrollArea>
       </div>
