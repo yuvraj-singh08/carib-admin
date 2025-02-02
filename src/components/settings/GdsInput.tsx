@@ -27,7 +27,8 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
     handleSubmit,
     watch,
     formState: { errors },
-    setValue
+    setValue,
+    reset
   } = useForm<z.infer<typeof gdsFormSchema>>({
     defaultValues: data,
   });
@@ -162,10 +163,17 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
             )}
           </div>
 
-          <div className="w-full flex justify-end mt-4">
+          <div className="w-full gap-3 flex justify-end mt-4">
+            <button
+              type="button"
+              className="bg-white hover:bg-slate-200 border w-40 rounded-lg py-2 px-4 transition-colors"
+              onClick={() => reset()}
+            >
+              Cancel
+            </button>
             <button
               type="submit"
-              className="bg-blue text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition-colors"
+              className="bg-blue text-white w-40 rounded-lg py-2 px-4 hover:bg-cyan-800 transition-colors"
             >
               Save Changes
             </button>
