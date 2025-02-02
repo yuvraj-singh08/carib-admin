@@ -214,6 +214,7 @@ const CustomerDetailsTable = () => {
               <TableHead>DOB</TableHead>
               <TableHead>Passport No.</TableHead>
               <TableHead>Last Booking</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="flex items-center justify-center">
                 Action
               </TableHead>
@@ -250,6 +251,7 @@ const CustomerDetailsTable = () => {
                   {customer.passportDetails?.passportNumber}
                 </TableCell>
                 <TableCell>{customer.lastBooking}</TableCell>
+                <TableCell>{customer.isBlocked ? (<span className="text-red-500">Blocked</span>) : (<span className="text-green-500">Active</span>)}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button

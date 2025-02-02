@@ -25,6 +25,7 @@ export interface Customer {
   dob?: string;
   role: "ADMIN" | "USER";
   lastBooking?: string;
+  isBlocked?: boolean;
   country?: string;
   gender?: string;
   pincode?: string;
