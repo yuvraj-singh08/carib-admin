@@ -213,6 +213,7 @@ const CustomerDetailsTable = () => {
               <TableHead>DOB</TableHead>
               <TableHead>Passport No.</TableHead>
               <TableHead>Last Booking</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="flex items-center justify-center">
                 Action
               </TableHead>
@@ -286,6 +287,7 @@ const CustomerDetailsTable = () => {
               ))}
             </TableBody>
           </PermissionGroup>
+
         </Table>
         <div className="flex items-center justify-between py-4 px-4">
           <div>

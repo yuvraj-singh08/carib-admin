@@ -61,7 +61,7 @@ export const sendBookingEmail = createAsyncThunk(
   async (bookingId: string, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        "/email/send",
+        `${apiUrl}/email/send`,
         { bookingId },
         {
           headers: {
