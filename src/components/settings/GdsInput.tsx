@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { updateGdsData } from "@/services/GdsSettingService";
 import { GdsData } from "@/hooks/useFetchGdsSetting";
 
 // Define the GDS form schema
