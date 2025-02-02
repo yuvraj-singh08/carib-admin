@@ -33,7 +33,7 @@ const SettingsPage = () => {
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="paymentCms">Payment CMS</TabsTrigger>
               <TabsTrigger value="GDSAPI">GDS API Settings</TabsTrigger>
-              {activeTab === "deals" && (
+              {/* {activeTab === "deals" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
               {activeTab === "payment" && (
@@ -47,7 +47,7 @@ const SettingsPage = () => {
               )}
               {activeTab === "GDSAPI" && (
                 <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[50px]" />
-              )}
+              )} */}
             </TabsList>
             <TabsContent value="deals">
               <PermissionGroup resource="settings" action="view">
