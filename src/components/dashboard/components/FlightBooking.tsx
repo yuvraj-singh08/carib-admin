@@ -175,6 +175,7 @@ const FlightBooking: React.FC = () => {
 
     return route.join(" → ");
   };
+  console.log("getItineraries",getItineraries())
 
   const handleStatusChange = (ticketNumber: number, newStatus: string) => {
     console.log("Status changed:", ticketNumber, newStatus);
@@ -549,8 +550,7 @@ const FlightBooking: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 font-medium">
-                      {subBooking.pnr || flightDetails?.flightDetails?.slices[0]?.PNR || "Not Found"}
-
+                      {subBooking?.pnr || `${flightDetails?.flightDetails?.slices && flightDetails?.flightDetails?.slices[0]?.PNR}` || "Not Found"}
                     </td>
                     <td className="px-4 py-3">
                       {subBooking.ticketNumber?.toString() || "N/A"}
