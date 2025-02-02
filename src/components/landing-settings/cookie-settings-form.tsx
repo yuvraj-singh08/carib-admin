@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 const BASE_API_URL = import.meta.env.VITE_BACKEND_URL as string;
 
@@ -70,9 +71,7 @@ const formSchema = z.object({
   cookieDescription: z.string().min(1, "Cookie Description is required"),
   cookieTitle: z.string().min(1, "Cookie Title is required"),
   strictlyCookieTitle: z.string().optional(),
-  strictlyCookieDescription: z
-    .string()
-    .optional(),
+  strictlyCookieDescription: z.string().optional(),
   contactUsDescription: z.string().optional(),
   contactUsURL: z.string().url("Invalid URL format"),
 });
@@ -357,11 +356,16 @@ const CookieSettingsForm = () => {
         </Card>
 
         {/* Save Button */}
-        <div className="w-full flex items-center justify-end px-5">
-          <Button type="submit" className="w-[120px]">
-            {cookieId ? "Update" : "Save"} Changes
-          </Button>
-        </div>
+        <PermissionButtonGroup
+          resource="landing_page"
+          action={cookieId ? "update" : "create"}
+        >
+          <div className="w-full flex items-center justify-end px-5">
+            <Button type="submit" className="w-[120px]">
+              {cookieId ? "Update" : "Save"} Changes
+            </Button>
+          </div>
+        </PermissionButtonGroup>
       </form>
     </Form>
   );

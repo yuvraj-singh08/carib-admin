@@ -8,7 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Textarea } from "../ui/textarea";
-import PermissionButtonGroup from "../permission-button/PermissionButton";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 interface PaymentOptionProps {
   name: string;

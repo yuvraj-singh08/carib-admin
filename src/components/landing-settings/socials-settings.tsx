@@ -22,6 +22,7 @@ import {
 } from "@/redux/socials";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 interface SocialSettings {
   id: string;
@@ -255,13 +256,18 @@ const SocialProvidersForm: React.FC = () => {
           </CardContent>
         </Card>
         <div className="flex justify-end mt-6">
-          <Button
-            type="submit"
-            className="bg-blue text-white px-6 py-2 rounded"
-            disabled={status === "loading"}
+          <PermissionButtonGroup
+            resource="landing_page"
+            action={settings.length > 0 ? "update" : "create"}
           >
-            {settings.length > 0 ? "Update" : "Save"} Changes
-          </Button>
+            <Button
+              type="submit"
+              className="bg-blue text-white px-6 py-2 rounded"
+              disabled={status === "loading"}
+            >
+              {settings.length > 0 ? "Update" : "Save"} Changes
+            </Button>
+          </PermissionButtonGroup>
         </div>
       </form>
     </Form>

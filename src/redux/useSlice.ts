@@ -1,4 +1,4 @@
-import { userPermission } from "@/components/permission-button/PermissionButton";
+import { userPermission } from "@/components/permissions/PermissionButton";
 import { axiosInstance } from "@/provider/axios";
 import { RootState } from "@/provider/redux-provider";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";

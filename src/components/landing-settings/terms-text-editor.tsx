@@ -26,6 +26,7 @@ import {
   getTermsAndConditions,
   updateTermsAndConditions,
 } from "@/redux/terms-settings"; // Make sure this import path is correct
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 const formSchema = z.object({
   isEnabled: z.boolean().default(false),
@@ -218,16 +219,21 @@ const TermsConditionsForm: React.FC = () => {
               >
                 Reset
               </Button>
-              <Button type="submit" disabled={status === "loading"}>
-                {termsAndConditions.length > 0
-                  ? status === "loading"
-                    ? "Updating"
-                    : "Update Changes"
-                  : "Save Changes"}
-                {status === "loading" && (
-                  <Loader2 className="size-5 shrink-0 animate-spin text-white ml-1" />
-                )}
-              </Button>
+              <PermissionButtonGroup
+                resource="landing_page"
+                action={termsAndConditions.length > 0 ? "update" : "create"}
+              >
+                <Button type="submit" disabled={status === "loading"}>
+                  {termsAndConditions.length > 0
+                    ? status === "loading"
+                      ? "Updating"
+                      : "Update Changes"
+                    : "Save Changes"}
+                  {status === "loading" && (
+                    <Loader2 className="size-5 shrink-0 animate-spin text-white ml-1" />
+                  )}
+                </Button>
+              </PermissionButtonGroup>
             </div>
           </form>
         </Form>

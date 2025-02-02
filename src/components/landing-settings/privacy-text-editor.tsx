@@ -25,6 +25,7 @@ import {
 } from "@/redux/privacy-settings"; // Adjust this import based on your Redux setup
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 const formSchema = z.object({
   isEnabled: z.boolean().default(false),
@@ -213,16 +214,21 @@ const PrivacyPolicyForm: React.FC = () => {
               >
                 Reset
               </Button>
-              <Button type="submit" disabled={status === "loading"}>
-                {privacyPolicies.length > 0
-                  ? status === "loading"
-                    ? "Updating"
-                    : "Update Changes"
-                  : "Save Changes"}
-                {status === "loading" && (
-                  <Loader2 className="size-5 shrink-0 animate-spin text-white ml-1" />
-                )}
-              </Button>
+              <PermissionButtonGroup
+                resource="landing_page"
+                action={privacyPolicies.length > 0 ? "update" : "create"}
+              >
+                <Button type="submit" disabled={status === "loading"}>
+                  {privacyPolicies.length > 0
+                    ? status === "loading"
+                      ? "Updating"
+                      : "Update Changes"
+                    : "Save Changes"}
+                  {status === "loading" && (
+                    <Loader2 className="size-5 shrink-0 animate-spin text-white ml-1" />
+                  )}
+                </Button>
+              </PermissionButtonGroup>
             </div>
           </form>
         </Form>

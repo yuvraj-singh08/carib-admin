@@ -51,6 +51,8 @@ import {
 } from "@/redux/fees-commison";
 import TableLoader from "../shared/table-loader";
 import { format } from "date-fns";
+import PermissionButtonGroup from "../permissions/PermissionButton";
+import PermissionGroup from "../permissions/PermissionGroup";
 
 const formSchema = z.object({
   type: z.string().min(1, "Type is required"),
@@ -216,22 +218,27 @@ export default function FeesCommissionManagerTable() {
           </h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button
-                onClick={() => {
-                  setEditingCommission(null);
-                  form.reset({
-                    type: "",
-                    commissionTitle: "",
-                    supplier: "",
-                    commissionFees: "",
-                    feeType: "PERCENT",
-                  });
-                  setIsDialogOpen(true);
-                }}
+              <PermissionButtonGroup
+                resource="commission_details"
+                action="create"
               >
-                <CirclePlus size={16} className="mr-2 fill-white text-blue" />
-                Add Fees & Commission
-              </Button>
+                <Button
+                  onClick={() => {
+                    setEditingCommission(null);
+                    form.reset({
+                      type: "",
+                      commissionTitle: "",
+                      supplier: "",
+                      commissionFees: "",
+                      feeType: "PERCENT",
+                    });
+                    setIsDialogOpen(true);
+                  }}
+                >
+                  <CirclePlus size={16} className="mr-2 fill-white text-blue" />
+                  Add Fees & Commission
+                </Button>
+              </PermissionButtonGroup>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
@@ -468,71 +475,89 @@ export default function FeesCommissionManagerTable() {
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {status === "loading" ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                </TableCell>
-              </TableRow>
-            ) : status === "failed" ? (
-              <TableRow>
-                <TableCell
-                  colSpan={8}
-                  className="text-center text-red-500 py-4"
-                >
-                  Error: {error || "Failed to load data"}
-                </TableCell>
-              </TableRow>
-            ) : paginatedCommissions.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-4">
-                  No commissions found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              paginatedCommissions.map((fee) => (
-                <TableRow key={fee.id}>
-                  <TableCell>
-                    <input
-                      type="checkbox"
-                      checked={isSelected(fee.id)}
-                      onChange={() => toggleSelectRow(fee.id)}
-                      aria-label="Select row"
-                    />
-                  </TableCell>
-                  <TableCell>{fee.type}</TableCell>
-                  <TableCell>{fee.commissionTitle}</TableCell>
-                  <TableCell>{fee.supplier}</TableCell>
-                  <TableCell>
-                    {fee.commissionFees} {fee.feeType === "PERCENT" ? "%" : "$"}
-                  </TableCell>
-                  <TableCell>
-                    {fee.feeType === "PERCENT" ? "Percentage" : "Fixed Amount"}
-                  </TableCell>
-                  <TableCell>{format(fee.updateTime, "dd/MM/yyyy")}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-4">
-                      <div className="size-7 rounded-md bg-green-200/50 flex items-center justify-center">
-                        <Pencil
-                          size={16}
-                          className="text-gray-500 cursor-pointer text-[#1AB69D]"
-                          onClick={() => handleEdit(fee)}
-                        />
-                      </div>
-                      <div className="size-7 rounded-md bg-red-200/50 flex items-center justify-center">
-                        <Trash2
-                          size={16}
-                          className="text-gray-500 cursor-pointer text-[#EB3D4D]"
-                          onClick={() => handleDelete(fee.id)}
-                        />
-                      </div>
-                    </div>
+          <PermissionGroup resource="commission_details" action="view">
+            <TableBody>
+              {status === "loading" ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
+              ) : status === "failed" ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    className="text-center text-red-500 py-4"
+                  >
+                    Error: {error || "Failed to load data"}
+                  </TableCell>
+                </TableRow>
+              ) : paginatedCommissions.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-4">
+                    No commissions found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedCommissions.map((fee) => (
+                  <TableRow key={fee.id}>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={isSelected(fee.id)}
+                        onChange={() => toggleSelectRow(fee.id)}
+                        aria-label="Select row"
+                      />
+                    </TableCell>
+                    <TableCell>{fee.type}</TableCell>
+                    <TableCell>{fee.commissionTitle}</TableCell>
+                    <TableCell>{fee.supplier}</TableCell>
+                    <TableCell>
+                      {fee.commissionFees}{" "}
+                      {fee.feeType === "PERCENT" ? "%" : "$"}
+                    </TableCell>
+                    <TableCell>
+                      {fee.feeType === "PERCENT"
+                        ? "Percentage"
+                        : "Fixed Amount"}
+                    </TableCell>
+                    <TableCell>
+                      {format(fee.updateTime, "dd/MM/yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-4">
+                        <PermissionButtonGroup
+                          resource="commission_details"
+                          action="update"
+                        >
+                          <div className="size-7 rounded-md bg-green-200/50 flex items-center justify-center">
+                            <Pencil
+                              size={16}
+                              className="text-gray-500 cursor-pointer text-[#1AB69D]"
+                              onClick={() => handleEdit(fee)}
+                            />
+                          </div>
+                        </PermissionButtonGroup>
+
+                        <PermissionButtonGroup
+                          resource="commission_details"
+                          action="delete"
+                        >
+                          <div className="size-7 rounded-md bg-red-200/50 flex items-center justify-center">
+                            <Trash2
+                              size={16}
+                              className="text-gray-500 cursor-pointer text-[#EB3D4D]"
+                              onClick={() => handleDelete(fee.id)}
+                            />
+                          </div>
+                        </PermissionButtonGroup>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </PermissionGroup>
         </Table>
         <div className="flex items-center justify-between mt-4">
           <div>
