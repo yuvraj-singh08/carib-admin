@@ -110,7 +110,7 @@ const ManagePaymentCms = () => {
                   className="w-full resize-none h-[140px]"
                   required
                 />
-                <PermissionButtonGroup resource="settings" action="create">
+                <PermissionButtonGroup resource="settings" action="create|update">
                   <Button
                     className="w-full"
                     onClick={() => handleSubmit(option.id)}

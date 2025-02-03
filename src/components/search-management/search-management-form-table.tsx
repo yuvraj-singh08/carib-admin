@@ -193,12 +193,14 @@ export default function SearchManagementTable() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => (
-        <Switch
-          checked={row.original.status === "ACTIVE"}
-          onCheckedChange={(checked) =>
-            handleStatusChange(row.original.id, checked)
-          }
-        />
+        <PermissionButtonGroup resource="search_management" action="update">
+          <Switch
+            checked={row.original.status === "ACTIVE"}
+            onCheckedChange={(checked) =>
+              handleStatusChange(row.original.id, checked)
+            }
+          />
+        </PermissionButtonGroup>
       ),
     },
     {

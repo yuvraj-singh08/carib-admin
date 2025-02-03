@@ -34,8 +34,16 @@ import { Separator } from "../ui/separator";
 import { useConfirm } from "@/hooks/use-confirm";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { useDispatch, useSelector } from "react-redux";
-import { addRole, deleteRole, fetchRoles, updateRole, RoleType} from "@/redux/user-role-permission";
+import {
+  addRole,
+  deleteRole,
+  fetchRoles,
+  updateRole,
+  RoleType,
+} from "@/redux/user-role-permission";
 import toast from "react-hot-toast";
+import PermissionGroup from "../permissions/PermissionGroup";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 const roleFormSchema = z.object({
   name: z.string().min(1, "Role name is required"),
@@ -51,7 +59,7 @@ const permissionGroups = [
   "Ticket System",
   "Landing Page",
   "Settings",
-  "Search Management"
+  "Search Management",
 ];
 
 const permissions = ["View", "Create", "Delete", "Update", "View All Records"];
@@ -59,12 +67,14 @@ const permissions = ["View", "Create", "Delete", "Update", "View All Records"];
 export default function CompleteRoleManagementComponent() {
   const dispatch = useDispatch<AppDispatch>();
   const { roles } = useSelector((state: RootState) => state.roles);
-  
+
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isPermissionDialogOpen, setIsPermissionDialogOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
-  const [permissionStates, setPermissionStates] = useState<{ [key: string]: boolean }>({});
-  
+  const [permissionStates, setPermissionStates] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Role",
     "Are you sure you want to delete this role? This action cannot be undone."
@@ -134,7 +144,7 @@ export default function CompleteRoleManagementComponent() {
         }, {} as { [key: string]: { view: boolean; update: boolean } }),
       })),
     };
-  
+
     dispatch(addRole(newRole));
     toast.success("Role created successfully.");
     setIsCreateDialogOpen(false);
@@ -142,34 +152,38 @@ export default function CompleteRoleManagementComponent() {
   };
 
   const togglePermissionGroup = (group: string) => {
-    const isGroupActive = !permissionStates[group]; 
+    const isGroupActive = !permissionStates[group];
     setPermissionStates((prev) => ({
       ...prev,
       [group]: isGroupActive,
     }));
-  
+
     if (selectedRole) {
       const updatedRole = { ...selectedRole };
       const groupIndex = updatedRole.permissionGroups.findIndex(
         (g) => g.name === group
       );
-  
+
       if (groupIndex !== -1) {
         // Update group active state
         updatedRole.permissionGroups[groupIndex].active = isGroupActive;
-  
-        Object.keys(updatedRole.permissionGroups[groupIndex].permissions).forEach(
-          (permission) => {
-            updatedRole.permissionGroups[groupIndex].permissions[permission].view = isGroupActive;
-            updatedRole.permissionGroups[groupIndex].permissions[permission].update = isGroupActive;
-          }
-        );
-  
+
+        Object.keys(
+          updatedRole.permissionGroups[groupIndex].permissions
+        ).forEach((permission) => {
+          updatedRole.permissionGroups[groupIndex].permissions[
+            permission
+          ].view = isGroupActive;
+          updatedRole.permissionGroups[groupIndex].permissions[
+            permission
+          ].update = isGroupActive;
+        });
+
         setSelectedRole(updatedRole);
       }
     }
   };
-  
+
   const handlePermissionChange = (
     group: string,
     permission: string,
@@ -178,36 +192,38 @@ export default function CompleteRoleManagementComponent() {
   ) => {
     if (selectedRole && permissionStates[group]) {
       // Clone the selectedRole object to avoid mutating the original state
-      const updatedRole = { 
-        ...selectedRole, 
+      const updatedRole = {
+        ...selectedRole,
         permissionGroups: selectedRole.permissionGroups.map((g) => {
           if (g.name === group) {
             return {
               ...g,
               permissions: {
                 ...g.permissions,
-                [permission]: { 
-                  ...g.permissions[permission], 
+                [permission]: {
+                  ...g.permissions[permission],
                   [type]: value, // Update the specific permission
-                }
-              }
+                },
+              },
             };
           }
           return g;
-        })
+        }),
       };
-  
+
       // Check if any permission is active to determine the group state
-      const groupIndex = updatedRole.permissionGroups.findIndex((g) => g.name === group);
+      const groupIndex = updatedRole.permissionGroups.findIndex(
+        (g) => g.name === group
+      );
       if (groupIndex !== -1) {
-        const isAnyPermissionActive = Object.values(updatedRole.permissionGroups[groupIndex].permissions).some(
-          (perm) => perm.view || perm.update
-        );
+        const isAnyPermissionActive = Object.values(
+          updatedRole.permissionGroups[groupIndex].permissions
+        ).some((perm) => perm.view || perm.update);
         updatedRole.permissionGroups[groupIndex].active = isAnyPermissionActive;
       }
-  
+
       setSelectedRole(updatedRole);
-  
+
       // Also update permissionStates
       setPermissionStates((prev) => ({
         ...prev,
@@ -215,7 +231,6 @@ export default function CompleteRoleManagementComponent() {
       }));
     }
   };
-  
 
   const handleDelete = async (id: string) => {
     const ok = await confirm();
@@ -236,16 +251,24 @@ export default function CompleteRoleManagementComponent() {
       <div className="w-full bg-white px-3 rounded-lg space-y-6 py-5">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold text-blue">Role Management</h2>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <Dialog
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+          >
             <DialogTrigger asChild>
-              <Button>Create Role</Button>
+              <PermissionButtonGroup resource="user_management" action="create">
+                <Button>Create Role</Button>
+              </PermissionButtonGroup>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Create Role</DialogTitle>
               </DialogHeader>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={form.control}
                     name="name"
@@ -286,28 +309,37 @@ export default function CompleteRoleManagementComponent() {
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {roles.map((role) => (
-              <TableRow key={role.id}>
-                <TableCell>{role.name}</TableCell>
-                <TableCell>{role.description}</TableCell>
-                <TableCell>
-                  <Button variant="outline" onClick={() => openPermissionDialog(role)}>
-                    Permissions
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleDelete(role.id)}
-                    className="bg-red-400/20 hover:bg-red-400/40"
-                  >
-                    <Trash2 size={16} className="text-red-500" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+          <PermissionGroup resource="user_management" action="view">
+            <TableBody>
+              {roles.map((role) => (
+                <TableRow key={role.id}>
+                  <TableCell>{role.name}</TableCell>
+                  <TableCell>{role.description}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      onClick={() => openPermissionDialog(role)}
+                    >
+                      Permissions
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <PermissionButtonGroup
+                      resource="user_management"
+                      action="delete"
+                    >
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleDelete(role.id)}
+                      >
+                        <Trash2 size={18} />
+                      </Button>
+                    </PermissionButtonGroup>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </PermissionGroup>
         </Table>
         <Dialog
           open={isPermissionDialogOpen}
@@ -354,7 +386,12 @@ export default function CompleteRoleManagementComponent() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit">Update</Button>
+                  <PermissionButtonGroup
+                    resource="user_management"
+                    action="update"
+                  >
+                    <Button type="submit">Update</Button>
+                  </PermissionButtonGroup>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   {permissionGroups.map((group) => (
@@ -371,7 +408,10 @@ export default function CompleteRoleManagementComponent() {
                           <div className="col-span-2">Name</div>
                           <div className="col-span-1 pl-4">Permissions</div>
                           {/* <div className="col-span-1 pl-3">Update</div> */}
-                          <Separator orientation="horizontal" className="col-span-4" />
+                          <Separator
+                            orientation="horizontal"
+                            className="col-span-4"
+                          />
                           {permissions.map((permission) => (
                             <React.Fragment key={permission}>
                               <div className="col-span-2">{permission}</div>
