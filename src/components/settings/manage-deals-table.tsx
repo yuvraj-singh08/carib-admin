@@ -220,28 +220,30 @@ const CouponManagementSystemTable = () => {
         <div className="flex justify-between mb-4">
           <h1 className="text-2xl font-bold text-blue">Special Deals</h1>
           <div className="flex items-center gap-2">
-            <Button
-              onClick={() => {
-                setEditingDeal(null);
-                form.reset({
-                  title: "",
-                  way: "oneway",
-                  code: "",
-                  origin: null,
-                  discount: "",
-                  discountType: "percentage",
-                  airlineCode: null,
-                  userLimit: 0,
-                  flightCode: null,
-                  expiryDate: new Date(),
-                  description: "",
-                });
-                setIsDialogOpen(true);
-              }}
-            >
-              <CirclePlus size={16} className="mr-2 fill-white text-blue" />
-              Add Special Deal
-            </Button>
+            <PermissionButtonGroup resource="settings" action="create">
+              <Button
+                onClick={() => {
+                  setEditingDeal(null);
+                  form.reset({
+                    title: "",
+                    way: "oneway",
+                    code: "",
+                    origin: null,
+                    discount: "",
+                    discountType: "percentage",
+                    airlineCode: null,
+                    userLimit: 0,
+                    flightCode: null,
+                    expiryDate: new Date(),
+                    description: "",
+                  });
+                  setIsDialogOpen(true);
+                }}
+              >
+                <CirclePlus size={16} className="mr-2 fill-white text-blue" />
+                Add Special Deal
+              </Button>
+            </PermissionButtonGroup>
             <div className="relative hidden md:block">
               <Input
                 placeholder="Search..."

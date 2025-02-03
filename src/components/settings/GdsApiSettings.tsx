@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import "./Gdsapi.css";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 const GdsApiSettings = () => {
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({
@@ -41,28 +42,41 @@ const GdsApiSettings = () => {
                   <div className="flex gap-4">
                     <div className="container">
                       <div className="tabs w-fit relative">
-                        <span className={`glider ${serverType[tab] === "Test Server" ? "test" : "production"}`}></span>
+                        <span
+                          className={`glider ${
+                            serverType[tab] === "Test Server"
+                              ? "test"
+                              : "production"
+                          }`}
+                        ></span>
 
                         <input
                           type="radio"
                           id={`${tab}-radio-1`}
                           name={`${tab}-tabs`}
                           checked={serverType[tab] === "Test Server"}
-                          onChange={() => handleServerChange(tab, "Test Server")}
+                          onChange={() =>
+                            handleServerChange(tab, "Test Server")
+                          }
                         />
-                        <label className="tab" htmlFor={`${tab}-radio-1`}>Test Server</label>
+                        <label className="tab" htmlFor={`${tab}-radio-1`}>
+                          Test Server
+                        </label>
 
                         <input
                           type="radio"
                           id={`${tab}-radio-2`}
                           name={`${tab}-tabs`}
                           checked={serverType[tab] === "Production Server"}
-                          onChange={() => handleServerChange(tab, "Production Server")}
+                          onChange={() =>
+                            handleServerChange(tab, "Production Server")
+                          }
                         />
-                        <label className="tab" htmlFor={`${tab}-radio-2`}>Production Server</label>
+                        <label className="tab" htmlFor={`${tab}-radio-2`}>
+                          Production Server
+                        </label>
                       </div>
                     </div>
-
                   </div>
                 </div>
                 <div>
@@ -84,9 +98,14 @@ const GdsApiSettings = () => {
                   )}
                 </div>
                 <div className="w-full flex justify-end">
-                  <button className="bg-blue rounded-lg text-white py-1 px-3 mt-2">
-                    Save Changes
-                  </button>
+                  <PermissionButtonGroup
+                    resource="settings"
+                    action="create|update"
+                  >
+                    <button className="bg-blue rounded-lg text-white py-1 px-3 mt-2">
+                      Save Changes
+                    </button>
+                  </PermissionButtonGroup>
                 </div>
               </div>
             )}
