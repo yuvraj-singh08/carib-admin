@@ -6,6 +6,7 @@ import { useStore } from "@/hooks/use-store";
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
 import { Sidebar } from "./sidebar";
 import { Navbar } from "./layout-navbar";
+import { AdminProvider } from "../AdminProvider/admin-context";
 
 export default function AdminPanelLayout({
   children,
@@ -17,7 +18,7 @@ export default function AdminPanelLayout({
   if (!sidebar) return null;
 
   return (
-    <>
+    <AdminProvider>
       <Navbar className="fixed top-0 left-0 right-0" />
       <Sidebar />
       <main
@@ -28,6 +29,6 @@ export default function AdminPanelLayout({
       >
         {children}
       </main>
-    </>
+    </AdminProvider>
   );
 }

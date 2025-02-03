@@ -1,8 +1,5 @@
-import { hasPermission } from "@/lib/hasPermission";
-import { AppDispatch, RootState } from "@/provider/redux-provider";
-import { fetchUserById } from "@/redux/useSlice";
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useAdmin } from "../AdminProvider/admin-context";
 
 export interface userPermission {
   name: string;
@@ -20,28 +17,9 @@ const PermissionGroup: React.FC<PermissionGroupProps> = ({
   action,
   children,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
-
-  const admin = useSelector((state: RootState) => state.user.user);
-
-  useEffect(() => {
-    dispatch(fetchUserById());
-  }, [dispatch]);
-
-  if (!admin) {
-    return null;
-  }
-
-  const userPermission = admin.permissions;
+  const { hasPermission } = useAdmin();
   
-  console.log(userPermission);
-  if (!userPermission) {
-    return null;
-  }
-
-  const hasPermissionToRender = admin && hasPermission(admin, resource, action);
-
-  if (!hasPermissionToRender) {
+  if (!hasPermission(resource, action)) {
     return null;
   }
 
