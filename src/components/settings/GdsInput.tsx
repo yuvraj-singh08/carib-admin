@@ -3,11 +3,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { GdsData } from "@/hooks/useFetchGdsSetting";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 // Define the GDS form schema
 const gdsFormSchema = z.object({
-  gds: z.enum(['DUFFEL', 'AMADEUS', 'KIU']),
-  mode: z.enum(['PRODUCTION', 'TEST']),
+  gds: z.enum(["DUFFEL", "AMADEUS", "KIU"]),
+  mode: z.enum(["PRODUCTION", "TEST"]),
   testApiKey: z.string().min(1, "Test API Key is required"),
   productionApiKey: z.string().min(1, "Production API Key is required"),
   productionApiSecret: z.string().min(1, "Production Secret Key is required"),
@@ -28,11 +29,11 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
     watch,
     formState: { errors },
     setValue,
-    reset
+    reset,
   } = useForm<z.infer<typeof gdsFormSchema>>({
     defaultValues: data,
   });
-  console.log("Haha")
+  console.log("Haha");
   const currentMode = watch("mode");
   const currentGds = watch("gds");
 
@@ -42,8 +43,8 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
   };
 
   // Handle mode change
-  const handleModeChange = (mode: 'TEST' | 'PRODUCTION') => {
-    setValue('mode', mode, { shouldValidate: true });
+  const handleModeChange = (mode: "TEST" | "PRODUCTION") => {
+    setValue("mode", mode, { shouldValidate: true });
   };
 
   // Handle form submission
@@ -63,11 +64,18 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
       </button>
 
       {sectionOpen && (
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-4 border-t">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="p-4 border-t"
+        >
           <div className="mb-4">
             <label className="font-semibold block mb-2">Select Mode:</label>
             <div className="tabs w-fit relative">
-              <span className={`glider ${currentMode === "TEST" ? "test" : "production"}`}></span>
+              <span
+                className={`glider ${
+                  currentMode === "TEST" ? "test" : "production"
+                }`}
+              ></span>
 
               {/* Test Mode Radio */}
               <input
@@ -115,7 +123,9 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
                 placeholder="API Key"
               />
               {errors.testApiKey && (
-                <p className="text-red-500 text-sm mt-1">{errors.testApiKey.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.testApiKey.message}
+                </p>
               )}
             </div>
 
@@ -129,7 +139,9 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
                   placeholder="Secret Key"
                 />
                 {errors.testApiSecret && (
-                  <p className="text-red-500 text-sm mt-1">{errors.testApiSecret.message}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.testApiSecret.message}
+                  </p>
                 )}
               </div>
             )}
@@ -143,7 +155,9 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
                 placeholder="API Key"
               />
               {errors.productionApiKey && (
-                <p className="text-red-500 text-sm mt-1">{errors.productionApiKey.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.productionApiKey.message}
+                </p>
               )}
             </div>
 
@@ -157,7 +171,9 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
                   placeholder="Secret Key"
                 />
                 {errors.productionApiSecret && (
-                  <p className="text-red-500 text-sm mt-1">{errors.productionApiSecret.message}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.productionApiSecret.message}
+                  </p>
                 )}
               </div>
             )}
@@ -171,12 +187,14 @@ export default function GdsInput({ data, onSubmit }: GdsInputProps) {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="bg-blue text-white w-40 rounded-lg py-2 px-4 hover:bg-cyan-800 transition-colors"
-            >
-              Save Changes
-            </button>
+            <PermissionButtonGroup resource="settings" action="create|update">
+              <button
+                type="submit"
+                className="bg-blue text-white w-40 rounded-lg py-2 px-4 hover:bg-cyan-800 transition-colors"
+              >
+                Save Changes
+              </button>
+            </PermissionButtonGroup>
           </div>
         </form>
       )}
