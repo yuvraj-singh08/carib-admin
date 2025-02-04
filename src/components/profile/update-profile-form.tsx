@@ -255,7 +255,7 @@ export default function ProfileForm() {
         </form>
       </Form>
 
-      <div className="mt-12">
+      {/* <div className="mt-12">
         <h2 className="text-xl font-semibold text-blue mb-6">
           Change Password
         </h2>
@@ -314,7 +314,7 @@ export default function ProfileForm() {
             </Button>
           </form>
         </Form>
-      </div>
+      </div> */}
     </div>
   );
 }

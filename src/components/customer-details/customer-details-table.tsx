@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 import {
   Customer,
   deleteCustomer,
@@ -22,16 +24,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ArrowLeft, Eye, Trash2 } from "lucide-react";
+import { ArrowLeft, Eye, Loader, Trash2 } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { useConfirm } from "@/hooks/use-confirm";
 import { AppDispatch } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
 import { format } from "date-fns";
-import PermissionGroup from "../permissions/PermissionGroup";
-import PermissionButtonGroup from "../permissions/PermissionButton";
-
+import { axiosInstance } from "@/provider/axios";
 const InfoItem = ({
   label,
   value,
@@ -152,6 +152,7 @@ const CustomerDetailsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedUser, setSelectedUser] = useState<Customer | null>(null);
+  const [loadingUsers, setLoadingUsers] = useState<{ [key: string]: boolean }>({});
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Customer Details",
     "Are you sure you want to delete this customer details? This action cannot be undone."
@@ -162,6 +163,36 @@ const CustomerDetailsTable = () => {
       dispatch(fetchCustomers());
     }
   }, [status, dispatch]);
+
+  const handleStatusChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    id: string
+  ) => {
+    //const newStatus = e.target.value;
+    const newStatus = e.target.value;
+    setLoadingUsers((prev) => ({ ...prev, [id]: true }));
+
+    try {
+      if (newStatus === "active") {
+        const response = await axiosInstance.post(`${apiUrl}/user/unblock`, {
+          id,
+        });
+        //setUserStatuses(prev => ({ ...prev, [id]: newStatus }));
+        toast.success(response.data.message);
+        dispatch(fetchCustomers());
+      } else {
+        const response = await axiosInstance.post(`${apiUrl}/user/block`, {
+          id,
+        });
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error changing user status:", error);
+      toast.error("Error", error.message);
+    } finally {
+      setLoadingUsers((prev) => ({ ...prev, [id]: false }));
+    }
+  };
 
   const paginatedCustomers = customers.slice(
     (currentPage - 1) * pageSize,
@@ -219,75 +250,75 @@ const CustomerDetailsTable = () => {
               </TableHead>
             </TableRow>
           </TableHeader>
-          <PermissionGroup resource="customer_details" action="view">
-            <TableBody>
-              {paginatedCustomers.map((customer: Customer) => (
-                <TableRow key={customer.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center space-x-2">
-                      <Avatar>
-                        <AvatarImage
-                          src={customer.avatarSrc}
-                          alt={customer.firstname}
-                        />
-                        <AvatarFallback>
-                          {customer.firstname.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="truncate">
-                        {customer.firstname} {customer.lastname}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-customBlue">
-                    {customer.mobileNumber}
-                  </TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell className="truncate max-w-[100px]">
-                    {customer.address}
-                  </TableCell>
-                  <TableCell>{customer.dob}</TableCell>
+          <TableBody>
+            {paginatedCustomers.map((customer: Customer) => (
+              <TableRow key={customer.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center space-x-2">
+                    <Avatar>
+                      <AvatarImage
+                        src={customer.avatarSrc}
+                        alt={customer.firstname}
+                      />
+                      <AvatarFallback>
+                        {customer.firstname.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="truncate">
+                      {customer.firstname} {customer.lastname}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-customBlue">
+                  {customer.mobileNumber}
+                </TableCell>
+                <TableCell>{customer.email}</TableCell>
+                <TableCell className="truncate max-w-[100px]">
+                  {customer.address}
+                </TableCell>
+                <TableCell>{customer.dob}</TableCell>
+                <TableCell>
+                  {customer.passportDetails?.passportNumber}
+                </TableCell>
+                <TableCell>{customer.lastBooking}</TableCell>
+                {loadingUsers[customer.id] ? (
+                  <div className="flex justify-center mt-4 self-center"><Loader className=" size-5 shrink-0 animate-spin" /></div>
+                ) : (
                   <TableCell>
-                    {customer.passportDetails?.passportNumber}
+                    <select
+                       value={customer.isBlocked ? "blocked" : "active"}
+                      onChange={(e) => handleStatusChange(e, customer.id)}
+                      className="border rounded px-2 py-1 text-sm"
+                    >
+                        <option value="blocked">🔴 Blocked</option>
+                      <option value="active">🟢 Active</option>
+                    </select>
                   </TableCell>
-                  <TableCell>{customer.lastBooking}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <PermissionButtonGroup
-                        resource="customer_details"
-                        action="view"
-                      >
-                        <Button
-                          variant="ghost"
-                          className="bg-orange-400/20 hover:bg-orange-400/40"
-                          onClick={() => {
-                            window.scrollTo(0, 0);
-                            setSelectedUser(customer);
-                          }}
-                        >
-                          <Eye size={16} className="text-orange-500" />
-                        </Button>
-                      </PermissionButtonGroup>
-
-                      <PermissionButtonGroup
-                        resource="customer_details"
-                        action="delete"
-                      >
-                        <Button
-                          variant="ghost"
-                          className="bg-red-200/40 hover:bg-red-200/60"
-                          onClick={() => handleDelete(customer.id)}
-                        >
-                          <Trash2 size={16} className="text-red-500" />
-                        </Button>
-                      </PermissionButtonGroup>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </PermissionGroup>
-
+                )}
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="ghost"
+                      className="bg-orange-400/20 hover:bg-orange-400/40"
+                      onClick={() => {
+                        window.scrollTo(0, 0);
+                        setSelectedUser(customer);
+                      }}
+                    >
+                      <Eye size={16} className="text-orange-500" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="bg-red-200/40 hover:bg-red-200/60"
+                      onClick={() => handleDelete(customer.id)}
+                    >
+                      <Trash2 size={16} className="text-red-500" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
         </Table>
         <div className="flex items-center justify-between py-4 px-4">
           <div>
