@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 import {
   Customer,
   deleteCustomer,
@@ -22,14 +24,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ArrowLeft, Eye, Trash2 } from "lucide-react";
+import { ArrowLeft, Eye, Loader, Trash2 } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { useConfirm } from "@/hooks/use-confirm";
 import { AppDispatch } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
 import { format } from "date-fns";
-
+import { axiosInstance } from "@/provider/axios";
 const InfoItem = ({
   label,
   value,
@@ -98,20 +100,21 @@ const UserDetails = ({
         {user?.passportDetails?.passportImg ? (
           <h3 className="text-lg font-bold text-blue mb-4">Passport Image</h3>
         ) : (
-          <h3 className="text-lg font-bold text-blue mb-4"> No Passport Found</h3>
-        
+          <h3 className="text-lg font-bold text-blue mb-4">
+            {" "}
+            No Passport Found
+          </h3>
         )}
-          
-              {user?.passportDetails?.passportImg?.map((img, index) => (
-                <>
-                
-                    <img
-                      src={img}
-                      alt={`uploaded-image-${index}`}
-                      className="w-40 h-auto aspect-square rounded-xl object-cover"
-                    />
-                    </>
-              ))}
+
+        {user?.passportDetails?.passportImg?.map((img, index) => (
+          <>
+            <img
+              src={img}
+              alt={`uploaded-image-${index}`}
+              className="w-40 h-auto aspect-square rounded-xl object-cover"
+            />
+          </>
+        ))}
       </div>
     </div>
 
@@ -119,29 +122,25 @@ const UserDetails = ({
       Additional Details (Co traveler)
     </h3>
     {user.coTraveler && user.coTraveler.length > 0 ? (
-          user.coTraveler.map((coTraveler) => (
-            <div className="space-y-4">
-        <InfoItem
-          label="Name"
-          value={coTraveler.name || "N/A"}
-        />
-        <InfoItem
-          label="DOB"
-          value={new Date(coTraveler.dateOfBirth).toLocaleDateString() || "N/A"}
-        />
-        <InfoItem
-          label="Email"
-          value={coTraveler.email || "N/A"}
-        />
-        <InfoItem
-          label="Passport No"
-          value={coTraveler.passportNumber || "N/A"}
-        />
+      user.coTraveler.map((coTraveler) => (
+        <div className="space-y-4">
+          <InfoItem label="Name" value={coTraveler.name || "N/A"} />
+          <InfoItem
+            label="DOB"
+            value={
+              new Date(coTraveler.dateOfBirth).toLocaleDateString() || "N/A"
+            }
+          />
+          <InfoItem label="Email" value={coTraveler.email || "N/A"} />
+          <InfoItem
+            label="Passport No"
+            value={coTraveler.passportNumber || "N/A"}
+          />
         </div>
-          ))):(
-            <p>No Co-Travellers Found</p>
-          )
-    }
+      ))
+    ) : (
+      <p>No Co-Travellers Found</p>
+    )}
   </div>
 );
 
@@ -153,6 +152,7 @@ const CustomerDetailsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedUser, setSelectedUser] = useState<Customer | null>(null);
+  const [loadingUsers, setLoadingUsers] = useState<{ [key: string]: boolean }>({});
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Customer Details",
     "Are you sure you want to delete this customer details? This action cannot be undone."
@@ -163,6 +163,36 @@ const CustomerDetailsTable = () => {
       dispatch(fetchCustomers());
     }
   }, [status, dispatch]);
+
+  const handleStatusChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    id: string
+  ) => {
+    //const newStatus = e.target.value;
+    const newStatus = e.target.value;
+    setLoadingUsers((prev) => ({ ...prev, [id]: true }));
+
+    try {
+      if (newStatus === "active") {
+        const response = await axiosInstance.post(`${apiUrl}/user/unblock`, {
+          id,
+        });
+        //setUserStatuses(prev => ({ ...prev, [id]: newStatus }));
+        toast.success(response.data.message);
+        dispatch(fetchCustomers());
+      } else {
+        const response = await axiosInstance.post(`${apiUrl}/user/block`, {
+          id,
+        });
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error changing user status:", error);
+      toast.error("Error", error.message);
+    } finally {
+      setLoadingUsers((prev) => ({ ...prev, [id]: false }));
+    }
+  };
 
   const paginatedCustomers = customers.slice(
     (currentPage - 1) * pageSize,
@@ -251,7 +281,20 @@ const CustomerDetailsTable = () => {
                   {customer.passportDetails?.passportNumber}
                 </TableCell>
                 <TableCell>{customer.lastBooking}</TableCell>
-                <TableCell>{customer.isBlocked ? (<span className="text-red-500">Blocked</span>) : (<span className="text-green-500">Active</span>)}</TableCell>
+                {loadingUsers[customer.id] ? (
+                  <div className="flex justify-center mt-4 self-center"><Loader className=" size-5 shrink-0 animate-spin" /></div>
+                ) : (
+                  <TableCell>
+                    <select
+                       value={customer.isBlocked ? "blocked" : "active"}
+                      onChange={(e) => handleStatusChange(e, customer.id)}
+                      className="border rounded px-2 py-1 text-sm"
+                    >
+                        <option value="blocked">🔴 Blocked</option>
+                      <option value="active">🟢 Active</option>
+                    </select>
+                  </TableCell>
+                )}
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button
