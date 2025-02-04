@@ -46,7 +46,8 @@ import {
   ManageUser,
 } from "@/redux/manage-user";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
-import PermissionButtonGroup from "../permission-button/PermissionButton";
+import PermissionButtonGroup from "../permissions/PermissionButton";
+import PermissionGroup from "../permissions/PermissionGroup";
 
 const userFormSchema = z
   .object({
@@ -217,25 +218,27 @@ export default function UserManagementPage() {
           <h2 className="text-2xl font-semibold text-blue">User Management</h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button
-                onClick={() => {
-                  setEditingUser(null);
-                  form.reset({
-                    uniqueId: "",
-                    name: "",
-                    email: "",
-                    roleId: "",
-                    roleName: "",
-                    address: "",
-                    password: "",
-                    confirmPassword: "",
-                    status: "ACTIVE",
-                  });
-                  setIsDialogOpen(true);
-                }}
-              >
-                Add User
-              </Button>
+              <PermissionButtonGroup resource="user_management" action="create">
+                <Button
+                  onClick={() => {
+                    setEditingUser(null);
+                    form.reset({
+                      uniqueId: "",
+                      name: "",
+                      email: "",
+                      roleId: "",
+                      roleName: "",
+                      address: "",
+                      password: "",
+                      confirmPassword: "",
+                      status: "ACTIVE",
+                    });
+                    setIsDialogOpen(true);
+                  }}
+                >
+                  Add User
+                </Button>
+              </PermissionButtonGroup>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
@@ -454,59 +457,69 @@ export default function UserManagementPage() {
               <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {paginatedUsers.map((user: any, index: number) => {
-              const roleName =
-                roles.find((role: any) => role.id === user.roleId)?.name ||
-                "N/A";
-              return (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <input
-                      type="checkbox"
-                      checked={checkedRows[index] || false}
-                      onChange={() => handleRowCheckboxChange(index)}
-                    />
-                  </TableCell>
-                  <TableCell>{user.uniqueId}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.contact}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{roleName}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                        user.status === "ACTIVE" ? "bg-green-500" : "bg-red-500"
-                      }`}
-                    ></span>
-                    {user.status}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <PermissionButtonGroup resource="user" action="update">
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleEdit(user)}
-                          className="bg-green-400/20 hover:bg-green-400/40"
+          <PermissionGroup resource="user_management" action="view">
+            <TableBody>
+              {paginatedUsers.map((user: any, index: number) => {
+                const roleName =
+                  roles.find((role: any) => role.id === user.roleId)?.name ||
+                  "N/A";
+                return (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={checkedRows[index] || false}
+                        onChange={() => handleRowCheckboxChange(index)}
+                      />
+                    </TableCell>
+                    <TableCell>{user.uniqueId}</TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.contact}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{roleName}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                          user.status === "ACTIVE"
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      ></span>
+                      {user.status}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <PermissionButtonGroup
+                          resource="user_management"
+                          action="update"
                         >
-                          <Pencil size={16} className="text-green-500" />
-                        </Button>
-                      </PermissionButtonGroup>
-                      <PermissionButtonGroup resource="user" action="delete">
-                        <Button
-                          variant="ghost"
-                          className="bg-red-400/20 hover:bg-red-400/40"
-                          onClick={() => handleDelete(user.id)}
+                          <Button
+                            variant="ghost"
+                            onClick={() => handleEdit(user)}
+                            className="bg-green-400/20 hover:bg-green-400/40"
+                          >
+                            <Pencil size={16} className="text-green-500" />
+                          </Button>
+                        </PermissionButtonGroup>
+                        <PermissionButtonGroup
+                          resource="user_management"
+                          action="delete"
                         >
-                          <Trash2 size={16} className="text-red-500" />
-                        </Button>
-                      </PermissionButtonGroup>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
+                          <Button
+                            variant="ghost"
+                            className="bg-red-400/20 hover:bg-red-400/40"
+                            onClick={() => handleDelete(user.id)}
+                          >
+                            <Trash2 size={16} className="text-red-500" />
+                          </Button>
+                        </PermissionButtonGroup>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </PermissionGroup>
         </Table>
 
         {/* Pagination Controls */}

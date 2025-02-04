@@ -7,6 +7,7 @@ import { AppDispatch, RootState } from "@/provider/redux-provider";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { FaEye } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 const BlogTable: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -32,10 +33,11 @@ const BlogTable: React.FC = () => {
     navigate(`/blog/${id}`);
   };
 
-
   const confirmDelete = async (id: string) => {
     try {
-      await axios.post("https://travelcarib.tekniche.xyz/admin/delete-blog", { id });
+      await axios.post("https://travelcarib.tekniche.xyz/admin/delete-blog", {
+        id,
+      });
       toast.success("Blog deleted successfully!");
       dispatch(getBlogs());
     } catch (error) {
@@ -80,7 +82,10 @@ const BlogTable: React.FC = () => {
 
   const truncateWords = (text: string, wordLimit: number): string => {
     const words = text.split(" ");
-    return words.slice(0, wordLimit).join(" ") + (words.length > wordLimit ? "..." : "");
+    return (
+      words.slice(0, wordLimit).join(" ") +
+      (words.length > wordLimit ? "..." : "")
+    );
   };
 
   const handlePageChange = (page: number) => {
@@ -91,9 +96,14 @@ const BlogTable: React.FC = () => {
     <div className="w-full bg-white rounded-xl p-10">
       <div className="flex justify-between mb-4">
         <h1 className="font-semibold text-xl text-blue">Blogs</h1>
-        <button onClick={handleAddBlog} className="bg-blue text-white px-4 py-2 rounded">
-          + Blogs
-        </button>
+        <PermissionButtonGroup resource="landing_page" action="create">
+          <button
+            onClick={handleAddBlog}
+            className="bg-blue text-white px-4 py-2 rounded"
+          >
+            + Blogs
+          </button>
+        </PermissionButtonGroup>
       </div>
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead className="bg-gray-100">
@@ -101,7 +111,9 @@ const BlogTable: React.FC = () => {
             <th className="border border-gray-300 px-4 py-2">S.No</th>
             <th className="border border-gray-300 px-4 py-2">Image</th>
             <th className="border border-gray-300 px-4 py-2">Description</th>
-            <th className="border border-gray-300 px-4 py-2">Secondary Description</th>
+            <th className="border border-gray-300 px-4 py-2">
+              Secondary Description
+            </th>
             <th className="border border-gray-300 px-4 py-2">Action</th>
           </tr>
         </thead>
@@ -174,7 +186,9 @@ const BlogTable: React.FC = () => {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`px-4 py-2 border cursor-pointer text-gray ${currentPage === 1 ? "text-gray-400" : "text-blue"}`}
+            className={`px-4 py-2 border cursor-pointer text-gray ${
+              currentPage === 1 ? "text-gray-400" : "text-blue"
+            }`}
           >
             Previous
           </button>

@@ -53,6 +53,8 @@ import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ConnectingAirportsSelector } from "./connecting-airports-selector";
 import { AirlinesMultiSelect } from "./airlines-multiselector";
+import PermissionButtonGroup from "../permissions/PermissionButton";
+import PermissionGroup from "../permissions/PermissionGroup";
 
 const formSchema = z.object({
   ruleTitle: z.string().min(1, "Rule title is required"),
@@ -191,12 +193,14 @@ export default function SearchManagementTable() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => (
-        <Switch
-          checked={row.original.status === "ACTIVE"}
-          onCheckedChange={(checked) =>
-            handleStatusChange(row.original.id, checked)
-          }
-        />
+        <PermissionButtonGroup resource="search_management" action="update">
+          <Switch
+            checked={row.original.status === "ACTIVE"}
+            onCheckedChange={(checked) =>
+              handleStatusChange(row.original.id, checked)
+            }
+          />
+        </PermissionButtonGroup>
       ),
     },
     {
@@ -209,22 +213,26 @@ export default function SearchManagementTable() {
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Button
-            onClick={() => handleEdit(row.original)}
-            variant="ghost"
-            size="sm"
-            className="bg-green-400/30 hover:bg-green-400/40"
-          >
-            <Pencil className="h-4 w-4 text-green-600" />
-          </Button>
-          <Button
-            onClick={() => handleDelete(row.original.id)}
-            variant="ghost"
-            size="sm"
-            className="bg-red-400/30 hover:bg-red-400/40"
-          >
-            <Trash2 className="h-4 w-4 text-red-600" />
-          </Button>
+          <PermissionButtonGroup resource="search_management" action="update">
+            <Button
+              onClick={() => handleEdit(row.original)}
+              variant="ghost"
+              size="sm"
+              className="bg-green-400/30 hover:bg-green-400/40"
+            >
+              <Pencil className="h-4 w-4 text-green-600" />
+            </Button>
+          </PermissionButtonGroup>
+          <PermissionButtonGroup resource="search_management" action="delete">
+            <Button
+              onClick={() => handleDelete(row.original.id)}
+              variant="ghost"
+              size="sm"
+              className="bg-red-400/30 hover:bg-red-400/40"
+            >
+              <Trash2 className="h-4 w-4 text-red-600" />
+            </Button>
+          </PermissionButtonGroup>
         </div>
       ),
     },
@@ -681,14 +689,16 @@ export default function SearchManagementTable() {
                 Cancel
               </Button>
             )}
-            <Button
-              type="submit"
-              className="bg-blue text-white"
-              disabled={loading}
-            >
-              {editingRuleId ? "Update Rule" : "Create Rule"}
-              {loading && <Loader className="size-5 animate-spin shrink-0" />}
-            </Button>
+            <PermissionButtonGroup resource="search_management" action="create">
+              <Button
+                type="submit"
+                className="bg-blue text-white"
+                disabled={loading}
+              >
+                {editingRuleId ? "Update Rule" : "Create Rule"}
+                {loading && <Loader className="size-5 animate-spin shrink-0" />}
+              </Button>
+            </PermissionButtonGroup>
           </div>
         </form>
       </Form>
@@ -711,34 +721,36 @@ export default function SearchManagementTable() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-4">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+          <PermissionGroup resource="search_management" action="view">
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="px-4">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+              )}
+            </TableBody>
+          </PermissionGroup>
         </Table>
       </div>
 

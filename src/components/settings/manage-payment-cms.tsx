@@ -8,7 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Textarea } from "../ui/textarea";
-import PermissionButtonGroup from "../permission-button/PermissionButton";
+import PermissionButtonGroup from "../permissions/PermissionButton";
 
 interface PaymentOptionProps {
   name: string;
@@ -110,7 +110,7 @@ const ManagePaymentCms = () => {
                   className="w-full resize-none h-[140px]"
                   required
                 />
-                <PermissionButtonGroup resource="settings" action="create">
+                <PermissionButtonGroup resource="settings" action="create|update">
                   <Button
                     className="w-full"
                     onClick={() => handleSubmit(option.id)}

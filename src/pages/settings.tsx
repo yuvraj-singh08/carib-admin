@@ -1,4 +1,5 @@
 import EMailSettingsForm from "@/components/landing-settings/email-settings-form";
+import PermissionGroup from "@/components/permissions/PermissionGroup";
 import GdsApiSettings from "@/components/settings/GdsApiSettings";
 import CouponManagementSystemTable from "@/components/settings/manage-deals-table";
 import ManagepaymentCms from "@/components/settings/manage-payment-cms";
@@ -32,7 +33,7 @@ const SettingsPage = () => {
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="paymentCms">Payment CMS</TabsTrigger>
               <TabsTrigger value="GDSAPI">GDS API Settings</TabsTrigger>
-              {activeTab === "deals" && (
+              {/* {activeTab === "deals" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
               {activeTab === "payment" && (
@@ -46,22 +47,32 @@ const SettingsPage = () => {
               )}
               {activeTab === "GDSAPI" && (
                 <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[50px]" />
-              )}
+              )} */}
             </TabsList>
             <TabsContent value="deals">
-              <CouponManagementSystemTable />
+              <PermissionGroup resource="settings" action="view">
+                <CouponManagementSystemTable />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="payment">
-              <ManagePaymentGateway />
+              <PermissionGroup resource="settings" action="view">
+                <ManagePaymentGateway />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="email">
-              <EMailSettingsForm />
+              <PermissionGroup resource="settings" action="view">
+                <EMailSettingsForm />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="paymentCms">
-              <ManagepaymentCms />
+              <PermissionGroup resource="settings" action="view">
+                <ManagepaymentCms />
+              </PermissionGroup>
             </TabsContent>
             <TabsContent value="GDSAPI">
-              <GdsApiSettings />
+              <PermissionGroup resource="settings" action="view">
+                <GdsApiSettings />
+              </PermissionGroup>
             </TabsContent>
           </Tabs>
         </div>
