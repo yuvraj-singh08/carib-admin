@@ -21,10 +21,10 @@ import { AppDispatch, RootState } from "@/provider/redux-provider";
 import {
   fetchUserById,
   updateUserProfile,
-  updateUserPassword,
+  //updateUserPassword,
 } from "@/redux/useSlice";
 import { uploadImage } from "@/hooks/aws";
-import { PasswordInput } from "../ui/password-input";
+//import { PasswordInput } from "../ui/password-input";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
@@ -45,17 +45,17 @@ const profileFormSchema = z.object({
   avatarSrc: z.string().optional(),
 });
 
-const passwordFormSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(6, "New password must be at least 6 characters"),
-});
+// const passwordFormSchema = z.object({
+//   currentPassword: z.string().min(1, "Current password is required"),
+//   newPassword: z.string().min(6, "New password must be at least 6 characters"),
+// });
 
 export default function ProfileForm() {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user.user);
-  const updatePasswordStatus = useSelector(
-    (state: RootState) => state.user.updatePasswordStatus
-  );
+  // const updatePasswordStatus = useSelector(
+  //   (state: RootState) => state.user.updatePasswordStatus
+  // );
   const [isLoading, setIsLoading] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
 
@@ -72,13 +72,13 @@ export default function ProfileForm() {
     },
   });
 
-  const passwordForm = useForm({
-    resolver: zodResolver(passwordFormSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-    },
-  });
+  // const passwordForm = useForm({
+  //   resolver: zodResolver(passwordFormSchema),
+  //   defaultValues: {
+  //     currentPassword: "",
+  //     newPassword: "",
+  //   },
+  // });
 
   useEffect(() => {
     if (user) {
@@ -114,22 +114,22 @@ export default function ProfileForm() {
     setIsLoading(false);
   }
 
-  async function onPasswordSubmit(values: z.infer<typeof passwordFormSchema>) {
-    const updatePasswordToast = toast.loading("Updating password...");
-    try {
-      await dispatch(updateUserPassword(values.newPassword)).unwrap();
-      toast.success("Password updated successfully", {
-        id: updatePasswordToast,
-      });
-      passwordForm.reset();
-    } catch (error) {
-      toast.error(
-        "Failed to update password. Please check your current password and try again.",
-        { id: updatePasswordToast }
-      );
-      console.error("Failed to update password:", error);
-    }
-  }
+  // async function onPasswordSubmit(values: z.infer<typeof passwordFormSchema>) {
+  //   const updatePasswordToast = toast.loading("Updating password...");
+  //   try {
+  //     await dispatch(updateUserPassword(values.newPassword)).unwrap();
+  //     toast.success("Password updated successfully", {
+  //       id: updatePasswordToast,
+  //     });
+  //     passwordForm.reset();
+  //   } catch (error) {
+  //     toast.error(
+  //       "Failed to update password. Please check your current password and try again.",
+  //       { id: updatePasswordToast }
+  //     );
+  //     console.error("Failed to update password:", error);
+  //   }
+  // }
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
