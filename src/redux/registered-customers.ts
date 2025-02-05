@@ -84,6 +84,36 @@ export const deleteCustomer = createAsyncThunk(
   }
 );
 
+export const blockCustomer = createAsyncThunk(
+  "users/blockCustomer",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/user/block`, { id });
+      return { id, message: response.data.message };
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data);
+      }
+      return rejectWithValue("Failed to block user");
+    }
+  }
+);
+
+export const unblockCustomer = createAsyncThunk(
+  "users/unblockCustomer",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/user/unblock`, { id });
+      return { id, message: response.data.message };
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return rejectWithValue(error.response.data);
+      }
+      return rejectWithValue("Failed to unblock user");
+    }
+  }
+);
+
 const customerSlice = createSlice({
   name: "user",
   initialState,
@@ -103,6 +133,18 @@ const customerSlice = createSlice({
       .addCase(fetchCustomers.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || null;
+      })
+      .addCase(blockCustomer.fulfilled, (state, action) => {
+        const customer = state.customers.find(c => c.id === action.payload.id);
+        if (customer) {
+          customer.isBlocked = true;
+        }
+      })
+      .addCase(unblockCustomer.fulfilled, (state, action) => {
+        const customer = state.customers.find(c => c.id === action.payload.id);
+        if (customer) {
+          customer.isBlocked = false;
+        }
       })
       .addCase(deleteCustomer.pending, (state) => {
         state.status = "loading";

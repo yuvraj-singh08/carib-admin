@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
+
 import {
+  blockCustomer,
   Customer,
   deleteCustomer,
   fetchCustomers,
+  unblockCustomer,
 } from "@/redux/registered-customers";
 import {
   Table,
@@ -31,7 +33,6 @@ import { AppDispatch } from "@/provider/redux-provider";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
 import { format } from "date-fns";
-import { axiosInstance } from "@/provider/axios";
 const InfoItem = ({
   label,
   value,
@@ -51,98 +52,151 @@ const UserDetails = ({
 }: {
   user: Customer;
   onBack: () => void;
-}) => (
-  <div className="w-full bg-white rounded-xl p-6">
-    <div className="flex items-center justify-between mb-6">
-      <h2 className="text-lg font-bold text-blue">Customer Details</h2>
-      <Button
-        onClick={onBack}
-        variant="outline"
-        className="flex items-center gap-2"
-      >
-        <ArrowLeft size={16} />
-        Back to List
-      </Button>
-    </div>
+}) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const [loadingUsers, setLoadingUsers] = useState<Record<string, boolean>>({});
 
-    <div className="flex items-center space-x-4 mb-6">
-      <Avatar className="w-16 h-16">
-        <AvatarImage src={user?.avatarSrc} alt={user?.firstname} />
-        <AvatarFallback>{user?.firstname.charAt(0)}</AvatarFallback>
-      </Avatar>
-      <div>
-        <h3 className="font-semibold text-md">
-          {user?.firstname} {user?.lastname}
-        </h3>
-        <p className="text-gray-500">{user?.email}</p>
+  const handleStatusChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    id: string
+  ) => {
+    const newStatus = e.target.value;
+    setLoadingUsers((prev) => ({ ...prev, [id]: true }));
+
+    try {
+      if (newStatus === "active") {
+        const result = await dispatch(unblockCustomer(id)).unwrap();
+        toast.success(result.message);
+      } else {
+        const result = await dispatch(blockCustomer(id)).unwrap();
+        toast.success(result.message);
+      }
+    } catch (error) {
+      toast.error("Failed to change user status");
+    } finally {
+      setLoadingUsers((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  return (
+    <div className="w-full bg-white rounded-xl p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-bold text-blue">Customer Details</h2>
+        <Button
+          onClick={onBack}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft size={16} />
+          Back to List
+        </Button>
       </div>
-    </div>
-    <Separator className="mb-6" />
 
-    <div className="grid grid-cols-1 gap-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-bold text-blue mb-4">User Info</h3>
-
-        <InfoItem
-          label="Passport Number"
-          value={user?.passportDetails?.passportNumber || "N/A"}
-        />
-        <InfoItem label="Mobile Number" value={user.mobileNumber || "N/A"} />
-        <InfoItem
-          label="DOB"
-          value={user.dob ? format(new Date(user.dob), "dd MMM, yyyy") : "N/A"}
-        />
-        <InfoItem label="Gender" value={user.gender || "N/A"} />
-        <InfoItem label="Address" value={user.address || "N/A"} />
-        <InfoItem label="Pincode" value={user.pincode || "N/A"} />
-      </div>
-      <div className="space-y-4">
-        {user?.passportDetails?.passportImg ? (
-          <h3 className="text-lg font-bold text-blue mb-4">Passport Image</h3>
-        ) : (
-          <h3 className="text-lg font-bold text-blue mb-4">
-            {" "}
-            No Passport Found
+      <div className="flex items-center space-x-4 mb-6">
+        <Avatar className="w-16 h-16">
+          <AvatarImage src={user?.avatarSrc} alt={user?.firstname} />
+          <AvatarFallback>{user?.firstname.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <div>
+          <h3 className="font-semibold text-md">
+            {user?.firstname} {user?.lastname}
           </h3>
-        )}
-
-        {user?.passportDetails?.passportImg?.map((img, index) => (
-          <>
-            <img
-              src={img}
-              alt={`uploaded-image-${index}`}
-              className="w-40 h-auto aspect-square rounded-xl object-cover"
-            />
-          </>
-        ))}
+          <p className="text-gray-500">{user?.email}</p>
+        </div>
       </div>
-    </div>
+      <Separator className="mb-6" />
 
-    <h3 className="text-lg font-bold text-blue mt-8 mb-4">
-      Additional Details (Co traveler)
-    </h3>
-    {user.coTraveler && user.coTraveler.length > 0 ? (
-      user.coTraveler.map((coTraveler) => (
+      <div className="grid grid-cols-1 gap-6">
         <div className="space-y-4">
-          <InfoItem label="Name" value={coTraveler.name || "N/A"} />
+          <h3 className="text-lg font-bold text-blue mb-4">User Info</h3>
+
+          <InfoItem
+            label="Passport Number"
+            value={user?.passportDetails?.passportNumber || "N/A"}
+          />
+          <InfoItem label="Mobile Number" value={user.mobileNumber || "N/A"} />
           <InfoItem
             label="DOB"
             value={
-              new Date(coTraveler.dateOfBirth).toLocaleDateString() || "N/A"
+              user.dob ? format(new Date(user.dob), "dd MMM, yyyy") : "N/A"
             }
           />
-          <InfoItem label="Email" value={coTraveler.email || "N/A"} />
-          <InfoItem
-            label="Passport No"
-            value={coTraveler.passportNumber || "N/A"}
-          />
+          <InfoItem label="Gender" value={user.gender || "N/A"} />
+          <InfoItem label="Address" value={user.address || "N/A"} />
+          <InfoItem label="Pincode" value={user.pincode || "N/A"} />
+
+          {/* status of customer */}
+
+          <div className="grid grid-cols-2 items-center gap-2">
+            <span className="font-medium text-gray-600">Status</span>
+            <span className="text-black">
+              {loadingUsers[user.id] ? (
+                <TableCell>
+                {/* <div className="flex justify-center mt-4 self-center"> */}
+                  <Loader className=" size-5 shrink-0 animate-spin" />
+                {/* </div> */}
+              </TableCell>
+              ) : (
+                <select
+                  value={user.isBlocked ? "blocked" : "active"}
+                  onChange={(e) => handleStatusChange(e, user.id)}
+                  className="border rounded px-2 py-1 text-sm"
+                >
+                  <option value="blocked">🔴 Blocked</option>
+                  <option value="active">🟢 Active</option>
+                </select>
+              )}
+            </span>
+          </div>
         </div>
-      ))
-    ) : (
-      <p>No Co-Travellers Found</p>
-    )}
-  </div>
-);
+        <div className="space-y-4">
+          {user?.passportDetails?.passportImg ? (
+            <h3 className="text-lg font-bold text-blue mb-4">Passport Image</h3>
+          ) : (
+            <h3 className="text-lg font-bold text-blue mb-4">
+              {" "}
+              No Passport Found
+            </h3>
+          )}
+
+          {user?.passportDetails?.passportImg?.map((img, index) => (
+            <>
+              <img
+                src={img}
+                alt={`uploaded-image-${index}`}
+                className="w-40 h-auto aspect-square rounded-xl object-cover"
+              />
+            </>
+          ))}
+        </div>
+      </div>
+
+      <h3 className="text-lg font-bold text-blue mt-8 mb-4">
+        Additional Details (Co traveler)
+      </h3>
+      {user.coTraveler && user.coTraveler.length > 0 ? (
+        user.coTraveler.map((coTraveler) => (
+          <div className="space-y-4">
+            <InfoItem label="Name" value={coTraveler.name || "N/A"} />
+            <InfoItem
+              label="DOB"
+              value={
+                new Date(coTraveler.dateOfBirth).toLocaleDateString() || "N/A"
+              }
+            />
+            <InfoItem label="Email" value={coTraveler.email || "N/A"} />
+            <InfoItem
+              label="Passport No"
+              value={coTraveler.passportNumber || "N/A"}
+            />
+          </div>
+        ))
+      ) : (
+        <p>No Co-Travellers Found</p>
+      )}
+    </div>
+  );
+};
 
 const CustomerDetailsTable = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -152,7 +206,9 @@ const CustomerDetailsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedUser, setSelectedUser] = useState<Customer | null>(null);
-  const [loadingUsers, setLoadingUsers] = useState<{ [key: string]: boolean }>({});
+  const [loadingUsers, setLoadingUsers] = useState<{ [key: string]: boolean }>(
+    {}
+  );
   const [ConfirmDialogue, confirm] = useConfirm(
     "Delete Customer Details",
     "Are you sure you want to delete this customer details? This action cannot be undone."
@@ -164,27 +220,50 @@ const CustomerDetailsTable = () => {
     }
   }, [status, dispatch]);
 
+  // const handleStatusChange = async (
+  //   e: React.ChangeEvent<HTMLSelectElement>,
+  //   id: string
+  // ) => {
+  //   //const newStatus = e.target.value;
+  //   const newStatus = e.target.value;
+  //   setLoadingUsers((prev) => ({ ...prev, [id]: true }));
+
+  //   try {
+  //     if (newStatus === "active") {
+  //       const response = await axiosInstance.post(`${apiUrl}/user/unblock`, {
+  //         id,
+  //       });
+  //       //setUserStatuses(prev => ({ ...prev, [id]: newStatus }));
+  //       toast.success(response.data.message);
+  //       dispatch(fetchCustomers());
+  //     } else {
+  //       const response = await axiosInstance.post(`${apiUrl}/user/block`, {
+  //         id,
+  //       });
+  //       toast.success(response.data.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error changing user status:", error);
+  //     toast.error("Failed to change user status");
+  //   } finally {
+  //     setLoadingUsers((prev) => ({ ...prev, [id]: false }));
+  //   }
+  // };
+
   const handleStatusChange = async (
     e: React.ChangeEvent<HTMLSelectElement>,
     id: string
   ) => {
-    //const newStatus = e.target.value;
     const newStatus = e.target.value;
     setLoadingUsers((prev) => ({ ...prev, [id]: true }));
 
     try {
       if (newStatus === "active") {
-        const response = await axiosInstance.post(`${apiUrl}/user/unblock`, {
-          id,
-        });
-        //setUserStatuses(prev => ({ ...prev, [id]: newStatus }));
-        toast.success(response.data.message);
-        dispatch(fetchCustomers());
+        const result = await dispatch(unblockCustomer(id)).unwrap();
+        toast.success(result.message);
       } else {
-        const response = await axiosInstance.post(`${apiUrl}/user/block`, {
-          id,
-        });
-        toast.success(response.data.message);
+        const result = await dispatch(blockCustomer(id)).unwrap();
+        toast.success(result.message);
       }
     } catch (error) {
       console.error("Error changing user status:", error);
@@ -193,12 +272,6 @@ const CustomerDetailsTable = () => {
       setLoadingUsers((prev) => ({ ...prev, [id]: false }));
     }
   };
-
-  const paginatedCustomers = customers.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-  const totalPages = Math.ceil(customers.length / pageSize);
 
   const handleDelete = async (id: string) => {
     const ok = await confirm();
@@ -211,6 +284,12 @@ const CustomerDetailsTable = () => {
       }
     }
   };
+
+  const paginatedCustomers = customers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+  const totalPages = Math.ceil(customers.length / pageSize);
 
   if (status === "loading") {
     return <TableLoader />;
@@ -282,15 +361,19 @@ const CustomerDetailsTable = () => {
                 </TableCell>
                 <TableCell>{customer.lastBooking}</TableCell>
                 {loadingUsers[customer.id] ? (
-                  <div className="flex justify-center mt-4 self-center"><Loader className=" size-5 shrink-0 animate-spin" /></div>
+                  <TableCell>
+                    <div className="flex justify-center mt-4 self-center">
+                      <Loader className=" size-5 shrink-0 animate-spin" />
+                    </div>
+                  </TableCell>
                 ) : (
                   <TableCell>
                     <select
-                       value={customer.isBlocked ? "blocked" : "active"}
+                      value={customer.isBlocked ? "blocked" : "active"}
                       onChange={(e) => handleStatusChange(e, customer.id)}
                       className="border rounded px-2 py-1 text-sm"
                     >
-                        <option value="blocked">🔴 Blocked</option>
+                      <option value="blocked">🔴 Blocked</option>
                       <option value="active">🟢 Active</option>
                     </select>
                   </TableCell>
