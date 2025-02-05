@@ -147,24 +147,30 @@ const BlogTable: React.FC = () => {
                 />
               </td>
               <td className="border border-gray-300 px-4 py-2 text-center">
-                <button
-                  onClick={() => handleEdit(blog.id)}
-                  className="bg-green-500 text-white p-2 rounded mr-2 hover:bg-green-600"
-                >
-                  <MdEdit />
-                </button>
-                <button
-                  onClick={() => handleView(blog.id)}
-                  className="bg-yellow-500 text-white p-2 rounded mr-2 hover:bg-yellow-600"
-                >
-                  <FaEye />
-                </button>
-                <button
-                  onClick={() => setDeletePopup(blog.id)}
-                  className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
-                >
-                  <MdDelete />
-                </button>
+                <PermissionButtonGroup resource="landing_page" action="update">
+                  <button
+                    onClick={() => handleEdit(blog.id)}
+                    className="bg-green-500 text-white p-2 rounded mr-2 hover:bg-green-600"
+                  >
+                    <MdEdit />
+                  </button>
+                </PermissionButtonGroup>
+                <PermissionButtonGroup resource="landing_page" action="view">
+                  <button
+                    onClick={() => handleView(blog.id)}
+                    className="bg-yellow-500 text-white p-2 rounded mr-2 hover:bg-yellow-600"
+                  >
+                    <FaEye />
+                  </button>
+                </PermissionButtonGroup>
+                <PermissionButtonGroup resource="landing_page" action="delete">
+                  <button
+                    onClick={() => setDeletePopup(blog.id)}
+                    className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
+                  >
+                    <MdDelete />
+                  </button>
+                </PermissionButtonGroup>
               </td>
             </tr>
           ))}
