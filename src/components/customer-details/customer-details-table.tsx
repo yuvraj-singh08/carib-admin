@@ -188,7 +188,7 @@ const CustomerDetailsTable = () => {
       }
     } catch (error) {
       console.error("Error changing user status:", error);
-      toast.error("Error", error.message);
+      toast.error("Failed to change user status");
     } finally {
       setLoadingUsers((prev) => ({ ...prev, [id]: false }));
     }
