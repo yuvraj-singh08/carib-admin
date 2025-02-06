@@ -3,8 +3,10 @@ import { useEffect } from "react";
 import AdminPanelLayout from "@/components/layout/admin-panel-layout";
 import useAuth from "@/hooks/use-auth";
 import { useNavigate } from "react-router-dom";
+import { useAuthMiddleware } from "@/authMiddleware";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  useAuthMiddleware();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
