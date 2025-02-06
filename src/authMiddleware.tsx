@@ -7,6 +7,7 @@ export const useAuthMiddleware = () => {
   const location = useLocation();
 
   useEffect(() => {
+    console.log("Checking if user is logged in...");
     const isLoggedIn = checkIfUserIsLoggedIn();
     const publicRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"]; // Only login and signup routes are public
 
@@ -19,6 +20,8 @@ export const useAuthMiddleware = () => {
     if (isLoggedIn && publicRoutes.includes(location.pathname)) {
       navigate("/", { replace: true }); // Redirect to the home page
     }
+
+    console.log("User is logged in:", isLoggedIn);
   }, [navigate, location]);
 };
 
