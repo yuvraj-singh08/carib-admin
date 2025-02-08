@@ -29,7 +29,7 @@ type ConnectingAirportsField = {
 };
 
 export function ConnectingAirportsSelector({
-  field,
+  field, 
 }: {
   field: ConnectingAirportsField;
 }) {
@@ -59,8 +59,11 @@ export function ConnectingAirportsSelector({
 
   // Sync local state to form
   useEffect(() => {
-    field.onChange(localValue);
-  }, [localValue, field]);
+    if (JSON.stringify(field.value) !== JSON.stringify(localValue)) {
+      field.onChange(localValue);
+    }
+  }, [localValue]);
+console.log("field",field);
 
   const handleUnselect = useCallback((index: number, cityValue: string) => {
     setLocalValue((prev) => {
