@@ -11,9 +11,13 @@ import flightIcon from "../../../../public/icons/flight.png";
 // import { BsCash } from "react-icons/bs";
 import { LuBaggageClaim } from "react-icons/lu";
 // import { MdOutlineFastfood } from "react-icons/md";
-import { sendBookingEmail } from '@/redux/booking';
+import { AdminStatus, sendBookingEmail, updateBooking } from "@/redux/booking";
 import toast from "react-hot-toast";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const FlightBooking: React.FC = () => {
   const navigate = useNavigate();
@@ -26,9 +30,38 @@ const FlightBooking: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState("FAILED_BOOKING");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [open, setOpen] = useState(false);
- 
-  const emailSending = useSelector((state: RootState) => state.bookings.emailSending);
-  const emailError = useSelector((state: RootState) => state.bookings.emailError);
+  console.log("selected option: ", selectedOption);
+
+
+  // const handleTicketStatus = async (id: string,  selectedOption: AdminStatus) => {
+  //   setIsDropdownOpen(!isDropdownOpen)
+  //     try {
+  //       await dispatch(updateBooking({ id, adminStatus: selectedOption })).unwrap();
+  //     } catch (error) {
+  //       console.error("Failed to update booking status:", error);
+  //     }
+  //   };
+
+  const handleTicketStatus = async (id: string, newStatus: AdminStatus) => {
+    try {
+      await dispatch(updateBooking({ id, adminStatus: newStatus })).unwrap();
+      setSelectedOption(newStatus); // Update local state after successful API call
+      setIsDropdownOpen(false);
+      toast.success("Booking status updated successfully");
+    } catch (error) {
+      console.error("Failed to update booking status:", error);
+      toast.error("Failed to update booking status");
+      // Revert to previous state if API call fails
+      setSelectedOption(selectedOption);
+    }
+  };
+
+  const emailSending = useSelector(
+    (state: RootState) => state.bookings.emailSending
+  );
+  const emailError = useSelector(
+    (state: RootState) => state.bookings.emailError
+  );
 
   const options = [
     { label: "TICKETED", color: "bg-green-500" },
@@ -37,7 +70,6 @@ const FlightBooking: React.FC = () => {
     { label: "EXPIRED", color: "bg-white" },
     { label: "FAILED_BOOKING", color: "bg-red-500" },
   ];
-
 
   const handleSendEmail = async (bookingId: string) => {
     setOpen(false);
@@ -51,8 +83,6 @@ const FlightBooking: React.FC = () => {
       toast.error(errorMessage);
     }
   };
-
-  
 
   // const getSelectedOptionColor = () =>
   //   options.find((option) => option.label === selectedOption)?.color || "";
@@ -175,7 +205,7 @@ const FlightBooking: React.FC = () => {
 
     return route.join(" → ");
   };
-  console.log("getItineraries",getItineraries())
+  console.log("getItineraries", getItineraries());
 
   const handleStatusChange = (ticketNumber: number, newStatus: string) => {
     console.log("Status changed:", ticketNumber, newStatus);
@@ -196,24 +226,24 @@ const FlightBooking: React.FC = () => {
   if (error) return <div>Error: {error}</div>;
   if (!flightDetails) return <div>No booking found</div>;
 
-      const LoadingSpinner = () => (
-        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="none"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
-      );
+  const LoadingSpinner = () => (
+    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+  );
 
   const passengers = flightDetails.passenger
     ? JSON.parse(flightDetails.passenger)
@@ -257,7 +287,7 @@ const FlightBooking: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full flex gap-2">
+      <div className="w-full md:flex md:gap-2 md:flex-row flex-col  flex gap-2">
         <div className="bg-white p-4 mt-4 rounded-md shadow-md w-full h-fit">
           {getItineraries().map((itinerary: any, itineraryIndex: any) => (
             <div key={itineraryIndex} className="mb-8">
@@ -273,7 +303,7 @@ const FlightBooking: React.FC = () => {
 
                     return (
                       <div key={segmentIndex} className="mb-6">
-                        <div className="flex items-center gap-4">
+                        <div className="md:flex md:flex-row md:items-center md:gap-4 flex flex-col gap-2">
                           {/* Airline Info */}
                           <div className="flex-1 flex gap-2 items-center">
                             <img
@@ -284,7 +314,7 @@ const FlightBooking: React.FC = () => {
                               alt="Airline"
                               className="h-10 w-10 object-contain"
                             />
-                            <div> 
+                            <div>
                               <p className="text-sm font-medium">
                                 {segment.operating_carrier?.name ||
                                   "Unknown Airline"}
@@ -359,7 +389,7 @@ const FlightBooking: React.FC = () => {
         </div>
 
         {/* Sidebar Section */}
-        <div className="w-1/3 flex flex-col gap-4">
+        <div className="md:w-1/3 flex flex-col gap-4">
           <div className="bg-white p-4 rounded-md shadow-md">
             <h3 className="text-lg font-semibold mb-4">Booking Details</h3>
             <div className="space-y-2">
@@ -367,10 +397,10 @@ const FlightBooking: React.FC = () => {
                 <span>Status:</span>
                 <div className="relative">
                   <div
-                    className={`px-4 py-2 border rounded cursor-pointer ${
+                    className={`px-2 py-1 border text-xs rounded cursor-pointer ${
                       options.find((o) => o.label === selectedOption)?.color
                     }`}
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   >
                     {selectedOption}
                   </div>
@@ -381,12 +411,13 @@ const FlightBooking: React.FC = () => {
                           key={option.label}
                           className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                           onClick={() => {
-                            setSelectedOption(option.label);
-                            setIsDropdownOpen(false);
+                            // Don't update state immediately, let the API call handle it
+                            handleTicketStatus(bookingId as string, option.label as AdminStatus);
                           }}
                         >
                           <div
                             className={`w-3 h-3 rounded-full ${option.color} mr-2`}
+                            
                           />
                           {option.label}
                         </div>
@@ -394,56 +425,60 @@ const FlightBooking: React.FC = () => {
                     </div>
                   )}
                 </div>
+                
               </div>
               <div className="flex justify-between">
                 <span>Payment:</span>
                 <span className="text-blue-600">Credit Card</span>
               </div>
-
+              <div className="flex justify-between items-center">
+                <span>Send Email: </span>
               <Popover onOpenChange={setOpen} open={open}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="secondary"
-                  type="button"
-                  disabled={emailSending[bookingId as string]}
-                >
-                  {emailSending[bookingId as string] ? (
-                    <LoadingSpinner />
-                  ) : (
-                    <img
-                      src="/icons/plane.png"
-                      alt="icon"
-                      className="w-4 h-4 shrink-0"
-                    />
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 shadow-lg rounded-lg border border-gray-200 p-6 bg-white mr-7">
-                <div className="grid gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium leading-none">Confirm Action</h4>
-                    <p className="text-sm text-gray-500">
-                      Do you want to send the email?
-                    </p>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    disabled={emailSending[bookingId as string]}
+                  >
+                    {emailSending[bookingId as string] ? (
+                      <LoadingSpinner />
+                    ) : (
+                      <img
+                        src="/icons/plane.png"
+                        alt="icon"
+                        className="w-4 h-4 shrink-0"
+                      />
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 shadow-lg rounded-lg border border-gray-200 p-6 bg-white mr-7">
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium leading-none">
+                        Confirm Action
+                      </h4>
+                      <p className="text-sm text-gray-500">
+                        Do you want to send the email?
+                      </p>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setOpen(false)}
+                      >
+                        No
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => handleSendEmail(bookingId as string)}
+                      >
+                        Yes
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setOpen(false)}
-                    >
-                      No
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => handleSendEmail(bookingId as string)}
-                    >
-                      Yes
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+                </PopoverContent>
+              </Popover></div>
             </div>
           </div>
 
@@ -550,7 +585,12 @@ const FlightBooking: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 font-medium">
-                      {subBooking?.pnr || `${flightDetails?.flightDetails?.slices && flightDetails?.flightDetails?.slices[0]?.PNR}` || "Not Found"}
+                      {subBooking?.pnr ||
+                        `${
+                          flightDetails?.flightDetails?.slices &&
+                          flightDetails?.flightDetails?.slices[0]?.PNR
+                        }` ||
+                        "Not Found"}
                     </td>
                     <td className="px-4 py-3">
                       {subBooking.ticketNumber?.toString() || "N/A"}
