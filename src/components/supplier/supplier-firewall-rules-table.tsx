@@ -188,6 +188,7 @@ export default function FlightRulesManager() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+
       const flightRuleData = {
         title: values.rulesTitle || "",
         supplier: values.supplierName,
@@ -201,6 +202,8 @@ export default function FlightRulesManager() {
       if (addFlightRule.fulfilled.match(resultAction)) {
         toast.success("Firewall rule created successfully");
         form.reset();
+        // console.log("form outside",form.getValues());
+
       } else {
         throw new Error("Failed to create firewall rule");
       }
@@ -260,7 +263,8 @@ export default function FlightRulesManager() {
                     <FormLabel>Select Flight Supplier</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      // defaultValue={field.value}
+                      value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
