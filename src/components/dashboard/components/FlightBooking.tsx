@@ -211,16 +211,16 @@ const FlightBooking: React.FC = () => {
     console.log("Status changed:", ticketNumber, newStatus);
   };
 
-  const handleSave = () => {
-    if (bookingId) {
-      dispatch(
-        updateFlightDetails({
-          bookingId,
-          updatedData: { status: selectedOption },
-        })
-      );
-    }
-  };
+  // const handleSave = () => {
+  //   if (bookingId) {
+  //     dispatch(
+  //       updateFlightDetails({
+  //         bookingId,
+  //         updatedData: { status: selectedOption },
+  //       })
+  //     );
+  //   }
+  // };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -617,12 +617,12 @@ const FlightBooking: React.FC = () => {
         </table>
       </div>
 
-      <button
+      {/* <button
         onClick={handleSave}
         className="w-fit bg-green-500 text-white px-4 py-2 rounded-md self-end"
       >
         Save Changes
-      </button>
+      </button> */}
     </div>
   );
 };

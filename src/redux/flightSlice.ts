@@ -38,7 +38,6 @@ export const fetchFlightDetails = createAsyncThunk<FlightDetails, string, { reje
   async (bookingId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/book/${bookingId}`);
-      console.log("response...",response.data.data)
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || error.message);
@@ -52,8 +51,10 @@ export const updateFlightDetails = createAsyncThunk<FlightDetails, UpdateFlightP
   async ({ bookingId, updatedData }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.put(`/api/v1/bookings/${bookingId}`, updatedData);
+      console.log("response...",response.data.data)
       return response.data;
     } catch (error: any) {
+      console.log("error...",error)
       return rejectWithValue(error.response?.data || error.message);
     }
   }
