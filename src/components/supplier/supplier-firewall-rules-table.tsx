@@ -61,6 +61,7 @@ const formSchema = z.object({
   flightNumber: z.string().optional(),
   fromAirport: z.string().optional(),
   toAirport: z.string().optional(),
+  flightSequence: z.string().optional(),
 });
 
 export default function FlightRulesManager() {
@@ -86,6 +87,7 @@ export default function FlightRulesManager() {
       flightNumber: "",
       fromAirport: "",
       toAirport: "",
+      flightSequence: "",
     },
   });
 
@@ -196,6 +198,7 @@ export default function FlightRulesManager() {
         flightNumber: values.flightNumber || "",
         from: values.fromAirport || "",
         to: values.toAirport || "",
+        flightSequence: values.flightSequence || "",
       };
 
       const resultAction = await dispatch(addFlightRule(flightRuleData));
@@ -328,6 +331,19 @@ export default function FlightRulesManager() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>To Destination Airport</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Destination Airport" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="flightSequence"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Flight Sequence To Block</FormLabel>
                     <FormControl>
                       <Input placeholder="Destination Airport" {...field} />
                     </FormControl>
