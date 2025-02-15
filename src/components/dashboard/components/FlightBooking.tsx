@@ -32,7 +32,6 @@ const FlightBooking: React.FC = () => {
   const [open, setOpen] = useState(false);
   console.log("selected option: ", selectedOption);
 
-
   // const handleTicketStatus = async (id: string,  selectedOption: AdminStatus) => {
   //   setIsDropdownOpen(!isDropdownOpen)
   //     try {
@@ -400,7 +399,7 @@ const FlightBooking: React.FC = () => {
                     className={`px-2 py-1 border text-xs rounded cursor-pointer ${
                       options.find((o) => o.label === selectedOption)?.color
                     }`}
-                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   >
                     {selectedOption}
                   </div>
@@ -412,12 +411,14 @@ const FlightBooking: React.FC = () => {
                           className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                           onClick={() => {
                             // Don't update state immediately, let the API call handle it
-                            handleTicketStatus(bookingId as string, option.label as AdminStatus);
+                            handleTicketStatus(
+                              bookingId as string,
+                              option.label as AdminStatus
+                            );
                           }}
                         >
                           <div
                             className={`w-3 h-3 rounded-full ${option.color} mr-2`}
-                            
                           />
                           {option.label}
                         </div>
@@ -425,7 +426,6 @@ const FlightBooking: React.FC = () => {
                     </div>
                   )}
                 </div>
-                
               </div>
               <div className="flex justify-between">
                 <span>Payment:</span>
@@ -433,85 +433,127 @@ const FlightBooking: React.FC = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span>Send Email: </span>
-              <Popover onOpenChange={setOpen} open={open}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="secondary"
-                    type="button"
-                    disabled={emailSending[bookingId as string]}
-                  >
-                    {emailSending[bookingId as string] ? (
-                      <LoadingSpinner />
-                    ) : (
-                      <img
-                        src="/icons/plane.png"
-                        alt="icon"
-                        className="w-4 h-4 shrink-0"
-                      />
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 shadow-lg rounded-lg border border-gray-200 p-6 bg-white mr-7">
-                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium leading-none">
-                        Confirm Action
-                      </h4>
-                      <p className="text-sm text-gray-500">
-                        Do you want to send the email?
-                      </p>
+                <Popover onOpenChange={setOpen} open={open}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      disabled={emailSending[bookingId as string]}
+                    >
+                      {emailSending[bookingId as string] ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <img
+                          src="/icons/plane.png"
+                          alt="icon"
+                          className="w-4 h-4 shrink-0"
+                        />
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 shadow-lg rounded-lg border border-gray-200 p-6 bg-white mr-7">
+                    <div className="grid gap-4">
+                      <div className="space-y-2">
+                        <h4 className="font-medium leading-none">
+                          Confirm Action
+                        </h4>
+                        <p className="text-sm text-gray-500">
+                          Do you want to send the email?
+                        </p>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setOpen(false)}
+                        >
+                          No
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleSendEmail(bookingId as string)}
+                        >
+                          Yes
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setOpen(false)}
-                      >
-                        No
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleSendEmail(bookingId as string)}
-                      >
-                        Yes
-                      </Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover></div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-md shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Price Breakdown</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span>Base Fare:</span>
-                <span>
-                  {flightDetails.currency}{" "}
-                  {flightDetails.baseFare?.toFixed(2) || "0.00"}
+          <div className="bg-white rounded-lg shadow-md w-full  p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-">
+              price Breakdown
+            </h2>
+
+            <div className="border-b border-gray-200 pb-4"></div>
+
+            <div className="space-y-4 mt-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700 text-[0.9rem]">
+                  Number of Adults:
+                </span>
+                <span className=" text-gray-900">
+                  {flightDetails.fareSummary.adults}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span>Taxes & Fees:</span>
-                <span>
-                  {flightDetails.currency}{" "}
-                  {flightDetails.tax_fee_surges?.toFixed(2) || "0.00"}
+
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700 text-[0.9rem]">
+                  Number of Children:
+                </span>
+                <span className=" text-gray-900">
+                  {flightDetails.fareSummary.children}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span>Other Charges:</span>
-                <span>
-                  {flightDetails.currency}{" "}
-                  {flightDetails.otherCharges?.toFixed(2) || "0.00"}
+
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700 text-[0.9rem]">
+                  Number of Infants:
+                </span>
+                <span className=" text-gray-900">
+                  {flightDetails.fareSummary.infants}
                 </span>
               </div>
-              <div className="pt-2 border-t font-medium flex justify-between">
-                <span>Total:</span>
-                <span>
-                  {flightDetails.currency}{" "}
-                  {flightDetails.totalAmount?.toFixed(2) || "0.00"}
+
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700 text-[0.9rem]">
+                  Extra Baggage:
                 </span>
+                <span className=" text-gray-900">
+                  {flightDetails.fareSummary.extra_luggage}
+                </span>
+              </div>
+
+              {/* <div className="flex justify-between items-center">
+            <span className="text-gray-700 text-[0.9rem]">Base Fare:</span>
+            <span className=" text-gray-900 text-[0.9rem]">{flightDetails.currency}{" "}
+            {flightDetails.baseFare?.toFixed(2) || "0.00"}</span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-gray-700 text-[0.9rem]">Taxes & Fees:</span>
+            <span className=" text-gray-900 text-[0.9rem]">  {flightDetails.currency}{" "}
+            {flightDetails.tax_fee_surges?.toFixed(2) || "0.00"}</span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-gray-700 text-[0.9rem]">Other Charges:</span>
+            <span className=" text-gray-900 text-[0.9rem]"> {flightDetails.currency}{" "}
+            {flightDetails.otherCharges?.toFixed(2) || "0.00"}</span>
+          </div> */}
+
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-md font-semibold text-[#3688da]">
+                    Total Amount:
+                  </span>
+                  <span className="text-md font-semibold text-[#3688da]">
+                    $ {flightDetails.baseFare?.toFixed(2) || "0.00"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
