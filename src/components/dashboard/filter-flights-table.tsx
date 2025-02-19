@@ -133,36 +133,7 @@ export default function FlightBookingsTable() {
     }
   };
 
-  // const handleSendEmail = async (bookingId: string) => {
-  //   setOpen(false);
-
-  //   setLoadingStates(prev => ({ ...prev, [bookingId]: true }));
-  //   try {
-  //     // Make a POST request to the backend API
-  //     //${apiUrl}/email/send
-  //     const response = await axiosInstance.post(
-  //       "http://localhost:8000/email/send",
-  //       {bookingId}, // If the API requires a request body, replace this empty object with your data
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json", // Specify headers if needed
-  //         },
-  //       }
-  //     );
-  //     console.log("Email sent successfully:", response.data);
-  //     //alert("Email sent successfully!");
-
-  //     toast.success("Email sent successfully!");
-
-  //   } catch (error) {
-  //     console.error("Error sending email:", error);
-  //     toast.error("Failed to send email. Check the console for details.");
-  //   }
-  //   finally{
-  //     setLoadingStates(prev => ({ ...prev, [bookingId]: false }));
-  //   }
-  // };
-
+ 
   const handleSendEmail = async (bookingId: string) => {
     setOpen(false);
     try {
