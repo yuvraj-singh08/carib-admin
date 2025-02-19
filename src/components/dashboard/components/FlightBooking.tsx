@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFlightDetails, updateFlightDetails } from "@/redux/flightSlice";
+import { fetchFlightDetails } from "@/redux/flightSlice";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
 import flightIcon from "../../../../public/icons/flight.png";
 // import { BsCash } from "react-icons/bs";
