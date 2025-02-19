@@ -259,7 +259,7 @@ export default function FlightBookingsTable() {
     },
     {
       accessorKey: "adminStatus",
-      header: "Booking Status",
+      header: "Booking Status (Email)",
       cell: ({ row }) => {
         const status = row.getValue("adminStatus") as AdminStatus;
         return (

@@ -18,6 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 
 const FlightBooking: React.FC = () => {
   const navigate = useNavigate();
@@ -635,7 +636,7 @@ const FlightBooking: React.FC = () => {
                         "Not Found"}
                     </td>
                     <td className="px-4 py-3">
-                      {subBooking.ticketNumber?.toString() || "N/A"}
+                      {subBooking.ticketNumber?.toString() || <Input type="text" className="w-[50%]"/>}
                     </td>
                     <td className="px-4 py-3">
                       <select
@@ -659,12 +660,12 @@ const FlightBooking: React.FC = () => {
         </table>
       </div>
 
-      {/* <button
-        onClick={handleSave}
+      <button
+        onClick={() => navigate("/")}
         className="w-fit bg-green-500 text-white px-4 py-2 rounded-md self-end"
       >
         Save Changes
-      </button> */}
+      </button>
     </div>
   );
 };
