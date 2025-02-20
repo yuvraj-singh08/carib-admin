@@ -3,6 +3,7 @@ import PermissionGroup from "@/components/permissions/PermissionGroup";
 import GdsApiSettings from "@/components/settings/GdsApiSettings";
 import CouponManagementSystemTable from "@/components/settings/manage-deals-table";
 import ManagepaymentCms from "@/components/settings/manage-payment-cms";
+import BaggageSettings from "@/components/settings/baggageSettings";
 import ManagePaymentGateway from "@/components/settings/manage-payment-gateway";
 import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
@@ -22,32 +23,33 @@ const SettingsPage = () => {
                 Special Deals
               </TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
-              <TabsTrigger
-                value="payment"
-                className="data-[state=active]:group"
-              >
-                Payment Gateway setting
-              </TabsTrigger>
+              <TabsTrigger value="payment"className="data-[state=active]:group">Payment Gateway setting</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="email">Email SMTP setting</TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="paymentCms">Payment CMS</TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
               <TabsTrigger value="GDSAPI">GDS API Settings</TabsTrigger>
-              {/* {activeTab === "deals" && (
+              <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="baggage">Baggage Settings</TabsTrigger>
+              {activeTab === "deals" && (
                 <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
               )}
               {activeTab === "payment" && (
                 <div className="w-48 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-48" />
               )}
               {activeTab === "email" && (
-                <div className="w-48 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[380px]" />
+                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-[430px]" />
               )}
               {activeTab === "paymentCms" && (
-                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[210px]" />
+                <div className="w-28 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[485px]" />
               )}
               {activeTab === "GDSAPI" && (
-                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[50px]" />
-              )} */}
+                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[285px]" />
+              )}
+              {activeTab === "baggage" && (
+                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[100px]" />
+              )}
             </TabsList>
             <TabsContent value="deals">
               <PermissionGroup resource="settings" action="view">
@@ -72,6 +74,11 @@ const SettingsPage = () => {
             <TabsContent value="GDSAPI">
               <PermissionGroup resource="settings" action="view">
                 <GdsApiSettings />
+              </PermissionGroup>
+            </TabsContent>
+            <TabsContent value="baggage">
+              <PermissionGroup resource="settings" action="view">
+                <BaggageSettings />
               </PermissionGroup>
             </TabsContent>
           </Tabs>
