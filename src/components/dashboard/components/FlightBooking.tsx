@@ -567,6 +567,7 @@ const FlightBooking: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left">Passenger</th>
+              <th className="px-4 py-3 text-left">Supplier</th>
               <th className="px-4 py-3 text-left">PNR</th>
               <th className="px-4 py-3 text-left">E-Ticket</th>
               <th className="px-4 py-3 text-left">Status</th>
@@ -627,6 +628,7 @@ const FlightBooking: React.FC = () => {
                         {passenger.gender === "m" ? "Male" : "Female"}
                       </span>
                     </td>
+                    <td></td>
                     <td className="px-4 py-3 font-medium">
                       {subBooking?.pnr ||
                         `${
