@@ -41,7 +41,7 @@ const BaggageSettings = () => {
         className="w-full bg-white rounded-xl pb-10 pt-6"
       >
         <Card className="shadow-none border-none">
-          <CardContent className="grid grid-cols-2 gap-40 mt-4">
+          <CardContent className="grid grid-cols-2 gap-20 mt-4">
             <FormField
               control={form.control}
               name="cabinBaggage"
