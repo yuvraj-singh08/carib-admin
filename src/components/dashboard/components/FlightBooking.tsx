@@ -49,7 +49,7 @@ const FlightBooking: React.FC = () => {
   //     }
   //   };
 
-  console.log(flightDetails.SubBooking[0].status.toUpperCase())
+  console.log(flightDetails)
 
   const handleTicketStatus = async (id: string, newStatus: AdminStatus) => {
     try {
@@ -238,7 +238,7 @@ const FlightBooking: React.FC = () => {
       navigate("/");
     } catch (error) {
       console.error("Error updating booking:", error);
-      toast.error(error.response?.data?.message || "Failed to update booking");
+      toast.error("Failed to update booking");
       console.log("ticket: ",flightDetails?.subBooking?.[0].id);
     } finally {
       setIsSaving(false);
