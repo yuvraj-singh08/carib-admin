@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { axiosInstance } from "@/provider/axios";
 
 const FlightBooking: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +34,12 @@ const FlightBooking: React.FC = () => {
   const [open, setOpen] = useState(false);
   console.log("selected option: ", selectedOption);
 
+  const [eTicket, setETicket] = useState("");
+  const [status, setStatus] = useState(flightDetails.SubBooking[0].status.toUpperCase());
+  const [isSaving, setIsSaving] = useState(false);
+
+  const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
+
   // const handleTicketStatus = async (id: string,  selectedOption: AdminStatus) => {
   //   setIsDropdownOpen(!isDropdownOpen)
   //     try {
@@ -41,6 +48,8 @@ const FlightBooking: React.FC = () => {
   //       console.error("Failed to update booking status:", error);
   //     }
   //   };
+
+  console.log(flightDetails.SubBooking[0].status.toUpperCase())
 
   const handleTicketStatus = async (id: string, newStatus: AdminStatus) => {
     try {
@@ -207,20 +216,38 @@ const FlightBooking: React.FC = () => {
   };
   console.log("getItineraries", getItineraries());
 
-  const handleStatusChange = (ticketNumber: number, newStatus: string) => {
-    console.log("Status changed:", ticketNumber, newStatus);
+  // const handleStatusChange = (ticketNumber: number, newStatus: string) => {
+  //   console.log("Status changed:", ticketNumber, newStatus);
+  // };
+  console.log("flight Details: ", flightDetails);
+
+  const handleSave = async() => {
+    setIsSaving(true)
+    try {
+      // Make API call to update the booking
+      const response = await axiosInstance.put(`${apiUrl}/book/subBooking/${flightDetails?.SubBooking[0]?.id}`,{
+        status:status,
+        ticket:eTicket
+      });
+      
+      console.log(response);
+
+      toast.success("Booking updated successfully");
+      
+      // Navigate to home page after success
+      navigate("/");
+    } catch (error) {
+      console.error("Error updating booking:", error);
+      toast.error(error.response?.data?.message || "Failed to update booking");
+      console.log("ticket: ",flightDetails?.subBooking?.[0].id);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  // const handleSave = () => {
-  //   if (bookingId) {
-  //     dispatch(
-  //       updateFlightDetails({
-  //         bookingId,
-  //         updatedData: { status: selectedOption },
-  //       })
-  //     );
-  //   }
-  // };
+
+
+
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -618,7 +645,8 @@ const FlightBooking: React.FC = () => {
 
             {Array.isArray(passengers) &&
               passengers.map((passenger: any, index: number) => {
-                const subBooking = flightDetails.subBooking?.[index] || {};
+                const subBooking = flightDetails.SubBooking?.[index] || {};
+                console.log(subBooking)
 
                 return (
                   <tr key={index}>
@@ -638,22 +666,25 @@ const FlightBooking: React.FC = () => {
                         "Not Found"}
                     </td>
                     <td className="px-4 py-3">
-                      {subBooking.ticketNumber?.toString() || <Input type="text" className="w-[50%]"/>}
+                      <Input type="text" defaultValue={subBooking.ticket} onChange={(e) => setETicket(e.target.value)} className="w-[50%]"/>
                     </td>
                     <td className="px-4 py-3">
                       <select
-                        value={subBooking.status || "pending"}
+                      defaultValue={subBooking.status}
+                        value={status}
                         onChange={(e) =>
-                          handleStatusChange(
-                            subBooking.ticketNumber,
-                            e.target.value
-                          )
+                          // handleStatusChange(
+                          //   subBooking.ticketNumber,
+                          //   e.target.value
+                          // )
+                          setStatus(e.target.value)
                         }
                         className="border rounded px-2 py-1 text-sm"
                       >
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="CONFIRMED">Confirmed</option>
                       </select>
+                      
                     </td>
                   </tr>
                 );
@@ -661,15 +692,30 @@ const FlightBooking: React.FC = () => {
           </tbody>
         </table>
       </div>
-
       <button
-        onClick={() => navigate("/")}
-        className="w-fit bg-green-500 text-white px-4 py-2 rounded-md self-end"
+        onClick={handleSave}
+        disabled={isSaving}
+        className="w-fit bg-green-500 text-white px-4 py-2 rounded-md self-end flex items-center justify-center"
       >
-        Save Changes
+      {isSaving ? (
+          <>
+            <LoadingSpinner />
+            Saving...
+          </>
+        ) : (
+          "Save Changes"
+        )}
       </button>
     </div>
   );
 };
 
 export default FlightBooking;
+
+
+
+
+
+
+
+
