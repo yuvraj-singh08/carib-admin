@@ -35,7 +35,7 @@ const FlightBooking: React.FC = () => {
   console.log("selected option: ", selectedOption);
 
   const [eTicket, setETicket] = useState("");
-  const [status, setStatus] = useState(flightDetails.SubBooking[0].status.toUpperCase());
+  const [status, setStatus] = useState(flightDetails?.SubBooking?.[0]?.status?.toUpperCase());
   const [isSaving, setIsSaving] = useState(false);
 
   const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
@@ -113,6 +113,7 @@ const FlightBooking: React.FC = () => {
       setSelectedOption(flightDetails.adminStatus);
     }
   }, [flightDetails]);
+
 
   const formatDuration = (duration: string) => {
     if (!duration) return "N/A";
