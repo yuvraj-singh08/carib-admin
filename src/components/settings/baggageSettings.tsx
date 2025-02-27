@@ -5,17 +5,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "../ui/input";
+import { axiosInstance } from "@/provider/axios";
+import toast from "react-hot-toast";
+import { useState } from "react";
+import { Loader } from "lucide-react";
 
 
 const formSchema = z.object({
-  cabinBaggage: z.string().min(1, "Cabin Baggage is required"),
-  checkedBaggage: z.string().min(1, "Checked Baggage is required"),
+  cabinBaggage: z.string().optional(),
+  checkedBaggage: z.string().optional(),
 });
 
 const BaggageSettings = () => {
+  const [loading, setLoading] = useState(false);
 
 
-
+  const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -26,8 +31,38 @@ const BaggageSettings = () => {
       },
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = async(data: any) => {
+      setLoading(true);
       console.log("Submitting form data:", data);
+      try {
+        if(data.cabinBaggage){
+          axiosInstance.put(`${apiUrl}/admin/baggage/452ea6a5-eb79-41cf-af56-e323f55cac1f`,
+            {weight: data.cabinBaggage,
+            type: "CABIN"}
+          )
+        }
+        if(data.checkedBaggage){
+          axiosInstance.put(`${apiUrl}/admin/baggage/c9a36f06-7fbd-4041-8421-9648acbeb65c`,
+            {weight: data.checkedBaggage,
+            type: "CHECKED"}
+          )
+        }
+        if(data.cabinBaggage && data.checkedBaggage){
+          toast.success("Baggage settings updated successfully");
+        } else if(data.checkedBaggage){ 
+          toast.success("Checked Baggage updated successfully");
+        }
+        else if(data.cabinBaggage){
+          toast.success("Cabin Baggage updated successfully");
+        }
+      }
+      catch (error) {
+        toast.error("Error updating baggage settings");
+        console.log("Error updating baggage settings:", error);
+      }
+      finally{
+        setLoading(false);
+      }
     };
 
 
@@ -50,7 +85,7 @@ const BaggageSettings = () => {
                   <FormLabel>Cabin Baggage</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-2">
-                    <Input {...field} />
+                    <Input type="number" {...field} />
                     <span>Kg</span></div>
                   </FormControl>
                   <FormMessage />
@@ -65,7 +100,7 @@ const BaggageSettings = () => {
                   <FormLabel>Checked Baggage</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-2">
-                    <Input {...field} />
+                    <Input type="number" {...field} />
                     <span>Kg</span></div>
                   </FormControl>
                   <FormMessage />
@@ -81,7 +116,7 @@ const BaggageSettings = () => {
             type="submit"
             className="bg-blue text-white"
           >
-            Update Baggage
+            {loading ? <Loader className="ml-2 size-5 shrink-0 animate-spin" /> : "Update Baggage"}
           </Button>
         </div>
       </form>
