@@ -18,38 +18,53 @@ const SettingsPage = () => {
       <main className="w-full min-h-screen flex flex-col gap-4">
         <div className="w-full h-full">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full bg-white h-14 flex items-center justify-start px-6 gap-6 relative overflow-hidden">
+            <TabsList className="w-full bg-white h-14 flex items-center justify-start px-6 gap-6 relative overflow-x-auto overflow-y-hidden"
+            style={{
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+            }}>
               <TabsTrigger value="deals" className="data-[state=active]:group">
                 Special Deals
+                {activeTab === "deals" && (
+                <div className="absolute w-[9%] h-4 bg-[#90BF5F] rounded-xl bottom-0 -mb-3" />
+              )}
               </TabsTrigger>
               <Separator orientation="vertical" className="h-[34px]" />
-              <TabsTrigger value="payment"className="data-[state=active]:group">Payment Gateway setting</TabsTrigger>
-              <Separator orientation="vertical" className="h-[34px]" />
-              <TabsTrigger value="email">Email SMTP setting</TabsTrigger>
-              <Separator orientation="vertical" className="h-[34px]" />
-              <TabsTrigger value="paymentCms">Payment CMS</TabsTrigger>
-              <Separator orientation="vertical" className="h-[34px]" />
-              <TabsTrigger value="GDSAPI">GDS API Settings</TabsTrigger>
-              <Separator orientation="vertical" className="h-[34px]" />
-              <TabsTrigger value="baggage">Baggage Settings</TabsTrigger>
-              {activeTab === "deals" && (
-                <div className="w-36 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-4" />
-              )}
+              <TabsTrigger value="payment"className="data-[state=active]:group">Payment Gateway setting
               {activeTab === "payment" && (
-                <div className="w-48 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-48" />
+                <div className="absolute w-[16%] h-4 bg-[#90BF5F] rounded-xl bottom-0 -mb-3" />
               )}
+              </TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="email">Email SMTP setting
               {activeTab === "email" && (
-                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 left-[430px]" />
+                <div className="absolute w-[13%] h-4 bg-[#90BF5F] rounded-xl bottom-0 -mb-3" />
               )}
+              </TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="paymentCms">Payment CMS
               {activeTab === "paymentCms" && (
-                <div className="w-28 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[485px]" />
+                <div className="absolute w-[9%] h-4 bg-[#90BF5F] rounded-xl bottom-0 -mb-3" />
               )}
+              </TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="GDSAPI">GDS API Settings
               {activeTab === "GDSAPI" && (
-                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[285px]" />
+                <div className="absolute w-[11%] h-4 bg-[#90BF5F] rounded-xl bottom-0 -mb-3" />
               )}
+              </TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
+              <TabsTrigger value="baggage">Baggage Settings
               {activeTab === "baggage" && (
-                <div className="w-40 h-4 bg-[#90BF5F] rounded-xl absolute -bottom-2.5 right-[100px]" />
+                <div className="absolute w-[11%] h-4 bg-[#90BF5F] rounded-xl bottom-0 -mb-3" />
               )}
+              </TabsTrigger>
+              
+              
+              
+              
+              
+              
             </TabsList>
             <TabsContent value="deals">
               <PermissionGroup resource="settings" action="view">

@@ -47,8 +47,8 @@ const BaggageSettings = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      cabinBaggage: baggageData?.[0]?.weight || "",
-      checkedBaggage: baggageData?.[1]?.weight || "",
+      checkedBaggage: baggageData?.[0]?.weight || "",
+      cabinBaggage: baggageData?.[1]?.weight || "",
     },
   });
 
@@ -109,7 +109,7 @@ const BaggageSettings = () => {
                   name="cabinBaggage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cabin Baggage</FormLabel>
+                      <FormLabel>Checked Baggage</FormLabel>
                       <FormControl>
                         <div className="flex items-center gap-2">
                           <Input type="number" {...field} />
@@ -125,7 +125,7 @@ const BaggageSettings = () => {
                   name="checkedBaggage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Checked Baggage</FormLabel>
+                      <FormLabel>Cabin Baggage</FormLabel>
                       <FormControl>
                         <div className="flex items-center gap-2">
                           <Input type="number" {...field} />
