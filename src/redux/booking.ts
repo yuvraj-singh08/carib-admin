@@ -200,6 +200,7 @@ const bookingsSlice = createSlice({
         state.status = "failed";
         state.loading = false;
         state.error = action.payload as string ?? "Failed to fetch bookings";
+        state.bookings =[];
       })
       .addCase(deleteBooking.fulfilled, (state, action) => {
         state.bookings = state.bookings.filter(
