@@ -594,11 +594,11 @@ const FlightBooking: React.FC = () => {
         <table className="min-w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left">Passenger</th>
-              <th className="px-4 py-3 text-left">Supplier</th>
-              <th className="px-4 py-3 text-left">PNR</th>
-              <th className="px-4 py-3 text-left">E-Ticket</th>
-              <th className="px-4 py-3 text-left">Status</th>
+              <th className="px-4 py-3 text-center">Passenger</th>
+              <th className="px-4 py-3 text-center">Supplier</th>
+              <th className="px-4 py-3 text-center">PNR</th>
+              <th className="px-4 py-3 text-center">E-Ticket</th>
+              <th className="px-4 py-3 text-center">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -657,8 +657,10 @@ const FlightBooking: React.FC = () => {
                         {passenger.gender === "m" ? "Male" : "Female"}
                       </span>
                     </td>
-                    <td></td>
-                    <td className="px-4 py-3 font-medium">
+                    <td className="text-center">
+                      {subBooking?.supplier || "Unknown"}
+                    </td>
+                    <td className="text-center font-medium">
                       {subBooking?.pnr ||
                         `${
                           flightDetails?.flightDetails?.slices &&
@@ -666,7 +668,7 @@ const FlightBooking: React.FC = () => {
                         }` ||
                         "Not Found"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="text-center flex justify-center items-center">
                       <Input type="text" defaultValue={subBooking.ticket} onChange={(e) => setETicket(e.target.value)} className="w-[50%]"/>
                     </td>
                     <td className="px-4 py-3">
