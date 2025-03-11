@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 
 export const createAxiosInstance = (): AxiosInstance => {
   const baseURL = import.meta.env.VITE_BACKEND_URL as string;
-
+  console.log("baseURL",baseURL)
   const axiosInstance: AxiosInstance = axios.create({
     baseURL: baseURL,
     headers: {

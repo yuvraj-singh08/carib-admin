@@ -74,7 +74,7 @@ export default function FlightBookingsTable() {
 
   const bookings = useSelector((state: RootState) => state.bookings.bookings);
   const loading = useSelector((state: RootState) => state.bookings.loading);
-  const error = useSelector((state: RootState) => state.bookings.error);
+  // const error = useSelector((state: RootState) => state.bookings.error);
   const emailSending = useSelector(
     (state: RootState) => state.bookings.emailSending
   );
@@ -411,13 +411,13 @@ export default function FlightBookingsTable() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="w-full p-4 bg-white rounded-xl text-red-600">
-        Error loading bookings: {error}
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="w-full p-4 bg-white rounded-xl text-red-600">
+  //       Error loading bookings: {error}
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="w-full bg-white px-3 rounded-xl">

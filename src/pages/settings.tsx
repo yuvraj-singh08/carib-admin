@@ -9,6 +9,7 @@ import { ContentLayout } from "@/components/shared/content-layout";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import FareTable from "@/components/settings/fare-settings";
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState("deals");
@@ -59,6 +60,13 @@ const SettingsPage = () => {
                 <div className="absolute w-[11%] h-4 bg-[#90BF5F] rounded-xl bottom-0 -mb-3" />
               )}
               </TabsTrigger>
+              <Separator orientation="vertical" className="h-[34px]" />
+
+              <TabsTrigger value="fare">Fare Settings
+              {activeTab === "fare" && (
+                <div className="absolute w-[11%] h-4 bg-[#90BF5F] rounded-xl bottom-0 -mb-3" />
+              )}
+              </TabsTrigger>
               
               
               
@@ -94,6 +102,11 @@ const SettingsPage = () => {
             <TabsContent value="baggage">
               <PermissionGroup resource="settings" action="view">
                 <BaggageSettings />
+              </PermissionGroup>
+            </TabsContent>
+            <TabsContent value="fare">
+              <PermissionGroup resource="settings" action="view">
+              <FareTable/>
               </PermissionGroup>
             </TabsContent>
           </Tabs>
