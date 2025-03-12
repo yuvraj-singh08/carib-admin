@@ -510,7 +510,7 @@ const FareTable = () => {
         <Dialog  open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-[800px]">
             <DialogHeader>
-              <DialogTitle>Edit Coupon</DialogTitle>
+              <DialogTitle>Edit Fare Rules</DialogTitle>
               <Separator />
             </DialogHeader>
             <Form {...form}>
@@ -595,7 +595,7 @@ const FareTable = () => {
                     className="flex items-center py-2 px-2 bg-blue text-white rounded-lg hover:bg-blue-600 transition-colors"
                   >
                     <Save className="h-4 w-4 mr-2" />
-                    Update Coupon
+                    Update 
                   </Button>
                 </div>
               </form>
