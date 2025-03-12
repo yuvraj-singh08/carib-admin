@@ -15,13 +15,15 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  // SelectOption,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
 import TableLoader from "../shared/table-loader";
 
-import { Save, Search } from "lucide-react";
+import {  Save, Search } from "lucide-react";
+
 
 type Fare = {
   id: number;
@@ -40,8 +42,8 @@ const FareTable = () => {
       fareClass: "Economy",
       airlines: "American Airlines",
       checkedBagsIncluded: 1,
-      refundableStatus: "Non-refundable",
-      changeableStatus: "Changeable with fee",
+      refundableStatus: "No",
+      changeableStatus: "No",
       lastUpdateTime: "2025-03-11T12:30:00Z",
     },
     {
@@ -49,8 +51,8 @@ const FareTable = () => {
       fareClass: "Business",
       airlines: "Delta Airlines",
       checkedBagsIncluded: 2,
-      refundableStatus: "Fully refundable",
-      changeableStatus: "Free changes",
+      refundableStatus: "Yes",
+      changeableStatus: "Yes",
       lastUpdateTime: "2025-03-10T15:45:00Z",
     },
     {
@@ -58,8 +60,8 @@ const FareTable = () => {
       fareClass: "First Class",
       airlines: "United Airlines",
       checkedBagsIncluded: 3,
-      refundableStatus: "Fully refundable",
-      changeableStatus: "Free changes",
+      refundableStatus: "Yes",
+      changeableStatus: "Yes",
       lastUpdateTime: "2025-03-09T10:15:00Z",
     },
     {
@@ -67,8 +69,8 @@ const FareTable = () => {
       fareClass: "Economy",
       airlines: "American Airlines",
       checkedBagsIncluded: 1,
-      refundableStatus: "Non-refundable",
-      changeableStatus: "Changeable with fee",
+      refundableStatus: "No",
+      changeableStatus: "No",
       lastUpdateTime: "2025-03-11T12:30:00Z",
     },
     {
@@ -76,8 +78,8 @@ const FareTable = () => {
       fareClass: "Business",
       airlines: "Delta Airlines",
       checkedBagsIncluded: 2,
-      refundableStatus: "Fully refundable",
-      changeableStatus: "Free changes",
+      refundableStatus: "Yes",
+      changeableStatus: "Yes",
       lastUpdateTime: "2025-03-10T15:45:00Z",
     },
     {
@@ -85,8 +87,8 @@ const FareTable = () => {
       fareClass: "First Class",
       airlines: "United Airlines",
       checkedBagsIncluded: 3,
-      refundableStatus: "Fully refundable",
-      changeableStatus: "Free changes",
+      refundableStatus: "Yes",
+      changeableStatus: "Yes",
       lastUpdateTime: "2025-03-09T10:15:00Z",
     },
 
@@ -95,8 +97,8 @@ const FareTable = () => {
       fareClass: "Economy",
       airlines: "American Airlines",
       checkedBagsIncluded: 1,
-      refundableStatus: "Non-refundable",
-      changeableStatus: "Changeable with fee",
+      refundableStatus: "No",
+      changeableStatus: "No",
       lastUpdateTime: "2025-03-11T12:30:00Z",
     },
     {
@@ -104,8 +106,8 @@ const FareTable = () => {
       fareClass: "Business",
       airlines: "Delta Airlines",
       checkedBagsIncluded: 2,
-      refundableStatus: "Fully refundable",
-      changeableStatus: "Free changes",
+      refundableStatus: "Yes",
+      changeableStatus: "Yes",
       lastUpdateTime: "2025-03-10T15:45:00Z",
     },
     {
@@ -113,8 +115,8 @@ const FareTable = () => {
       fareClass: "First Class",
       airlines: "United Airlines",
       checkedBagsIncluded: 3,
-      refundableStatus: "Fully refundable",
-      changeableStatus: "Free changes",
+      refundableStatus: "Yes",
+      changeableStatus: "Yes",
       lastUpdateTime: "2025-03-09T10:15:00Z",
     },
     {
@@ -122,8 +124,8 @@ const FareTable = () => {
       fareClass: "Economy",
       airlines: "American Airlines",
       checkedBagsIncluded: 1,
-      refundableStatus: "Non-refundable",
-      changeableStatus: "Changeable with fee",
+      refundableStatus: "No",
+      changeableStatus: "No",
       lastUpdateTime: "2025-03-11T12:30:00Z",
     },
     {
@@ -131,8 +133,8 @@ const FareTable = () => {
       fareClass: "Business",
       airlines: "Delta Airlines",
       checkedBagsIncluded: 2,
-      refundableStatus: "Fully refundable",
-      changeableStatus: "Free changes",
+      refundableStatus: "Yes",
+      changeableStatus: "Yes",
       lastUpdateTime: "2025-03-10T15:45:00Z",
     },
     {
@@ -140,8 +142,8 @@ const FareTable = () => {
       fareClass: "First Class",
       airlines: "United Airlines",
       checkedBagsIncluded: 3,
-      refundableStatus: "Fully refundable",
-      changeableStatus: "Free changes",
+      refundableStatus: "Yes",
+      changeableStatus: "Yes",
       lastUpdateTime: "2025-03-09T10:15:00Z",
     },
   ];
@@ -158,8 +160,8 @@ const FareTable = () => {
     fareClass: "",
     airline: "",
     checkedBags: "",
-    refundable: "Yes",
-    changeable: "Yes",
+    refundable: "",
+    changeable: "",
   });
 
   // Filter data based on search term
@@ -212,8 +214,8 @@ const FareTable = () => {
       fareClass: "",
       airline: "",
       checkedBags: "",
-      refundable: "Yes",
-      changeable: "Yes",
+      refundable: "",
+      changeable: "",
     });
   };
 
@@ -274,7 +276,36 @@ const FareTable = () => {
                 placeholder="Enter bags included "
               />
             </div>
+
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Refundable Status
+              </label>
+              <input
+                type="text"
+                name="refundable"
+                value={newEntry.refundable}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter Refundable Status "
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Changeable Status
+              </label>
+              <input
+                type="text"
+                name="changeable"
+                value={newEntry.changeable}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter Changable Status "
+              />
+            </div>
+
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Refundable Status
               </label>
@@ -292,10 +323,12 @@ const FareTable = () => {
                   <SelectValue placeholder=" Changeable Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Yes">Yes</SelectItem>
-                  <SelectItem value="No">No</SelectItem>
+                <SelectOption value="Yes">Yes</SelectOption>
+                <SelectOption value="No">No</SelectOption>
                 </SelectContent>
               </Select>
+
+              
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -315,14 +348,14 @@ const FareTable = () => {
                   <SelectValue placeholder=" Changeable Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Yes">Yes</SelectItem>
-                  <SelectItem value="No">No</SelectItem>
+                  <SelectOption value="Yes">Yes</SelectOption>
+                  <SelectOption value="No">No</SelectOption>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
           </div>
 
-          <div className="w-full flex justify-between mt-4">
+          <div className="w-full mb-3 flex justify-between mt-4">
             <div className="flex items-center gap-2">
               <div className="relative hidden md:block">
                 <Input
