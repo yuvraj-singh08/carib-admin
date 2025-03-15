@@ -38,10 +38,11 @@ export const useConfirm = (
   };
 
   const ConfirmationDialog = () => (
-    <Dialog open={promise !== null}>
+    <Dialog open={promise !== null } onOpenChange={handleClose}>
       <DialogContent className="max-w-sm px-4">
         <DialogHeader>
           <img
+          onClick={handleCancel}
             src="/icons/delete.png"
             alt="delete icon"
             className="w-14 h-auto shrink-0 mb-3"

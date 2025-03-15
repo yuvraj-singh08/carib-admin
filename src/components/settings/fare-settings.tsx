@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 import {
   Table,
@@ -10,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {  Pencil, Trash2 } from "lucide-react";
 
 import {
   Select,
@@ -20,10 +20,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
-import TableLoader from "../shared/table-loader";
 
-import {  Save, Search } from "lucide-react";
-
+import { Save, Search } from "lucide-react";
+import { InputTags } from "../ui/multitagInput";
+import PermissionButtonGroup from "../permissions/PermissionButton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Separator } from "@radix-ui/react-select";
+import { useForm } from "react-hook-form";
+import { Textarea } from "../ui/textarea";
+import { useConfirm } from "@/hooks/use-confirm";
 
 type Fare = {
   id: number;
@@ -151,53 +169,43 @@ const FareTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [pageSize, setPageSize] = useState(10);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [ConfirmDialogue, confirm] = useConfirm(
+      "Delete Fare Rule",
+      "Are you sure you want to delete this fare rule? This action cannot be undone."
+    );
   //   const [sortConfig, setSortConfig] = useState<{
   //     key: keyof (typeof dummyFares)[0] | null;
   //     direction: "asc" | "desc";
   //   }>({ key: null, direction: "asc" });
 
+  // const [newEntry, setNewEntry] = useState({
+  //   fareClass: "",
+  //   airline: "",
+  //   checkedBags: "",
+  //   refundable: "",
+  //   changeable: "",
+  // });
+
   const [newEntry, setNewEntry] = useState({
-    fareClass: "",
-    airline: "",
+    fareClass: [], // Array to store multiple fare classes
+    airline: [], // Array to store multiple airlines
     checkedBags: "",
     refundable: "",
     changeable: "",
   });
+  const form = useForm({
+    defaultValues: {
+      airline: [],
+      fareClass: [],
+      refundable: "",
+      changeable: "",
+    },
+  });
 
-  // Filter data based on search term
-  const filteredData = dummyFares.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
-
-  // Sort data
-  //   const sortedData = [...filteredData].sort((a, b) => {
-  //     if (!sortConfig.key) return 0;
-  //     if (a[sortConfig.key] < b[sortConfig.key]) {
-  //       return sortConfig.direction === 'asc' ? -1 : 1;
-  //     }
-  //     if (a[sortConfig.key] > b[sortConfig.key]) {
-  //       return sortConfig.direction === 'asc' ? 1 : -1;
-  //     }
-  //     return 0;
-  //   });
-
-  // Pagination
-  const totalPages = Math.ceil(filteredData.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginatedData = filteredData.slice(startIndex, startIndex + pageSize);
-
-  //   const handleSort = (key: keyof typeof dummyFares[0]) => {
-  //     setSortConfig({
-  //       key,
-  //       direction:
-  //         sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc',
-  //     });
-  //   };
-
+  // Handle input change for other fields
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setNewEntry((prev) => ({
@@ -207,173 +215,194 @@ const FareTable = () => {
   };
 
   const handleSave = () => {
-    // In a real app, this would be an API call
     console.log("Saving new entry:", newEntry);
-    // Reset form
     setNewEntry({
-      fareClass: "",
-      airline: "",
+      fareClass: [],
+      airline: [],
       checkedBags: "",
       refundable: "",
       changeable: "",
     });
   };
 
-  if (status === "loading") {
-    return <TableLoader />;
-  }
+  // Filter data based on search term
+  const filteredData = dummyFares.filter((item) =>
+    Object.values(item).some((value) =>
+      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+ 
+
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedData = filteredData.slice(startIndex, startIndex + pageSize);
+
+
+  const handleEdit = (id:number) => {
+    const selectedFare = dummyFares.find((fare) => fare.id === id);
+    if (selectedFare) {
+      form.reset({
+        airline: [], // Convert to array for InputTags
+        fareClass: [], // Convert to array for InputTags
+        refundable: selectedFare.refundableStatus,
+        changeable: selectedFare.changeableStatus,
+      });
+      // setEditingDeal(true);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    console.log("Delete deal", id);
+     await confirm();
+  };
+
+  
+
+
+  const onSubmit = async (data: any) => {
+    try {
+      console.log("Form Data Submitted:", data);
+
+      // API request logic (modify as needed)
+      const response = await fetch("/api/coupons", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save coupon");
+      }
+
+      const result = await response.json();
+      console.log("Coupon Saved:", result);
+
+      // Close the dialog and reset the form
+      setIsDialogOpen(false);
+      form.reset();
+    } catch (error) {
+      console.error("Error saving coupon:", error);
+    }
+  };
 
   console.log("pageSize", pageSize);
   console.log("totalPages", totalPages);
 
   return (
     <>
+    <ConfirmDialogue />
       <div className="p-4 bg-white rounded-xl">
         <div className="flex justify-between mb-4">
           <h1 className="text-2xl font-bold text-blue">Fare Settings</h1>
         </div>
 
-        {/* <div>kejf</div> */}
+       
 
-        <div className="   border-gray-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Fare Class
-              </label>
-              <input
-                type="text"
-                name="fareClass"
-                value={newEntry.fareClass}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter fare class"
-              />
-            </div>
+        <div className="border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Fare Class */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Airlines
               </label>
-              <input
-                type="text"
-                name="airline"
+
+              <InputTags
                 value={newEntry.airline}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter airline"
+                onChange={(newValues: any) => {
+                  setNewEntry((prev) => ({
+                    ...prev,
+                    airline: newValues,
+                  }));
+                }}
               />
             </div>
+
+            {/* Airline */}
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fare Rules
+              </label>
+
+              <InputTags
+                value={newEntry.fareClass}
+                onChange={(newValues: any) => {
+                  setNewEntry((prev) => ({
+                    ...prev,
+                    fareClass: newValues,
+                  }));
+                }}
+              />
+            </div>
+
+            {/* Checked Bags */}
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Checked Bags
               </label>
-              <input
-                type="text"
+              <textarea
                 name="checkedBags"
                 value={newEntry.checkedBags}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter bags included "
+                className="w-full placeholder:text-sm min-h-10 max-h-[5rem]   px-3 py-2 h-10 no-scrollbar border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter bags included"
               />
-            </div>
+            </div> */}
 
+            {/* Refundable Status */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Refundable Status
               </label>
-              <input
-                type="text"
+              <textarea
                 name="refundable"
                 value={newEntry.refundable}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter Refundable Status "
+                className="w-full placeholder:text-[0.8rem] min-h-10 max-h-[5rem]   px-3 py-2 h-10 no-scrollbar border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter Refundable Status"
               />
             </div>
 
+            {/* Changeable Status */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Changeable Status
               </label>
-              <input
-                type="text"
+              <textarea
                 name="changeable"
                 value={newEntry.changeable}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter Changable Status "
+                className="w-full placeholder:text-[0.8rem] min-h-10 max-h-[5rem]   px-3 py-2 h-10 no-scrollbar border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter Changeable Status"
               />
             </div>
-
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Refundable Status
-              </label>
-              <Select
-                name="refundable"
-                defaultValue={newEntry.refundable}
-                onValueChange={(value) => {
-                  setNewEntry((prev) => ({
-                    ...prev,
-                    refundable: value,
-                  }));
-                }}
-              >
-                <SelectTrigger className="w-full border border-gray-300 rounded-lg px-3 py-2">
-                  <SelectValue placeholder=" Changeable Status" />
-                </SelectTrigger>
-                <SelectContent>
-                <SelectOption value="Yes">Yes</SelectOption>
-                <SelectOption value="No">No</SelectOption>
-                </SelectContent>
-              </Select>
-
-              
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Changeable Status
-              </label>
-              <Select
-                name="changeable"
-                onValueChange={(value) => {
-                  setNewEntry((prev) => ({
-                    ...prev,
-                    changeable: value,
-                  }));
-                }}
-                defaultValue={newEntry.changeable}
-              >
-                <SelectTrigger className="w-full border border-gray-300 rounded-lg px-3 py-2">
-                  <SelectValue placeholder=" Changeable Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectOption value="Yes">Yes</SelectOption>
-                  <SelectOption value="No">No</SelectOption>
-                </SelectContent>
-              </Select>
-            </div> */}
           </div>
 
           <div className="w-full mb-3 flex justify-between mt-4">
-            <div className="flex items-center gap-2">
+            <div className="flex border rounded items-center gap-2">
               <div className="relative hidden md:block">
-                <Input
+                <input
                   placeholder="Search..."
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-[180px] rounded-xl h-10 pl-9"
+                  className="w-[180px] rounded h-10 pl-9"
                 />
-                <Search className="size-5 shrink-0 text-gray absolute top-2.5 left-2" />
+                <span className="size-5 shrink-0 text-gray absolute top-2.5 left-2">
+                  <Search />
+                </span>
               </div>
             </div>
 
-            <Button
+            <button
               onClick={handleSave}
-              className="flex items-center  py-2 bg-blue text-white rounded-lg hover:bg-blue-600 transition-colors"
+              className="flex items-center py-2 px-2 bg-blue text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
               <Save className="h-4 w-4 mr-2" />
               Save Changes
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -386,6 +415,7 @@ const FareTable = () => {
               <TableHead>Refundable Status</TableHead>
               <TableHead>Changeable Status</TableHead>
               <TableHead>Last Update Time</TableHead>
+              <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -400,6 +430,29 @@ const FareTable = () => {
                 <TableCell>{fare.changeableStatus}</TableCell>
                 <TableCell>
                   {format(new Date(fare.lastUpdateTime), "dd-MM-yyyy HH:mm:ss")}
+                </TableCell>
+                <TableCell className="flex items-center justify-center">
+                  <div className="flex items-center space-x-2">
+                   
+                    <PermissionButtonGroup resource="settings" action="update">
+                      <Button
+                        variant="ghost"
+                        className="bg-green-400/20 hover:bg-green-400/40"
+                        onClick={() => handleEdit(fare.id)}
+                      >
+                        <Pencil size={16} className="text-green-500" />
+                      </Button>
+                    </PermissionButtonGroup>
+                    <PermissionButtonGroup resource="settings" action="delete">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleDelete(fare.id)}
+                        className="bg-red-400/20 hover:bg-red-400/40"
+                      >
+                        <Trash2 size={16} className="text-red-500" />
+                      </Button>
+                    </PermissionButtonGroup>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -453,6 +506,102 @@ const FareTable = () => {
             </Button>
           </div>
         </div>
+
+        <Dialog  open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[800px]">
+            <DialogHeader>
+              <DialogTitle>Edit Fare Rules</DialogTitle>
+              <Separator />
+            </DialogHeader>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col items-start gap-3"
+              >
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Airlines */}
+                  <FormField
+                    control={form.control}
+                    name="airline"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Airlines</FormLabel>
+                        <FormControl>
+                          <InputTags className="" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Fare Rules */}
+                  <FormField
+                    control={form.control}
+                    name="fareClass"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fare Rules</FormLabel>
+                        <FormControl>
+                          <InputTags {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Refundable Status */}
+                  <FormField
+                    control={form.control}
+                    name="refundable"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Refundable Status</FormLabel>
+                        <FormControl>
+                          <Textarea
+                          className=""
+                            {...field}
+                            placeholder="Enter Refundable Status"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Changeable Status */}
+                  <FormField
+                    control={form.control}
+                    name="changeable"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Changeable Status</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Enter Changeable Status"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="w-full mb-3 flex justify-end mt-4">
+                  
+
+                  <Button
+                    type="submit"
+                    className="flex items-center py-2 px-2 bg-blue text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Update 
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );
