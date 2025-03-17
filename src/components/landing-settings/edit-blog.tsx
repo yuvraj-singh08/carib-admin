@@ -4,8 +4,8 @@ import { Editor } from "primereact/editor";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../ui/button";
-import axios from "axios";
 import { uploadImage } from "@/hooks/aws";
+import { axiosInstance } from "@/provider/axios";
 
 
 const EditBlogPage = () => {
@@ -23,7 +23,7 @@ const EditBlogPage = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://travelcarib.tekniche.xyz/admin/blog/${id}`
         );
         const { mainImg, description, secondaryImg, secondaryDesc } = response.data;
@@ -64,7 +64,7 @@ const EditBlogPage = () => {
         secondaryDesc: secondaryDescription,
       };
 
-      await axios.post("https://travelcarib.tekniche.xyz/admin/update-blog", payload);
+      await axiosInstance.post("https://travelcarib.tekniche.xyz/admin/update-blog", payload);
       toast.success("Blog updated successfully!");
       navigate("/landing-settings");
     } catch (error) {
