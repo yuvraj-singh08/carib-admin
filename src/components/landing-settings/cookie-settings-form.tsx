@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -19,6 +18,7 @@ import { Textarea } from "../ui/textarea";
 import toast from "react-hot-toast";
 import TableLoader from "../shared/table-loader";
 import PermissionButtonGroup from "../permissions/PermissionButton";
+import { axiosInstance } from "@/provider/axios";
 
 const BASE_API_URL = import.meta.env.VITE_BACKEND_URL as string;
 
@@ -98,7 +98,7 @@ const CookieSettingsForm = () => {
   useEffect(() => {
     const fetchCookies = async () => {
       try {
-        const response = await axios.get(`${BASE_API_URL}/admin/cookies`);
+        const response = await axiosInstance.get(`${BASE_API_URL}/admin/cookies`);
         if (response.data.cookies && response.data.cookies.length > 0) {
           const cookie = response.data.cookies[0];
           setCookieId(cookie.id);
@@ -126,7 +126,7 @@ const CookieSettingsForm = () => {
   const onSubmit = async (data: any) => {
     try {
       if (cookieId) {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           `${BASE_API_URL}/admin/update-cookie`,
           {
             id: cookieId,
@@ -140,7 +140,7 @@ const CookieSettingsForm = () => {
           toast.error("Failed to update cookie");
         }
       } else {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           `${BASE_API_URL}/admin/add-cookie`,
           data
         );

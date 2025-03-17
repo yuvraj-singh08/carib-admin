@@ -37,9 +37,9 @@ import { BiReset } from "react-icons/bi";
 import { User, Baby, Luggage, Briefcase } from "lucide-react";
 import { AdminFlightSearchSchema } from "@/schemas/admin-flight-search";
 import { useFlightsData } from "@/hooks/flights-search-result";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { FlightResultsDialog } from "./flight-result-dialogue";
+import { axiosInstance } from "@/provider/axios";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -88,7 +88,7 @@ export const FlightSearchSection = () => {
       maxLayovers: "2",
     };
 
-    axios
+    axiosInstance
       .post(apiUrl, requestData)
       .then((response) => {
         toast.success("Flights Fetched Successfully");

@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BlogContent from "./blog-content";
 // import Sidebar from "./sidebar";
-import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { axiosInstance } from "@/provider/axios";
 
 // Define the Blog type
 interface Blog {
@@ -28,7 +28,7 @@ const BlogPage = () => {
     const fetchBlog = async () => {
       try {
         setLoading(true);
-        const response = await axios.get<Blog>(
+        const response = await axiosInstance.get<Blog>(
           `https://travelcarib.tekniche.xyz/admin/blog/${id}`
         );
         setBlog(response.data);

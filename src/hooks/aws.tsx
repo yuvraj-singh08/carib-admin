@@ -1,12 +1,12 @@
-import axios from "axios";
+import { axiosInstance } from "@/provider/axios";
 
 export const uploadImage = async (img: File) => {
   let imgUrl: string = "";
 
-  await axios
+  await axiosInstance
     .get(import.meta.env.VITE_BACKEND_URL + "/bucket/get-url")
     .then(async ({ data: { uploadURL } }) => {
-      await axios({
+      await axiosInstance({
         method: "PUT",
         url: uploadURL,
         headers: { "Content-Type": "multipart/form-data" },

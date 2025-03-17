@@ -1,5 +1,6 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
 
 interface EmailSMTP {
   id: string;
@@ -32,7 +33,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL as string;
 export const addEmailSMTP = createAsyncThunk(
   "emailSMTP/addEmailSMTP",
   async (emailSMTPData: Omit<EmailSMTP, "id">) => {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_BASE_URL}/admin/add-email-smtp`,
       emailSMTPData
     );
@@ -43,7 +44,7 @@ export const addEmailSMTP = createAsyncThunk(
 export const getEmailSMTPs = createAsyncThunk(
   "emailSMTP/getEmailSMTPs",
   async () => {
-    const response = await axios.get(`${API_BASE_URL}/admin/emails`);
+    const response = await axiosInstance.get(`${API_BASE_URL}/admin/emails`);
     return response.data.emailSMTP;
   }
 );
@@ -51,7 +52,7 @@ export const getEmailSMTPs = createAsyncThunk(
 export const getEmailSMTPById = createAsyncThunk(
   "emailSMTP/getEmailSMTPById",
   async (id: string) => {
-    const response = await axios.post(`${API_BASE_URL}/admin/email`, { id });
+    const response = await axiosInstance.post(`${API_BASE_URL}/admin/email`, { id });
     return response.data.emailSMTP;
   }
 );
@@ -59,7 +60,7 @@ export const getEmailSMTPById = createAsyncThunk(
 export const updateEmailSMTP = createAsyncThunk(
   "emailSMTP/updateEmailSMTP",
   async (emailSMTPData: EmailSMTP) => {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_BASE_URL}/admin/update-email-smtp`,
       emailSMTPData
     );
@@ -70,7 +71,7 @@ export const updateEmailSMTP = createAsyncThunk(
 export const deleteEmailSMTP = createAsyncThunk(
   "emailSMTP/deleteEmailSMTP",
   async (id: string) => {
-    await axios.post(`${API_BASE_URL}/admin/delete-email-smtp`, { id });
+    await axiosInstance.post(`${API_BASE_URL}/admin/delete-email-smtp`, { id });
     return id;
   }
 );

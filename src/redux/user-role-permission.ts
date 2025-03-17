@@ -1,5 +1,6 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
 
 type Permission = {
   view: boolean;
@@ -24,14 +25,14 @@ export interface RoleType {
 const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 
 export const fetchRoles = createAsyncThunk("roles/fetchRoles", async () => {
-  const response = await axios.get(`${apiUrl}/admin/roles`);
+  const response = await axiosInstance.get(`${apiUrl}/admin/roles`);
   return response.data.roles;
 });
 
 export const addRole = createAsyncThunk(
   "roles/addRole",
   async (data: Omit<RoleType, "id">) => {
-    const response = await axios.post(`${apiUrl}/admin/add-roles`, data);
+    const response = await axiosInstance.post(`${apiUrl}/admin/add-roles`, data);
     return response.data.roles;
   }
 );
@@ -39,7 +40,7 @@ export const addRole = createAsyncThunk(
 export const deleteRole = createAsyncThunk(
   "roles/deleteRole",
   async (id: string) => {
-    await axios.post(`${apiUrl}/admin/delete-roles`, { id });
+    await axiosInstance.post(`${apiUrl}/admin/delete-roles`, { id });
     return id;
   }
 );
@@ -48,7 +49,7 @@ export const updateRole = createAsyncThunk(
   "roles/updateRole",
   async (data: RoleType) => {
     const { id, name, description, permissionGroups } = data; 
-    const response = await axios.post(`${apiUrl}/admin/update-roles`, {
+    const response = await axiosInstance.post(`${apiUrl}/admin/update-roles`, {
       id,
       title: name,
       description,

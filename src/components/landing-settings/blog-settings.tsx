@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { getBlogs } from "@/redux/blogSlice";
 import { AppDispatch, RootState } from "@/provider/redux-provider";
@@ -8,6 +7,7 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import { FaEye } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import PermissionButtonGroup from "../permissions/PermissionButton";
+import { axiosInstance } from "@/provider/axios";
 
 const BlogTable: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,12 +35,13 @@ const BlogTable: React.FC = () => {
 
   const confirmDelete = async (id: string) => {
     try {
-      await axios.post("https://travelcarib.tekniche.xyz/admin/delete-blog", {
+      await axiosInstance.post("https://travelcarib.tekniche.xyz/admin/delete-blog", {
         id,
       });
       toast.success("Blog deleted successfully!");
       dispatch(getBlogs());
     } catch (error) {
+      console.log(error);
       toast.error("Failed to delete blog. Please try again.");
     } finally {
       setDeletePopup(null);

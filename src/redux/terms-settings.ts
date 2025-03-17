@@ -1,5 +1,6 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
 
 interface TermsAndConditions {
   id: string;
@@ -26,7 +27,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL as string;
 export const addTermsAndConditions = createAsyncThunk(
   "termsAndConditions/addTermsAndConditions",
   async (termsData: Omit<TermsAndConditions, "id">) => {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_BASE_URL}/admin/add-term`,
       termsData
     );
@@ -37,7 +38,7 @@ export const addTermsAndConditions = createAsyncThunk(
 export const getTermsAndConditions = createAsyncThunk(
   "termsAndConditions/getTermsAndConditions",
   async () => {
-    const response = await axios.get(`${API_BASE_URL}/admin/terms`);
+    const response = await axiosInstance.get(`${API_BASE_URL}/admin/terms`);
     return response.data.privacy;
   }
 );
@@ -45,7 +46,7 @@ export const getTermsAndConditions = createAsyncThunk(
 export const getTermsAndConditionsById = createAsyncThunk(
   "termsAndConditions/getTermsAndConditionsById",
   async (id: string) => {
-    const response = await axios.post(`${API_BASE_URL}/admin/term/${id}`);
+    const response = await axiosInstance.post(`${API_BASE_URL}/admin/term/${id}`);
     return response.data.privacy;
   }
 );
@@ -53,7 +54,7 @@ export const getTermsAndConditionsById = createAsyncThunk(
 export const updateTermsAndConditions = createAsyncThunk(
   "termsAndConditions/updateTermsAndConditions",
   async (termsData: TermsAndConditions) => {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_BASE_URL}/admin/update-term`,
       termsData
     );
@@ -64,7 +65,7 @@ export const updateTermsAndConditions = createAsyncThunk(
 export const deleteTermsAndConditions = createAsyncThunk(
   "termsAndConditions/deleteTermsAndConditions",
   async (id: string) => {
-    await axios.post(`${API_BASE_URL}/admin/delete-term`, { id });
+    await axiosInstance.post(`${API_BASE_URL}/admin/delete-term`, { id });
     return id;
   }
 );
