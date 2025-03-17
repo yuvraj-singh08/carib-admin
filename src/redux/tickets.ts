@@ -1,5 +1,5 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 
 const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 
@@ -40,7 +40,7 @@ const initialState: TicketState = {
 export const fetchTickets = createAsyncThunk(
   "tickets/fetchTickets",
   async () => {
-    const response = await axios.get(`${apiUrl}/admin/tickets`);
+    const response = await axiosInstance.get(`${apiUrl}/admin/tickets`);
     return response.data.tickets;
   }
 );
@@ -48,7 +48,7 @@ export const fetchTickets = createAsyncThunk(
 export const fetchTicketById = createAsyncThunk(
   "tickets/fetchTicketById",
   async (id: string) => {
-    const response = await axios.get(`${apiUrl}/admin/ticket/${id}`);
+    const response = await axiosInstance.get(`${apiUrl}/admin/ticket/${id}`);
     return response.data.ticket;
   }
 );
@@ -57,7 +57,7 @@ export const updateTicket = createAsyncThunk(
   "tickets/updateTicket",
   async (ticketData: Partial<Ticket> & { id: string }) => {
     const { id, ...data } = ticketData; // Destructure id and the rest of the data
-    const response = await axios.post(`${apiUrl}/admin/update-ticket`, {
+    const response = await axiosInstance.post(`${apiUrl}/admin/update-ticket`, {
       id,
       ...data, // Pass the rest of the ticket data to the API
     });
@@ -68,7 +68,7 @@ export const updateTicket = createAsyncThunk(
 export const deleteTicket = createAsyncThunk(
   "tickets/deleteTicket",
   async (id: string) => {
-    await axios.post(`${apiUrl}/admin/delete-ticket`, { id });
+    await axiosInstance.post(`${apiUrl}/admin/delete-ticket`, { id });
     return id;
   }
 );

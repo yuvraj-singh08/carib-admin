@@ -1,5 +1,6 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
 
 export type FlightRule = {
   id: string;
@@ -17,7 +18,7 @@ const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 export const fetchFlightRules = createAsyncThunk(
   "flightRules/fetchFlightRules",
   async () => {
-    const response = await axios.get(`${apiUrl}/admin/firewall`);
+    const response = await axiosInstance.get(`${apiUrl}/admin/firewall`);
     return response.data.firewall;
   }
 );
@@ -25,7 +26,7 @@ export const fetchFlightRules = createAsyncThunk(
 export const addFlightRule = createAsyncThunk(
   "flightRules/addFlightRule",
   async (data: Omit<FlightRule, "id" | "updateTime">) => {
-    const response = await axios.post(`${apiUrl}/admin/add-firewall`, data);
+    const response = await axiosInstance.post(`${apiUrl}/admin/add-firewall`, data);
     return response.data.firewall; 
   }
 );
@@ -33,7 +34,7 @@ export const addFlightRule = createAsyncThunk(
 export const deleteFlightRule = createAsyncThunk(
   "flightRules/deleteFlightRule",
   async (id: string) => {
-    await axios.post(`${apiUrl}/admin/delete-firewall`, { id });
+    await axiosInstance.post(`${apiUrl}/admin/delete-firewall`, { id });
     return id;
   }
 );

@@ -1,5 +1,5 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 
 export interface CommissionType {
   id: string;
@@ -22,7 +22,7 @@ const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 export const fetchCommissions = createAsyncThunk(
   "commissionManager/fetchCommissions",
   async () => {
-    const response = await axios.get(`${apiUrl}/admin/commission`);
+    const response = await axiosInstance.get(`${apiUrl}/admin/commission`);
     return response.data.commission;
   }
 );
@@ -30,7 +30,7 @@ export const fetchCommissions = createAsyncThunk(
 export const addCommission = createAsyncThunk(
   "commissionManager/addCommission",
   async (data: Omit<CommissionType, "id" | "updateTime">) => {
-    const response = await axios.post(`${apiUrl}/admin/add-commission`, data);
+    const response = await axiosInstance.post(`${apiUrl}/admin/add-commission`, data);
     return response.data.commission;
   }
 );
@@ -38,7 +38,7 @@ export const addCommission = createAsyncThunk(
 export const updateCommission = createAsyncThunk(
   "commissionManager/updateCommission",
   async (data: CommissionType) => {
-    const response = await axios.post(`${apiUrl}/admin/update-commission`, data);
+    const response = await axiosInstance.post(`${apiUrl}/admin/update-commission`, data);
     return response.data.commission;
   }
 );
@@ -46,7 +46,7 @@ export const updateCommission = createAsyncThunk(
 export const deleteCommission = createAsyncThunk(
   "commissionManager/deleteCommission",
   async (id: string) => {
-    await axios.post(`${apiUrl}/admin/delete-commission`, { id });
+    await axiosInstance.post(`${apiUrl}/admin/delete-commission`, { id });
     return id;
   }
 );
@@ -55,7 +55,7 @@ export const deleteCommission = createAsyncThunk(
 export const fetchCommissionTypes = createAsyncThunk(
   "commissionManager/fetchCommissionTypes",
   async () => {
-    const response = await axios.get(`${apiUrl}/admin/types`);
+    const response = await axiosInstance.get(`${apiUrl}/admin/types`);
     return response.data.commissionTypes;
   }
 );
@@ -63,7 +63,7 @@ export const fetchCommissionTypes = createAsyncThunk(
 export const addCommissionType = createAsyncThunk(
   "commissionManager/addCommissionType",
   async (type: string) => {
-    const response = await axios.post(`${apiUrl}/admin/add-type`, { type });
+    const response = await axiosInstance.post(`${apiUrl}/admin/add-type`, { type });
     return response.data.commissionType;
   }
 );
@@ -71,7 +71,7 @@ export const addCommissionType = createAsyncThunk(
 export const updateCommissionType = createAsyncThunk(
   "commissionManager/updateCommissionType",
   async ({ id, type }: { id: string; type: string }) => {
-    const response = await axios.post(`${apiUrl}/admin/update-type`, { id, type });
+    const response = await axiosInstance.post(`${apiUrl}/admin/update-type`, { id, type });
     return response.data.commissionType;
   }
 );
@@ -79,7 +79,7 @@ export const updateCommissionType = createAsyncThunk(
 export const deleteCommissionType = createAsyncThunk(
   "commissionManager/deleteCommissionType",
   async (id: string) => {
-    await axios.post(`${apiUrl}/admin/delete-type`, { id });
+    await axiosInstance.post(`${apiUrl}/admin/delete-type`, { id });
     return id;
   }
 );

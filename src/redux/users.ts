@@ -1,5 +1,5 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 
 export interface User {
   id: string;
@@ -37,14 +37,14 @@ const initialState: UserState = {
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL as string;
 
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
-  const response = await axios.get<User[]>(`${API_BASE_URL}/user`);
+  const response = await axiosInstance.get<User[]>(`${API_BASE_URL}/user`);
   return response.data;
 });
 
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (id: string) => {
-    const response = await axios.get<User>(`${API_BASE_URL}/user/${id}`);
+    const response = await axiosInstance.get<User>(`${API_BASE_URL}/user/${id}`);
     return response.data;
   }
 );
@@ -52,7 +52,7 @@ export const getUserById = createAsyncThunk(
 export const updateUserProfile = createAsyncThunk(
   "users/updateUserProfile",
   async (userData: Partial<User>) => {
-    const response = await axios.put<User>(
+    const response = await axiosInstance.put<User>(
       `${API_BASE_URL}/user/profile`,
       userData
     );
@@ -63,7 +63,7 @@ export const updateUserProfile = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "users/updateUser",
   async (userData: User) => {
-    const response = await axios.put<User>(
+    const response = await axiosInstance.put<User>(
       `${API_BASE_URL}/admin/user`,
       userData
     );
@@ -74,7 +74,7 @@ export const updateUser = createAsyncThunk(
 export const deleteUser = createAsyncThunk(
   "users/deleteUser",
   async (id: string) => {
-    await axios.post(`${API_BASE_URL}/admin/user/${id}`);
+    await axiosInstance.post(`${API_BASE_URL}/admin/user/${id}`);
     return id;
   }
 );

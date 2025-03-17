@@ -1,5 +1,5 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 
 export type SocialPlatform = {
   platform: string;
@@ -19,7 +19,7 @@ export const fetchSocialSettings = createAsyncThunk<SocialSettings[]>(
   "socialSettings/fetchSocialSettings",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${apiUrl}/admin/socials`);
+      const response = await axiosInstance.get(`${apiUrl}/admin/socials`);
       return response.data.socials as SocialSettings[];
     } catch (error: any) {
       return rejectWithValue(
@@ -33,7 +33,7 @@ export const fetchSocialSettingById = createAsyncThunk<SocialSettings, string>(
   "socialSettings/fetchSocialSettingById",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${apiUrl}/admin/get-social`, { id });
+      const response = await axiosInstance.post(`${apiUrl}/admin/get-social`, { id });
       return response.data.social as SocialSettings;
     } catch (error: any) {
       return rejectWithValue(
@@ -48,7 +48,7 @@ export const addSocialSettings = createAsyncThunk<
   Omit<SocialSettings, "id">
 >("socialSettings/addSocialSettings", async (data, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`${apiUrl}/admin/add-social`, data);
+    const response = await axiosInstance.post(`${apiUrl}/admin/add-social`, data);
     return response.data.social as SocialSettings;
   } catch (error: any) {
     return rejectWithValue(
@@ -62,7 +62,7 @@ export const updateSocialSettings = createAsyncThunk<
   SocialSettings
 >("socialSettings/updateSocialSettings", async (data, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`${apiUrl}/admin/update-social`, data);
+    const response = await axiosInstance.post(`${apiUrl}/admin/update-social`, data);
     return response.data.social as SocialSettings;
   } catch (error: any) {
     return rejectWithValue(
@@ -75,7 +75,7 @@ export const deleteSocialSettings = createAsyncThunk<string, string>(
   "socialSettings/deleteSocialSettings",
   async (id, { rejectWithValue }) => {
     try {
-      await axios.post(`${apiUrl}/admin/delete-social`, { id });
+      await axiosInstance.post(`${apiUrl}/admin/delete-social`, { id });
       return id;
     } catch (error: any) {
       return rejectWithValue(

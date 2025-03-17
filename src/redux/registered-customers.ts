@@ -1,3 +1,4 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -62,7 +63,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL as string;
 export const fetchCustomers = createAsyncThunk(
   "users/fetchCustomers",
   async () => {
-    const response = await axios.get<Customer[]>(`${API_BASE_URL}/user`);
+    const response = await axiosInstance.get<Customer[]>(`${API_BASE_URL}/user`);
     // Filter out customers with "ADMIN" role
     return response.data.filter(customer => customer.role !== "ADMIN");
   }
@@ -73,7 +74,7 @@ export const deleteCustomer = createAsyncThunk(
   "users/deleteCustomer",
   async (id: string, { rejectWithValue }) => {
     try {
-      await axios.post(`${API_BASE_URL}/user/del-user`, { id });
+      await axiosInstance.post(`${API_BASE_URL}/user/del-user`, { id });
       return id;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -88,7 +89,7 @@ export const blockCustomer = createAsyncThunk(
   "users/blockCustomer",
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/user/block`, { id });
+      const response = await axiosInstance.post(`${API_BASE_URL}/user/block`, { id });
       return { id, message: response.data.message };
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -103,7 +104,7 @@ export const unblockCustomer = createAsyncThunk(
   "users/unblockCustomer",
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/user/unblock`, { id });
+      const response = await axiosInstance.post(`${API_BASE_URL}/user/unblock`, { id });
       return { id, message: response.data.message };
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

@@ -1,5 +1,6 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
 
 const apiUrl = import.meta.env.VITE_BACKEND_URL as string;
 
@@ -35,7 +36,7 @@ const initialState: UserState = {
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
   async () => {
-    const response = await axios.get(`${apiUrl}/admin/users`);
+    const response = await axiosInstance.get(`${apiUrl}/admin/users`);
     return response.data.users;
   }
 );
@@ -44,7 +45,7 @@ export const fetchUsers = createAsyncThunk(
 export const fetchUserById = createAsyncThunk(
   "users/fetchUserById",
   async (id: string) => {
-    const response = await axios.get(`${apiUrl}/admin/user/${id}`);
+    const response = await axiosInstance.get(`${apiUrl}/admin/user/${id}`);
     return response.data.user;
   }
 );
@@ -53,7 +54,7 @@ export const fetchUserById = createAsyncThunk(
 export const addUser = createAsyncThunk(
   "users/addUser",
   async (userData: Omit<ManageUser, "id" | "password"> & { roleId: string }) => {
-    const response = await axios.post(`${apiUrl}/admin/add-user`, {
+    const response = await axiosInstance.post(`${apiUrl}/admin/add-user`, {
       ...userData,
       role: {
         connect: {
@@ -69,7 +70,7 @@ export const addUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "users/updateUser",
   async (userData: Partial<ManageUser> & { id: string }) => {
-    const response = await axios.post(`${apiUrl}/admin/update-user`, userData);
+    const response = await axiosInstance.post(`${apiUrl}/admin/update-user`, userData);
     return response.data.user;
   }
 );
@@ -78,7 +79,7 @@ export const updateUser = createAsyncThunk(
 export const deleteUser = createAsyncThunk(
   "users/deleteUser",
   async (id: string) => {
-    await axios.post(`${apiUrl}/admin/delete-user`, { id });
+    await axiosInstance.post(`${apiUrl}/admin/delete-user`, { id });
     return id;
   }
 );

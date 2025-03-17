@@ -1,3 +1,4 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -41,7 +42,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL as string;
 export const createSearchManagement = createAsyncThunk(
   "searchManagement/create",
   async (data: Omit<SearchManagement, "id" | "lastUpdate">) => {
-    const response = await axios.post<SearchManagement>(
+    const response = await axiosInstance.post<SearchManagement>(
       `${API_BASE_URL}/admin/add-search`,
       data
     );
@@ -52,7 +53,7 @@ export const createSearchManagement = createAsyncThunk(
 export const getSearchManagement = createAsyncThunk(
   "searchManagement/getAll",
   async () => {
-    const response = await axios.get<SearchManagement[]>(
+    const response = await axiosInstance.get<SearchManagement[]>(
       `${API_BASE_URL}/admin/search`
     );
     return response.data;
@@ -63,7 +64,7 @@ export const updateSearchManagement = createAsyncThunk(
   "searchManagement/update",
   async (data: SearchManagement, { rejectWithValue }) => {
     try {
-      const response = await axios.post<SearchManagement>(
+      const response = await axiosInstance.post<SearchManagement>(
         `${API_BASE_URL}/admin/update-search`,
         data
       );
@@ -80,7 +81,7 @@ export const updateSearchManagement = createAsyncThunk(
 export const deleteSearchManagement = createAsyncThunk(
   "searchManagement/delete",
   async (id: string) => {
-    await axios.post(`${API_BASE_URL}/admin/delete-search`, { id });
+    await axiosInstance.post(`${API_BASE_URL}/admin/delete-search`, { id });
     return id;
   }
 );

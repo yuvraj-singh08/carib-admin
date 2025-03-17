@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { uploadImage } from "@/hooks/aws";
-import axios from "axios";
+import { axiosInstance } from "@/provider/axios";
 
 // Define the API endpoints
 const POST_API_URL = "https://travelcarib.tekniche.xyz/admin/add-blog";
@@ -63,7 +63,7 @@ export const postBlog = createAsyncThunk(
         secondaryDesc: blogData.secondaryDesc,
       };
 
-      const response = await axios.post(POST_API_URL, newData);
+      const response = await axiosInstance.post(POST_API_URL, newData);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -78,7 +78,7 @@ export const getBlogs = createAsyncThunk(
   "blog/getBlogs",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(GET_API_URL);
+      const response = await axiosInstance.get(GET_API_URL);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(

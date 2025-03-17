@@ -1,5 +1,5 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 
 interface PrivacyPolicy {
   id: string;
@@ -26,7 +26,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL as string;
 export const addPrivacyPolicy = createAsyncThunk(
   "privacyPolicy/addPrivacyPolicy",
   async (privacyPolicyData: Omit<PrivacyPolicy, "id">) => {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_BASE_URL}/admin/add-privacy`,
       privacyPolicyData
     );
@@ -37,7 +37,7 @@ export const addPrivacyPolicy = createAsyncThunk(
 export const getPrivacyPolicies = createAsyncThunk(
   "privacyPolicy/getPrivacyPolicies",
   async () => {
-    const response = await axios.get(`${API_BASE_URL}/admin/privacies`);
+    const response = await axiosInstance.get(`${API_BASE_URL}/admin/privacies`);
     return response.data.privacy;
   }
 );
@@ -45,7 +45,7 @@ export const getPrivacyPolicies = createAsyncThunk(
 export const getPrivacyPolicyById = createAsyncThunk(
   "privacyPolicy/getPrivacyPolicyById",
   async (id: string) => {
-    const response = await axios.post(`${API_BASE_URL}/admin/privacy/`, { id });
+    const response = await axiosInstance.post(`${API_BASE_URL}/admin/privacy/`, { id });
     return response.data.privacy;
   }
 );
@@ -53,7 +53,7 @@ export const getPrivacyPolicyById = createAsyncThunk(
 export const updatePrivacyPolicy = createAsyncThunk(
   "privacyPolicy/updatePrivacyPolicy",
   async (privacyPolicyData: PrivacyPolicy) => {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_BASE_URL}/admin/update-privacy`,
       privacyPolicyData
     );
@@ -64,7 +64,7 @@ export const updatePrivacyPolicy = createAsyncThunk(
 export const deletePrivacyPolicy = createAsyncThunk(
   "privacyPolicy/deletePrivacyPolicy",
   async (id: string) => {
-    await axios.post(`${API_BASE_URL}/admin/delete-privacy`, { id });
+    await axiosInstance.post(`${API_BASE_URL}/admin/delete-privacy`, { id });
     return id;
   }
 );

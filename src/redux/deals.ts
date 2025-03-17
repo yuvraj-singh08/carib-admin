@@ -1,5 +1,6 @@
+import { axiosInstance } from "@/provider/axios";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+
 
 export interface Deal {
   id: string;
@@ -38,7 +39,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL as string;
 export const createDeal = createAsyncThunk(
   "deals/createDeal",
   async (dealData: Omit<Deal, "id">) => {
-    const response = await axios.post<Deal>(
+    const response = await axiosInstance.post<Deal>(
       `${API_BASE_URL}/admin/add-deal`,
       dealData
     );
@@ -47,14 +48,14 @@ export const createDeal = createAsyncThunk(
 );
 
 export const getDeals = createAsyncThunk("deals/getDeals", async () => {
-  const response = await axios.get<Deal[]>(`${API_BASE_URL}/admin/deals`);
+  const response = await axiosInstance.get<Deal[]>(`${API_BASE_URL}/admin/deals`);
   return response.data;
 });
 
 export const getDealById = createAsyncThunk(
   "deals/getDealById",
   async (id: string) => {
-    const response = await axios.get<Deal>(`${API_BASE_URL}/deal/${id}`);
+    const response = await axiosInstance.get<Deal>(`${API_BASE_URL}/deal/${id}`);
     return response.data;
   }
 );
@@ -62,7 +63,7 @@ export const getDealById = createAsyncThunk(
 export const getDealByCode = createAsyncThunk(
   "deals/getDealByCode",
   async (code: string) => {
-    const response = await axios.get<{ deal: Deal }>(`${API_BASE_URL}/deal/code/${code}`);
+    const response = await axiosInstance.get<{ deal: Deal }>(`${API_BASE_URL}/deal/code/${code}`);
     return response.data.deal;
   }
 );
@@ -70,7 +71,7 @@ export const getDealByCode = createAsyncThunk(
 export const updateDeal = createAsyncThunk(
   "deals/updateDeal",
   async (dealData: Deal) => {
-    const response = await axios.post<Deal>(
+    const response = await axiosInstance.post<Deal>(
       `${API_BASE_URL}/admin/update-deal`,
       dealData
     );
@@ -81,7 +82,7 @@ export const updateDeal = createAsyncThunk(
 export const deleteDeal = createAsyncThunk(
   "deals/deleteDeal",
   async (id: string) => {
-    await axios.post(`${API_BASE_URL}/admin/delete-deal`, { id });
+    await axiosInstance.post(`${API_BASE_URL}/admin/delete-deal`, { id });
     return id;
   }
 );
